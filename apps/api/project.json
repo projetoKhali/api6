@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run python apps/api/main.py"
+      }
+    },
+    "add": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry add {args.dep}"
+      }
+    }
+  }
+}

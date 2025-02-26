@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "api"
+version = "0.1.0"
+readme = "README.md"
+package-mode = false
+
+[[tool.poetry.packages]]
+include = "api"
+
+[tool.poetry.dependencies]
+python = "*"
+flask = "*"
+flask-cors = "*"
+pymongo = "*"
+psycopg2 = "*"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "*"
+flake8 = "*"
+pytest = "*"
+pytest-sugar = "*"
+pytest-cov = "*"
+pytest-html = "*"
+
+[tool.nx]
+autoActivate = true
