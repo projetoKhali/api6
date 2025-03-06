@@ -1,77 +1,205 @@
-# Api6
+<br id="topo">
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
-
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
-
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-
-## Finish your CI setup
-
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Y7L5elMcBh)
+![API6](https://github.com/user-attachments/assets/a9f5c228-61f2-4c7e-834c-c37635a21f42)
 
 
-## Run tasks
+<p align="center">
+    <a href="#sobre">Sobre</a> |
+    <a href="#backlogproduto">Backlog do produto</a>  |
+    <a href="#backlogsprint">Backlog da sprint </a> |
+    <a href="#entrega">Entrega das Sprints</a>  |
+    <a href="#burndown">Burndown</a>  |
+    <a href="#gerenciamento">Gerenciamento do projeto</a>  |
+    <a href="#documentacoes">Documentações</a>  |
+    <a href="#prototipo">Protótipo</a>     |
+    <a href="#tecnologias">Tecnologias</a>  |
+    <a href="#equipe">Equipe</a>        
+</p>
 
-To run tasks with Nx use:
+<span id="sobre">
 
-```sh
-npx nx <target> <project-name>
-```
+## Desafio
 
-For example:
+O desafio proposto pela empresa <a href="https://www.kersys.com.br/"> Kersys </a> consiste no desenvolvimento de um Sistema Inteligente de Planejamento e Monitoramento de Reflorestamento (SIPMR) para otimizar a recuperação ambiental. O sistema utilizará análise de dados e machine learning para prever padrões de crescimento, sugerir estratégias de plantio e monitorar a evolução das áreas reflorestadas. Com isso, buscamos melhorar a eficiência do reflorestamento, antecipando riscos ambientais e facilitando a tomada de decisão para um planejamento sustentável.
 
-```sh
-npx nx build myproject
-```
+## Proposta
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Nossa proposta consiste em um...
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+<span id="backlogproduto">
 
-## Add new projects
+## Backlog do produto
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+<details>
 
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
-
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
-
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+<summary>Confira nosso Backlog</summary>
+    
+| Épico  | Story | Prioridade | Critérios de aceite | Código do Requisito | Sprint |
+|-----------------|------------------------------|------------------------------------------------------|------------|----------------|----------------|
+|  -  | -   | -|  - | - | - |
 
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+</details>
 
-## Install Nx Console
+<details>
+<summary>Requisitos do projeto </summary>
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+| Código  | Tipo           | Descrição                                                                                                        | Prioridade |
+|---------|----------------|------------------------------------------------------------------------------------------------------------------|------------|
+| RF-01   | Funcional      |              |       |
+| RF-02   | Funcional      |         |       |
+| RF-03   | Funcional      |  |      |
+| RF-04   | Funcional      |      |     |
+| RF-05   | Funcional      |  |    |
+| RF-06   | Funcional      |  |      |
+| RNF-01  | Não Funcional  |        |       |
+| RNF-02  | Não Funcional  |        |       |
+| RNF-03  | Não Funcional  |              |       |
+| RNF-04  | Não Funcional  |  |      |
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+</details>
 
-## Useful links
 
-Learn more:
+<span id="backlogsprint">
+    
+## Backlog da sprint
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+<details open>
+<summary>Sprint 1 </summary>
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+| **Épico** | **Funcionalidade** | **Pontuação** |
+| :-------- | :-------- | :-----------: |
+| -       | -     |  -   |
+| -         | -| - |
+
+</details>
+
+<span id="entrega">
+
+
+## Entrega das sprints
+
+<details>
+
+<summary>Sprint 1 - </summary>
+
+### De 10/03 a 30/03
+#
+
+</details>
+
+<span id="burndown">
+
+## Burndown
+
+<details>
+<summary> Sprint 1 </summary>
+    
+
+
+</details>
+
+
+
+<span id="gerenciamento">
+
+## Gerenciamento do projeto 
+
+<a href="">Github Projects</a>
+
+<span id="documentacoes">
+
+## Documentações 
+
+>Confira nossas documentações: https://github.com/projetoKhali/api6-docs
+<br>
+
+
+<span id="prototipo">
+
+## Protótipo
+
+<a href="">Figma</a>
+
+<span id="tecnologias">
+
+</br>
+
+## Tecnologias
+
+<h3 style="color: #C1FF72  "> Front-end </h3>
+
+<img height= 80 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" />
+
+> React
+          
+<h3 style="color: #C1FF72  "> Back-end </h3>
+
+
+<img width= 80 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" />
+          
+
+> Python         
+          
+
+#
+
+
+<span id="equipe">
+
+
+![API6 equipe](https://github.com/user-attachments/assets/5bb59915-c8c6-4d2f-96f4-ff4d2a9e15d6)
+
+
+<table style="width:100%; border-collapse: collapse;">
+    <tr style="background-color: #620874; color: #06EF47;">
+        <th style="text-align: center; text-align: center; padding: 10px;">Função</th>
+        <th style="text-align: center; text-align: center; padding: 10px;">Nome</th>
+        <th style="text-align: center; text-align: center; padding: 10px;">LinkedIn & GitHub</th>
+    </tr>
+   <tr>
+        <td style="text-align: center; padding: 10px;">Scrum Master</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">Marcos Vinícius Malaquias</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">
+            <a href="https://www.linkedin.com/in/marcos-malaquias/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
+            <a href="https://github.com/Incivius"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center; text-align: center; padding: 10px;">Product Owner</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">Paulo Granthon</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">
+            <a href="https://www.linkedin.com/in/paulo-granthon/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
+            <a href="https://github.com/paulo-granthon"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center; text-align: center; padding: 10px;">Developer</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">Jhonatan Lopes</td>
+        <td style="text-align: center; text-align: center; padding: 10px;">
+            <a href="https://www.linkedin.com/in/jhonatan-o-lopes/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
+            <a href="https://github.com/JhonatanLop"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center; text-align: center; padding: 10px;">Developer</td>
+        <td style="text-align: center; padding: 10px;">Nicole Souza</td>
+        <td style="text-align: center; padding: 10px;">
+            <a href="https://www.linkedin.com/in/nicolem-souza/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
+            <a href="https://github.com/NicSouza"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center; padding: 10px;">Developer</td>
+        <td style="text-align: center; padding: 10px;">Tânia Cruz</td>
+        <td style="text-align: center; padding: 10px;">
+            <a href="https://www.linkedin.com/in/tânia-cruz-30ab5812a/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
+            <a href="https://github.com/taniacruzz"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+        </td>
+    </tr>
+</table>
+
+
+
+→ [Voltar ao topo](#topo)
