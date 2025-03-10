@@ -1,4 +1,3 @@
----
 version: "3.8"
 
 services:
@@ -12,6 +11,22 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+  
+  postgres_db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
 
 volumes:
   mongo_data:
+    driver: local
+  postgres_data:
+    driver: local
