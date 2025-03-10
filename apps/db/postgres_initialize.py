@@ -13,7 +13,7 @@ def create_tables(engine):
         __tablename__ = 'users'
         id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
         name = Column(String)
-        login = Column(String)
+        login = Column(String, index=True)
         password = Column(Text)
 
     class Permission(Base):
