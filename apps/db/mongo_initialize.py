@@ -33,13 +33,29 @@ def create_collections(db):
             "rain_min_med_max": [0, 0, 0],
             "rain_probability": 0
         },
-        "plantations": {
-            "plot_id": "plot_id",
-            "species_id": "species_id",
-            "irrigation": "",
-            "fertilization": "",
-            "pest_control": ""
-        }
+        "events": [
+            {
+                "type": "planting",
+                "date": "YYYY-MM-DD",
+                "planted_area": 100.0,
+                "planted_quantity": 500,
+                "irrigation": "drip"
+            },
+            {
+                "type": "maintenance",
+                "date": "YYYY-MM-DD",
+                "dead_plants": 10,
+                "average_growth": 0.5,
+                "observations": "need for fertilization"
+            },
+            {
+                "type": "harvest",
+                "date": "YYYY-MM-DD",
+                "harvested_quantity": 450,
+                "losses": 50,
+                "price": 2.5
+            }
+        ]
     }
     
     for collection, structure in collections.items():
@@ -52,6 +68,9 @@ def create_collections(db):
 
 def crud_operations(db):
     species_collection = db["species"]
+    events_collection = db["events"]
+    plots_collection = db["plots"]
+    climate_collection = db["climate"]
     
     # Create
     new_species = {
@@ -77,6 +96,71 @@ def crud_operations(db):
     # Delete
     deleted_species = species_collection.delete_one({"_id": species_id})
     print(f"Espécies deletadas: {deleted_species.deleted_count}")
+
+    new_plots = {
+        "area": 100.0,
+        "coordinates": [-22.9035, -43.2096],
+        "city": "Rio de Janeiro",
+        "state": "RJ",
+    }    
+    plot_id = plots_collection.insert_one(new_plots).inserted_id
+
+    new_climate = [
+        {
+            "day": "2023-10-01",
+            "temperature_min_med_max": [15.0, 20.0, 25.0],
+            "humidity_min_med_max": [60, 70, 80],
+            "wind_min_med_max": [0, 5, 10],
+            "rain_min_med_max": [0, 0, 0],
+            "rain_probability": 0
+        },
+        {
+            "day": "2023-10-15",
+            "temperature_min_med_max": [16.0, 21.0, 26.0],
+            "humidity_min_med_max": [65, 75, 85],
+            "wind_min_med_max": [1, 6, 11],
+            "rain_min_med_max": [0, 0, 0],
+            "rain_probability": 20
+        }
+    ]
+    result = climate_collection.insert_many(new_climate)
+    climate_ids = result.inserted_ids
+
+    print(climate_ids)
+
+    # Insert examples in events collection
+    new_events = [
+        {
+            "type": "planting",
+            "species_id": species_id,
+            "date": "2023-10-01",
+            "planted_area": 150.0,
+            "planted_quantity": 600,
+            "irrigation": "sprinkler",
+            "climate_id": climate_ids[0]
+        },
+        {
+            "type": "maintenance",
+            "species_id": species_id,
+            "date": "2023-10-15",
+            "dead_plants": 5,
+            "average_growth": 0.6,
+            "observations": "pest control needed",
+            "climate_id": climate_ids[1]
+        },
+        {
+            "type": "harvest",
+            "plots": plot_id,
+            "date": "2023-12-01",
+            "harvested_quantity": 500,
+            "losses": 30,
+            "price": 3.0
+        }
+    ]
+    
+    for event in new_events:
+        event_id = events_collection.insert_one(event).inserted_id
+        print(f"Novo evento inserido com ID: {event_id}")
 
 if __name__ == "__main__":
     db = mongo_connect("Agrodb")
