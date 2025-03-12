@@ -4,7 +4,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "poetry run python apps/api/main.py"
+        "command": "poetry run python {projectRoot}/main.py"
       }
     },
     "add": {
