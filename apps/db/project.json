@@ -1,6 +1,18 @@
 {
   "name": "db",
   "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run python {projectRoot}/main.py"
+      }
+    },
+    "add": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry add {args.dep}"
+      }
+    },
     "postgres-up": {
       "executor": "nx:run-commands",
       "options": {
