@@ -15,11 +15,20 @@ def create_collections(db):
         "species": {
             "scientific_name": "",
             "common_name": "",
-            "growth_time": "",
-            "water_requirement": ""
+            "growth_time": {
+                "unit_of_measure": "days",
+                "value": 0
+            },
+            "water_requirement": {
+                "unit_of_measure": "liters",
+                "value": 0.0
+            }
         },
         "plots": {
-            "area": 0.0,
+            "area": {
+                "unit_of_measure": "", # m², km², ha
+                "value": 0.0
+            },
             "coordinates": [0.0, 0.0],
             "city": "",
             "state": "",
@@ -27,33 +36,95 @@ def create_collections(db):
         },
         "climate": {
             "day": "YYYY-MM-DD",
-            "temperature_min_med_max": [0.0, 0.0, 0.0],
-            "humidity_min_med_max": [0, 0, 0],
-            "wind_min_med_max": [0, 0, 0],
-            "rain_min_med_max": [0, 0, 0],
-            "rain_probability": 0
+            "temperature": {
+                "min": 0.0,
+                "med": 0.0,
+                "max": 0.0,
+                "unit_of_measure": "" # °C, °F
+            },
+            "humidity": {
+                "unit_of_measure": "", # %, g/m³
+                "value": 0.0
+            },
+            "wind": {
+                "unit_of_measure": "", # km/h, m/s
+                "value": 0.0
+            },
+            "rain": {
+                "min": 0.0,
+                "med": 0.0,
+                "max": 0.0,
+                "unit_of_measure": "" # mm, in
+            },
+            "rain_probability": {
+                "unit_of_measure": "%",
+                "value": 0.0    
+            }
         },
         "events": [
             {
+                "plot_id": "",
+                "species_id": "",
+                "climate_id": "",
                 "type": "planting",
                 "date": "YYYY-MM-DD",
-                "planted_area": 100.0,
-                "planted_quantity": 500,
-                "irrigation": "drip"
+                "planted_area": {
+                    "unit_of_measure": "", # m², km², ha
+                    "value": 0.0
+                },
+                "planted_quantity": {
+                    "unit_of_measure": "", # units, kg, g
+                    "value": 0
+                },
+                "irrigation": [
+                    {
+                        "unit_of_measure": "", # liters, mm
+                        "quantity": 0.0
+                    }
+                ],
+                "observations": ""
             },
             {
+                "planting_id": "",
+                "plot_id": "",
+                "climate_id": "",
                 "type": "maintenance",
                 "date": "YYYY-MM-DD",
-                "dead_plants": 10,
-                "average_growth": 0.5,
-                "observations": "need for fertilization"
+                "dead_plants": {
+                    "unit_of_measure": "", # units, kg, g
+                    "value": 0
+                },
+                "average_growth": {
+                    "unit_of_measure": "", # cm, m  
+                    "value": 0.0
+                },
+                "fertilizer": [
+                    {
+                        "unit_of_measure": "", # kg, g
+                        "quantity": 0.0
+                    }
+                ],
+                "observations": ""
             },
             {
+                "planting_id": "",
+                "plot_id": "",
+                "climate_id": "",
                 "type": "harvest",
                 "date": "YYYY-MM-DD",
-                "harvested_quantity": 450,
-                "losses": 50,
-                "price": 2.5
+                "price": 0.0,
+                "harvested_quantity": [
+                    {
+                        "unit_of_measure": "", # units, kg, g
+                        "quantity": 0.0
+                    }
+                ],
+                "losses": [
+                    {
+                        "unit_of_measure": "", # units, kg, g
+                        "quantity": 0.0
+                    }
+                ]
             }
         ]
     }
@@ -72,92 +143,171 @@ def crud_operations(db):
     plots_collection = db["plots"]
     climate_collection = db["climate"]
     
-    # Create
+    # Species
     new_species = {
-        "scientific_name": "Solanum lycopersicum",
-        "common_name": "Tomato",
-        "growth_time": "60-80 days",
-        "water_requirement": "Moderate"
+        "scientific_name": "Solanum tuberosum",
+        "common_name": "Potato",
+        "growth_time": {
+            "unit_of_measure": "days",
+            "value": 90
+        },
+        "water_requirement": {
+            "unit_of_measure": "mm",
+            "value": 300.0
+        }
     }
     species_id = species_collection.insert_one(new_species).inserted_id
     print(f"Nova espécie inserida com ID: {species_id}")
-
     # Read
     species = species_collection.find_one({"_id": species_id})
     print(f"Espécie encontrada: {species}")
-
     # Update
     updated_species = species_collection.update_one(
         {"_id": species_id},
-        {"$set": {"common_name": "Tomato (Updated)"}}
+        {"$set": {"common_name": "Potato (Updated)"}}
     )
     print(f"Espécies atualizadas: {updated_species.modified_count}")
-
     # Delete
     deleted_species = species_collection.delete_one({"_id": species_id})
     print(f"Espécies deletadas: {deleted_species.deleted_count}")
 
+
     new_plots = {
-        "area": 100.0,
-        "coordinates": [-22.9035, -43.2096],
-        "city": "Rio de Janeiro",
-        "state": "RJ",
-    }    
+        "area": {
+            "unit_of_measure": "km²",
+            "value": 3.0
+        },
+        "coordinates": [55.3051, 130.5089],
+        "city": "",
+        "state": "",
+        "country": ""
+    }
     plot_id = plots_collection.insert_one(new_plots).inserted_id
 
     new_climate = [
         {
-            "day": "2023-10-01",
-            "temperature_min_med_max": [15.0, 20.0, 25.0],
-            "humidity_min_med_max": [60, 70, 80],
-            "wind_min_med_max": [0, 5, 10],
-            "rain_min_med_max": [0, 0, 0],
-            "rain_probability": 0
+            "day": "2024-03-12",
+            "temperature": {
+                "unit_of_measure": "°C",
+                "min": 22.0,
+                "med": 28.0,
+                "max": 30.0,
+            },
+            "humidity": {
+                "unit_of_measure": "%",
+                "med": 64.0,
+            },
+            "wind": {
+                "unit_of_measure": "km/h",
+                "med": 3.0,
+            },
+            "rain": {
+                "unit_of_measure": "mm",
+                "min": 0.0,
+                "med": 0.0,
+                "max": 0.0,
+            },
+            "rain_probability": {
+                "unit_of_measure": "%",
+                "value": 0.0
+            }
         },
         {
-            "day": "2023-10-15",
-            "temperature_min_med_max": [16.0, 21.0, 26.0],
-            "humidity_min_med_max": [65, 75, 85],
-            "wind_min_med_max": [1, 6, 11],
-            "rain_min_med_max": [0, 0, 0],
-            "rain_probability": 20
+            "day": "2024-03-13",
+            "temperature": {
+                "unit_of_measure": "°C",
+                "min": 22.0,
+                "med": 28.0,
+                "max": 30.0,
+            },
+            "humidity": {
+                "unit_of_measure": "%",
+                "med": 64.0,
+            },
+            "wind": {
+                "unit_of_measure": "km/h",
+                "med": 3.0,
+            },
+            "rain": {
+                "unit_of_measure": "mm",
+                "min": 0.0,
+                "med": 0.0,
+                "max": 0.0,
+            },
+            "rain_probability": {
+                "unit_of_measure": "%",
+                "value": 0.0
+            }
         }
     ]
     result = climate_collection.insert_many(new_climate)
     climate_ids = result.inserted_ids
 
-    print(climate_ids)
-
-    # Insert examples in events collection
+    # Evento de plantio
     new_events = [
         {
+            "plot_id": plot_id,
+            "species_id": species_id,
+            "climate_id": climate_ids[0],
             "type": "planting",
-            "species_id": species_id,
-            "date": "2023-10-01",
-            "planted_area": 150.0,
-            "planted_quantity": 600,
-            "irrigation": "sprinkler",
-            "climate_id": climate_ids[0]
+            "planted_area": {
+                "unit_of_measure": "m²",
+                "value": 230.0
+            },
+            "planted_quantity": {
+                "unit_of_measure": "units",
+                "value": 400.0
+            },
+            "irrigation": [
+                {
+                    "unit_of_measure": "liters",
+                    "quantity": 2000.0
+                }
+            ],
+            "observations": "the solo is very fertile"
         },
         {
+            "plot_id": plot_id,
+            "species_id": species_id,
+            "climate_id": climate_ids[1],
             "type": "maintenance",
-            "species_id": species_id,
-            "date": "2023-10-15",
-            "dead_plants": 5,
-            "average_growth": 0.6,
-            "observations": "pest control needed",
-            "climate_id": climate_ids[1]
+            "dead_plants": {
+                "unit_of_measure": "units",
+                "value": 10.0
+            },
+            "average_growth": {
+                "unit_of_measure": "cm",
+                "value": 5.0
+            },
+            "fertilizer": [
+                {
+                    "unit_of_measure": "kg",
+                    "quantity": 2.0
+                }
+            ],
+            "observations": "the plants are growing well"
         },
         {
+            "plot_id": plot_id,
+            "species_id": species_id,
+            "climate_id": climate_ids[1],
             "type": "harvest",
-            "plots": plot_id,
-            "date": "2023-12-01",
-            "harvested_quantity": 500,
-            "losses": 30,
-            "price": 3.0
+            "price": 2.0,
+            "harvested_quantity": [
+                {
+                    "unit_of_measure": "units",
+                    "quantity": 390.0
+                }
+            ],
+            "losses": [
+                {
+                    "unit_of_measure": "units",
+                    "quantity": 10.0
+                }
+            ]
         }
     ]
-    
+
     for event in new_events:
         event_id = events_collection.insert_one(event).inserted_id
         print(f"Novo evento inserido com ID: {event_id}")
