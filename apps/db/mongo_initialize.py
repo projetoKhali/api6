@@ -17,11 +17,11 @@ def create_collections(db):
             "scientific_name": "",
             "common_name": "",
             "growth_time": {
-                "unit_of_measure": "days",
+                "unit_of_measure": "", # days, months, years
                 "value": 0
             },
             "water_requirement": {
-                "unit_of_measure": "liters",
+                "unit_of_measure": "", # liters, m³, mm³
                 "value": 0.0
             }
         },
@@ -64,17 +64,17 @@ def create_collections(db):
         },
         "events": [
             {
+                "species_id": ObjectId(),
                 "plot_id": ObjectId(),
                 "climate_id": ObjectId(),
                 "type": "planting",
-                "date": "YYYY-MM-DD",
                 "planted_area": {
                     "unit_of_measure": "", # m², km², ha
                     "value": 0.0
                 },
                 "planted_quantity": {
                     "unit_of_measure": "", # units, kg, g
-                    "value": 0
+                    "value": 0.0
                 },
                 "irrigation": [
                     {
@@ -86,10 +86,10 @@ def create_collections(db):
             },
             {
                 "planting_id": ObjectId(),
+                "species_id": ObjectId(),
                 "plot_id": ObjectId(),
                 "climate_id": ObjectId(),
                 "type": "maintenance",
-                "date": "YYYY-MM-DD",
                 "dead_plants": {
                     "unit_of_measure": "", # units, kg, g
                     "value": 0
@@ -108,10 +108,10 @@ def create_collections(db):
             },
             {
                 "planting_id": ObjectId(),
+                "species_id": ObjectId(),
                 "plot_id": ObjectId(),
                 "climate_id": ObjectId(),
                 "type": "harvest",
-                "date": "YYYY-MM-DD",
                 "price": 0.0,
                 "harvested_quantity": [
                     {
@@ -132,8 +132,7 @@ def create_collections(db):
     for collection, structure in collections.items():
         if (collection not in db.list_collection_names()):
             db.create_collection(collection)
-            db[collection].insert_one(structure)
-            print(f"Coleção '{collection}' criada com estrutura padrão.")
+            print(f"Coleção '{collection}' criada.")
         else:
             print(f"Coleção '{collection}' já existe.")
     
@@ -251,31 +250,35 @@ def crud_operations(db):
     climate_ids = result.inserted_ids
 
     # Evento de plantio
+    planting_event = {
+        "species_id": ObjectId(species_id),
+        "plot_id": ObjectId(plot_id),
+        "climate_id": ObjectId(climate_ids[0]),
+        "type": "planting",
+        "planted_area": {
+            "unit_of_measure": "m²",
+            "value": 230.0
+        },
+        "planted_quantity": {
+            "unit_of_measure": "units",
+            "value": 400.0
+        },
+        "irrigation": [
+            {
+                "unit_of_measure": "liters",
+                "quantity": 2000.0
+            }
+        ],
+        "observations": "the solo is very fertile"
+    }
+
+    planting_id = events_collection.insert_one(planting_event).inserted_id
+
     new_events = [
         {
-            "plot_id": ObjectId(plot_id),
+            "planting_id": ObjectId(planting_id),
             "species_id": ObjectId(species_id),
-            "climate_id": ObjectId(climate_ids[0]),
-            "type": "planting",
-            "planted_area": {
-                "unit_of_measure": "m²",
-                "value": 230.0
-            },
-            "planted_quantity": {
-                "unit_of_measure": "units",
-                "value": 400.0
-            },
-            "irrigation": [
-                {
-                    "unit_of_measure": "liters",
-                    "quantity": 2000.0
-                }
-            ],
-            "observations": "the solo is very fertile"
-        },
-        {
             "plot_id": ObjectId(plot_id),
-            "species_id": ObjectId(species_id),
             "climate_id": ObjectId(climate_ids[1]),
             "type": "maintenance",
             "dead_plants": {
@@ -295,8 +298,9 @@ def crud_operations(db):
             "observations": "the plants are growing well"
         },
         {
-            "plot_id": ObjectId(plot_id),
+            "planting_id": ObjectId(planting_id),
             "species_id": ObjectId(species_id),
+            "plot_id": ObjectId(plot_id),
             "climate_id": ObjectId(climate_ids[1]),
             "type": "harvest",
             "price": 2.0,
@@ -322,4 +326,4 @@ def crud_operations(db):
 if __name__ == "__main__":
     db = mongo_connect("Agrodb")
     create_collections(db)
-    # crud_operations(db)
+    crud_operations(db)
