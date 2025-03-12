@@ -1,0 +1,42 @@
+{
+  "name": "db",
+  "targets": {
+    "postgres-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres"
+      }
+    },
+    "mongo-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d mongo"
+      }
+    },
+    "postgres-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml down"
+      }
+    },
+    "mongo-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml down"
+      }
+    },
+    "pg-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run infra:postgres-up"
+      }
+    },
+    "pg-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run infra:postgres-down"
+      }
+    }
+  }
+}
+
