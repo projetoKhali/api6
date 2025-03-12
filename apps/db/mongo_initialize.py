@@ -1,4 +1,5 @@
-from pymongo import MongoClient
+from pymongo import ASCENDING, MongoClient
+from bson.objectid import ObjectId
 
 def mongo_connect(database_name, url="mongodb://admin:password@localhost:27017/"):
     try:
@@ -63,9 +64,8 @@ def create_collections(db):
         },
         "events": [
             {
-                "plot_id": "",
-                "species_id": "",
-                "climate_id": "",
+                "plot_id": ObjectId(),
+                "climate_id": ObjectId(),
                 "type": "planting",
                 "date": "YYYY-MM-DD",
                 "planted_area": {
@@ -85,9 +85,9 @@ def create_collections(db):
                 "observations": ""
             },
             {
-                "planting_id": "",
-                "plot_id": "",
-                "climate_id": "",
+                "planting_id": ObjectId(),
+                "plot_id": ObjectId(),
+                "climate_id": ObjectId(),
                 "type": "maintenance",
                 "date": "YYYY-MM-DD",
                 "dead_plants": {
@@ -107,9 +107,9 @@ def create_collections(db):
                 "observations": ""
             },
             {
-                "planting_id": "",
-                "plot_id": "",
-                "climate_id": "",
+                "planting_id": ObjectId(),
+                "plot_id": ObjectId(),
+                "climate_id": ObjectId(),
                 "type": "harvest",
                 "date": "YYYY-MM-DD",
                 "price": 0.0,
@@ -136,6 +136,13 @@ def create_collections(db):
             print(f"Coleção '{collection}' criada com estrutura padrão.")
         else:
             print(f"Coleção '{collection}' já existe.")
+    
+    db.species.create_index([("scientific_name", ASCENDING)], unique=True)
+    db.plots.create_index([("coordinates", ASCENDING)])  # Índice geoespacial
+    db.climate.create_index([("day", ASCENDING)])
+    db.events.create_index([("plot_id", ASCENDING), ("species_id", ASCENDING), ("climate_id", ASCENDING)])
+
+    print("📌 Índices criados com sucesso!")
 
 def crud_operations(db):
     species_collection = db["species"]
@@ -246,9 +253,9 @@ def crud_operations(db):
     # Evento de plantio
     new_events = [
         {
-            "plot_id": plot_id,
-            "species_id": species_id,
-            "climate_id": climate_ids[0],
+            "plot_id": ObjectId(plot_id),
+            "species_id": ObjectId(species_id),
+            "climate_id": ObjectId(climate_ids[0]),
             "type": "planting",
             "planted_area": {
                 "unit_of_measure": "m²",
@@ -267,9 +274,9 @@ def crud_operations(db):
             "observations": "the solo is very fertile"
         },
         {
-            "plot_id": plot_id,
-            "species_id": species_id,
-            "climate_id": climate_ids[1],
+            "plot_id": ObjectId(plot_id),
+            "species_id": ObjectId(species_id),
+            "climate_id": ObjectId(climate_ids[1]),
             "type": "maintenance",
             "dead_plants": {
                 "unit_of_measure": "units",
@@ -288,9 +295,9 @@ def crud_operations(db):
             "observations": "the plants are growing well"
         },
         {
-            "plot_id": plot_id,
-            "species_id": species_id,
-            "climate_id": climate_ids[1],
+            "plot_id": ObjectId(plot_id),
+            "species_id": ObjectId(species_id),
+            "climate_id": ObjectId(climate_ids[1]),
             "type": "harvest",
             "price": 2.0,
             "harvested_quantity": [
@@ -315,4 +322,4 @@ def crud_operations(db):
 if __name__ == "__main__":
     db = mongo_connect("Agrodb")
     create_collections(db)
-    crud_operations(db)
+    # crud_operations(db)
