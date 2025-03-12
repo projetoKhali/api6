@@ -66,7 +66,7 @@ def create_collections(db):
             {
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate_id": ObjectId(),
+                "climate": {}, # Objeto do tipo climate
                 "type": "planting",
                 "planted_area": {
                     "unit_of_measure": "", # m², km², ha
@@ -88,7 +88,7 @@ def create_collections(db):
                 "planting_id": ObjectId(),
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate_id": ObjectId(),
+                "climate": {},
                 "type": "maintenance",
                 "dead_plants": {
                     "unit_of_measure": "", # units, kg, g
@@ -110,7 +110,7 @@ def create_collections(db):
                 "planting_id": ObjectId(),
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate_id": ObjectId(),
+                "climate": {},
                 "type": "harvest",
                 "price": 0.0,
                 "harvested_quantity": [
@@ -253,7 +253,7 @@ def crud_operations(db):
     planting_event = {
         "species_id": ObjectId(species_id),
         "plot_id": ObjectId(plot_id),
-        "climate_id": ObjectId(climate_ids[0]),
+        "climate": new_climate[0],
         "type": "planting",
         "planted_area": {
             "unit_of_measure": "m²",
@@ -279,7 +279,7 @@ def crud_operations(db):
             "planting_id": ObjectId(planting_id),
             "species_id": ObjectId(species_id),
             "plot_id": ObjectId(plot_id),
-            "climate_id": ObjectId(climate_ids[1]),
+            "climate": new_climate[1],
             "type": "maintenance",
             "dead_plants": {
                 "unit_of_measure": "units",
@@ -301,7 +301,7 @@ def crud_operations(db):
             "planting_id": ObjectId(planting_id),
             "species_id": ObjectId(species_id),
             "plot_id": ObjectId(plot_id),
-            "climate_id": ObjectId(climate_ids[1]),
+            "climate": new_climate[1],
             "type": "harvest",
             "price": 2.0,
             "harvested_quantity": [
