@@ -1,7 +1,7 @@
 from pymongo import ASCENDING, MongoClient
 from bson.objectid import ObjectId
 
-def mongo_connect(database_name, url="mongodb://admin:password@localhost:27017/"):
+def mongo_connect(database_name, url="mongodb://mongo:secret@localhost:27017/"):
     try:
         client = MongoClient(url)
         db = client[database_name]
@@ -35,38 +35,37 @@ def create_collections(db):
             "state": "",
             "country": ""
         },
-        "climate": {
-            "day": "YYYY-MM-DD",
-            "temperature": {
-                "min": 0.0,
-                "med": 0.0,
-                "max": 0.0,
-                "unit_of_measure": "" # °C, °F
-            },
-            "humidity": {
-                "unit_of_measure": "", # %, g/m³
-                "value": 0.0
-            },
-            "wind": {
-                "unit_of_measure": "", # km/h, m/s
-                "value": 0.0
-            },
-            "rain": {
-                "min": 0.0,
-                "med": 0.0,
-                "max": 0.0,
-                "unit_of_measure": "" # mm, in
-            },
-            "rain_probability": {
-                "unit_of_measure": "%",
-                "value": 0.0    
-            }
-        },
         "events": [
             {
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate": {}, # Objeto do tipo climate
+                "climate": {
+                    "day": "YYYY-MM-DD",
+                    "temperature": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": "" # °C, °F
+                    },
+                    "humidity": {
+                        "unit_of_measure": "", # %, g/m³
+                        "value": 0.0
+                    },
+                    "wind": {
+                        "unit_of_measure": "", # km/h, m/s
+                        "value": 0.0
+                    },
+                    "rain": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": "" # mm, in
+                    },
+                    "rain_probability": {
+                        "unit_of_measure": "%",
+                        "value": 0.0    
+                    }
+                },
                 "type": "planting",
                 "planted_area": {
                     "unit_of_measure": "", # m², km², ha
@@ -88,19 +87,45 @@ def create_collections(db):
                 "planting_id": ObjectId(),
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate": {},
+                "climate": {
+                    "day": "YYYY-MM-DD",
+                    "temperature": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": ""
+                    },
+                    "humidity": {
+                        "unit_of_measure": "",
+                        "value": 0.0
+                    },
+                    "wind": {
+                        "unit_of_measure": "",
+                        "value": 0.0
+                    },
+                    "rain": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": ""
+                    },
+                    "rain_probability": {
+                        "unit_of_measure": "%",
+                        "value": 0.0    
+                    }
+                },
                 "type": "maintenance",
                 "dead_plants": {
-                    "unit_of_measure": "", # units, kg, g
+                    "unit_of_measure": "",
                     "value": 0
                 },
                 "average_growth": {
-                    "unit_of_measure": "", # cm, m  
+                    "unit_of_measure": "",
                     "value": 0.0
                 },
                 "fertilizer": [
                     {
-                        "unit_of_measure": "", # kg, g
+                        "unit_of_measure": "",
                         "quantity": 0.0
                     }
                 ],
@@ -110,18 +135,44 @@ def create_collections(db):
                 "planting_id": ObjectId(),
                 "species_id": ObjectId(),
                 "plot_id": ObjectId(),
-                "climate": {},
+                "climate": {
+                    "day": "YYYY-MM-DD",
+                    "temperature": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": ""
+                    },
+                    "humidity": {
+                        "unit_of_measure": "",
+                        "value": 0.0
+                    },
+                    "wind": {
+                        "unit_of_measure": "",
+                        "value": 0.0
+                    },
+                    "rain": {
+                        "min": 0.0,
+                        "med": 0.0,
+                        "max": 0.0,
+                        "unit_of_measure": ""
+                    },
+                    "rain_probability": {
+                        "unit_of_measure": "%",
+                        "value": 0.0    
+                    }
+                },
                 "type": "harvest",
                 "price": 0.0,
                 "harvested_quantity": [
                     {
-                        "unit_of_measure": "", # units, kg, g
+                        "unit_of_measure": "",
                         "quantity": 0.0
                     }
                 ],
                 "losses": [
                     {
-                        "unit_of_measure": "", # units, kg, g
+                        "unit_of_measure": "",
                         "quantity": 0.0
                     }
                 ]
