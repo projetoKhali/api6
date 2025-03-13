@@ -11,7 +11,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python apps/api/main.py"
+        "command": "poetry run python {projectRoot}/main.py"
       }
     },
     "add": {
