@@ -26,41 +26,6 @@ def create_tables(engine):
 
 Session = sessionmaker(bind=get_engine())
 
-def create_user(name, login, password):
-    session = Session()
-    # TODO - Validar se login já existe e criptografar a senha
-    new_user = User(name=name, login=login, password=password)
-    session.add(new_user)
-    session.commit()
-    session.close()
-
-def get_user(user_id):
-    session = Session()
-    user = session.query(User).filter(User.id == user_id).first()
-    session.close()
-    return user
-
-def update_user(user_id, name=None, login=None, password=None):
-    session = Session()
-    user = session.query(User).filter(User.id == user_id).first()
-    if user:
-        if name:
-            user.name = name
-        if login:
-            user.login = login
-        if password:
-            user.password = password
-        session.commit()
-    session.close()
-
-def delete_user(user_id):
-    session = Session()
-    user = session.query(User).filter(User.id == user_id).first()
-    if user:
-        session.delete(user)
-        session.commit()
-    session.close()
-
 def test_connection(engine):
     try:
         with engine.connect() as connection:
@@ -74,17 +39,3 @@ if __name__ == "__main__":
     engine = get_engine()
     create_tables(engine)
     test_connection(engine)
-
-    # Exemplo de uso das funções CRUD
-    create_user("John Doe", "johndoe", "password123")
-
-    user = get_user(1)
-    print(user.name, user.login, user.password)
-
-    update_user(1, name="Jane Doe")
-    user = get_user(1)
-    print(user.name, user.login, user.password)
-
-    delete_user(1)
-    user = get_user(1)
-    print(user)
