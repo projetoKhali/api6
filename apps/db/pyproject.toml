@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "db"
+version = "0.1.0"
+readme = "README.md"
+package-mode = false
+
+[[tool.poetry.packages]]
+include = "api"
+
+[tool.poetry.dependencies]
+python = "*"
+dotenv = "*"
+pymongo = "*"
+psycopg2 = "*"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "*"
+flake8 = "*"
+pytest = "*"
+pytest-sugar = "*"
+pytest-cov = "*"
+pytest-html = "*"
+
+[tool.nx]
+autoActivate = true
