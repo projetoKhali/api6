@@ -65,5 +65,16 @@
         "linter": "eslint"
       }
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "cacheableOperations": ["test", "build", "lint"],
+        "env": {
+          "VIRTUAL_ENV": "{workspaceRoot}/.venv",
+          "PATH": "{workspaceRoot}/.venv/bin:{env.PATH}"
+        }
+      }
+    }
   }
 }
