@@ -9,6 +9,7 @@ include = "api"
 
 [tool.poetry.dependencies]
 python = "*"
+dotenv = "*"
 flask = "*"
 flask-cors = "*"
 pymongo = "*"
