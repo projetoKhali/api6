@@ -1,16 +1,22 @@
 {
   "name": "db",
   "targets": {
-    "serve": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "poetry run python {projectRoot}/main.py"
-      }
-    },
     "add": {
       "executor": "nx:run-commands",
       "options": {
         "command": "poetry add {args.dep}"
+      }
+    },
+    "up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-up mongo-up"
+      }
+    },
+    "down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-down mongo-down"
       }
     },
     "postgres-up": {
@@ -40,15 +46,14 @@
     "pg-up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run infra:postgres-up"
+        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-up"
       }
     },
     "pg-down": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run infra:postgres-down"
+        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-down"
       }
     }
   }
 }
-
