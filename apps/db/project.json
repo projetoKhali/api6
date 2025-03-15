@@ -61,6 +61,23 @@
         "outputFile": "{projectRoot}/reports/pylint.txt"
       }
     },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "options": {
+        "command": "poetry run pytest tests/",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test-integration": {
+      "executor": "@nxlv/python:run-commands",
+      "options": {
+        "command": "poetry run pytest tests/",
+        "cwd": "{projectRoot}",
+        "env": {
+          "TEST_MONGO_IMAGE": "mongo:5",
+          "MONGO_URI": "mongodb://localhost:28017"
+        }
+      }
     }
   }
 }
