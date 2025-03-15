@@ -54,6 +54,13 @@
       "options": {
         "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-down"
       }
+    },
+    "lint": {
+      "executor": "@nxlv/python:flake8",
+      "options": {
+        "outputFile": "{projectRoot}/reports/pylint.txt"
+      }
+    },
     }
   }
 }
