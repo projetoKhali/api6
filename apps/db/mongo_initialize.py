@@ -1,200 +1,228 @@
-from pymongo import ASCENDING, MongoClient
-from bson.objectid import ObjectId
+from pymongo import ASCENDING
+from mongo_db import MongoDB
 
-def mongo_connect(database_name, url="mongodb://mongo:secret@localhost:27017/"):
-    try:
-        client = MongoClient(url)
-        db = client[database_name]
-        print("✅ Conectado ao MongoDB!", db.command("ping"))
-        return db
-    except Exception as e:
-        print(f"Erro ao conectar ao MongoDB: {e}")
-        return None
-
-def create_collections(db):
-    collections = {
-        "species": {
-            "scientific_name": "",
-            "common_name": "",
-            "growth_time": {
-                "unit_of_measure": "", # days, months, years
-                "value": 0
-            },
-            "water_requirement": {
-                "unit_of_measure": "", # liters, m³, mm³
-                "value": 0.0
+def create_species_collection(db):
+    species_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": [
+                "scientific_name", 
+                "common_name", 
+                "growth_time", 
+                "water_requirement", 
+                "unit_of_measurement_for_planting", 
+                "unit_of_measurement_for_harvest", 
+                "unit_of_measurement_for_loss"
+            ],
+            "properties": {
+                "scientific_name": {
+                    "bsonType": "string",
+                    "description": "Nome científico da espécie"
+                },
+                "common_name": {
+                    "bsonType": "string",
+                    "description": "Nome popular da espécie"
+                },
+                "growth_time": {
+                    "bsonType": "object",
+                    "required": ["unit_of_measure", "value"],
+                    "properties": {
+                        "unit_of_measure": {
+                            "bsonType": "string",
+                            "description": "Unidade de medida (meses, anos)"
+                        },
+                        "value": {
+                            "bsonType": "int",
+                            "description": "Valor numérico do tempo de crescimento"
+                        }
+                    }
+                },
+                "water_requirement": {
+                    "bsonType": "double",
+                    "description": "Quantidade de água necessária para a espécie"
+                },
+                "unit_of_measurement_for_planting": {
+                    "bsonType": "string",
+                    "description": "Unidade de medida para plantio"
+                },
+                "unit_of_measurement_for_harvest": {
+                    "bsonType": "string",
+                    "description": "Unidade de medida para colheita"
+                },
+                "unit_of_measurement_for_loss": {
+                    "bsonType": "string",
+                    "description": "Unidade de medida para perdas"
+                }
             }
-        },
-        "plots": {
-            "area": {
-                "unit_of_measure": "", # m², km², ha
-                "value": 0.0
-            },
-            "coordinates": [0.0, 0.0],
-            "city": "",
-            "state": "",
-            "country": ""
-        },
-        "events": [
-            {
-                "species_id": ObjectId(),
-                "plot_id": ObjectId(),
-                "climate": {
-                    "day": "YYYY-MM-DD",
-                    "temperature": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": "" # °C, °F
-                    },
-                    "humidity": {
-                        "unit_of_measure": "", # %, g/m³
-                        "value": 0.0
-                    },
-                    "wind": {
-                        "unit_of_measure": "", # km/h, m/s
-                        "value": 0.0
-                    },
-                    "rain": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": "" # mm, in
-                    },
-                    "rain_probability": {
-                        "unit_of_measure": "%",
-                        "value": 0.0    
-                    }
-                },
-                "type": "planting",
-                "planted_area": {
-                    "unit_of_measure": "", # m², km², ha
-                    "value": 0.0
-                },
-                "planted_quantity": {
-                    "unit_of_measure": "", # units, kg, g
-                    "value": 0.0
-                },
-                "irrigation": [
-                    {
-                        "unit_of_measure": "", # liters, mm
-                        "quantity": 0.0
-                    }
-                ],
-                "observations": ""
-            },
-            {
-                "planting_id": ObjectId(),
-                "species_id": ObjectId(),
-                "plot_id": ObjectId(),
-                "climate": {
-                    "day": "YYYY-MM-DD",
-                    "temperature": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": ""
-                    },
-                    "humidity": {
-                        "unit_of_measure": "",
-                        "value": 0.0
-                    },
-                    "wind": {
-                        "unit_of_measure": "",
-                        "value": 0.0
-                    },
-                    "rain": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": ""
-                    },
-                    "rain_probability": {
-                        "unit_of_measure": "%",
-                        "value": 0.0    
-                    }
-                },
-                "type": "maintenance",
-                "dead_plants": {
-                    "unit_of_measure": "",
-                    "value": 0
-                },
-                "average_growth": {
-                    "unit_of_measure": "",
-                    "value": 0.0
-                },
-                "fertilizer": [
-                    {
-                        "unit_of_measure": "",
-                        "quantity": 0.0
-                    }
-                ],
-                "observations": ""
-            },
-            {
-                "planting_id": ObjectId(),
-                "species_id": ObjectId(),
-                "plot_id": ObjectId(),
-                "climate": {
-                    "day": "YYYY-MM-DD",
-                    "temperature": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": ""
-                    },
-                    "humidity": {
-                        "unit_of_measure": "",
-                        "value": 0.0
-                    },
-                    "wind": {
-                        "unit_of_measure": "",
-                        "value": 0.0
-                    },
-                    "rain": {
-                        "min": 0.0,
-                        "med": 0.0,
-                        "max": 0.0,
-                        "unit_of_measure": ""
-                    },
-                    "rain_probability": {
-                        "unit_of_measure": "%",
-                        "value": 0.0    
-                    }
-                },
-                "type": "harvest",
-                "price": 0.0,
-                "harvested_quantity": [
-                    {
-                        "unit_of_measure": "",
-                        "quantity": 0.0
-                    }
-                ],
-                "losses": [
-                    {
-                        "unit_of_measure": "",
-                        "quantity": 0.0
-                    }
-                ]
-            }
-        ]
+        }
     }
-    
-    for collection, structure in collections.items():
-        if (collection not in db.list_collection_names()):
-            db.create_collection(collection)
-            print(f"Coleção '{collection}' criada.")
-        else:
-            print(f"Coleção '{collection}' já existe.")
-    
-    db.species.create_index([("scientific_name", ASCENDING)], unique=True)
-    db.plots.create_index([("coordinates", ASCENDING)])  # Índice geoespacial
-    db.climate.create_index([("day", ASCENDING)])
-    db.events.create_index([("plot_id", ASCENDING), ("species_id", ASCENDING), ("climate_id", ASCENDING)])
+    try:
+        db.create_collection("species", validator=species_validator)
+        print("Coleção 'species' criada com validador.")
+    except Exception as e:
+        print(f"Erro ao criar ou atualizar a coleção 'species': {e}")
 
-    print("📌 Índices criados com sucesso!")
+def create_plots_collection(db):
+    plots_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["area", "coordinates", "city", "state", "country"],
+            "properties": {
+                "area": {
+                    "bsonType": "object",
+                    "required": ["unit_of_measure", "value"],
+                    "properties": {
+                        "unit_of_measure": {
+                            "bsonType": "string",
+                            "description": "Unidade de medida (m², km², ha)"
+                        },
+                        "value": {
+                            "bsonType": "double",
+                            "description": "Valor numérico da área"
+                        }
+                    }
+                },
+                "coordinates": {
+                    "bsonType": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                        "bsonType": "double"
+                    },
+                    "description": "Coordenadas geográficas no formato [longitude, latitude]"
+                },
+                "city": {
+                    "bsonType": "string",
+                    "description": "Cidade da área"
+                },
+                "state": {
+                    "bsonType": "string",
+                    "description": "Estado da área"
+                },
+                "country": {
+                    "bsonType": "string",
+                    "description": "País da área"
+                }
+            }
+        }
+    }
+    try:
+        db.create_collection("plots", validator=plots_validator)
+        print("Coleção 'plots' criada com validador.")
+    except Exception as e:
+        print(f"Erro ao criar ou atualizar a coleção 'plots': {e}")
 
+def create_events_collection(db):
+    climate_schema = {
+        "bsonType": "object",
+        "required": ["day", "temperature", "humidity", "wind", "rain", "rain_probability"],
+        "properties": {
+            "day": {
+                "bsonType": "date",
+                "description": "Data no formato ISODate"
+            },
+            "temperature": {
+                "bsonType": "object",
+                "required": ["min", "med", "max"],
+                "properties": {
+                    "min": {"bsonType": "double"},
+                    "med": {"bsonType": "double"},
+                    "max": {"bsonType": "double"}
+                }
+            },
+            "humidity": {"bsonType": "double"},
+            "wind": {"bsonType": "double"},
+            "rain": {"bsonType": "double"},
+            "rain_probability": {"bsonType": "double"}
+        }
+    }
+
+    planting_schema = {
+        "bsonType": "object",
+        "required": ["species_id", "plot_id", "type", "climate", "planted_area", "planted_quantity", "observations"],
+        "properties": {
+            "species_id": {"bsonType": "objectId"},
+            "plot_id": {"bsonType": "objectId"},
+            "type": {"enum": ["planting"]},
+            "climate": climate_schema,
+            "planted_area": {
+                "bsonType": "object",
+                "required": ["unit_of_measure", "value"],
+                "properties": {
+                    "unit_of_measure": {"bsonType": "string"},
+                    "value": {"bsonType": "double"}
+                }
+            },
+            "planted_quantity": {"bsonType": "double"},
+            "observations": {"bsonType": "string"}
+        }
+    }
+
+    maintenance_schema = {
+        "bsonType": "object",
+        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "dead_plants", "fertilizer", "pesticide", "observations"],
+        "properties": {
+            "planting_id": {"bsonType": "objectId"},
+            "species_id": {"bsonType": "objectId"},
+            "plot_id": {"bsonType": "objectId"},
+            "type": {"enum": ["maintenance"]},
+            "climate": climate_schema,
+            "dead_plants": {"bsonType": "int"},
+            "fertilizer": {"bsonType": "double"},
+            "pesticide": {"bsonType": "double"},
+            "observations": {"bsonType": "string"}
+        }
+    }
+
+    harvest_schema = {
+        "bsonType": "object",
+        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "price", "harvested_quantity", "losses", "observations"],
+        "properties": {
+            "planting_id": {"bsonType": "objectId"},
+            "species_id": {"bsonType": "objectId"},
+            "plot_id": {"bsonType": "objectId"},
+            "type": {"enum": ["harvest"]},
+            "climate": climate_schema,
+            "price": {"bsonType": "double"},
+            "harvested_quantity": {"bsonType": "double"},
+            "losses": {"bsonType": "double"},
+            "observations": {"bsonType": "string"}
+        }
+    }
+
+    # Utilizando 'oneOf' para aceitar os três tipos de evento
+    events_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "oneOf": [
+                planting_schema,
+                maintenance_schema,
+                harvest_schema
+            ]
+        }
+    }
+    try:
+        db.create_collection("events", validator=events_validator)
+        print("Coleção 'events' criada com validador.")
+    except Exception as e:
+        print(f"Erro ao criar ou atualizar a coleção 'events': {e}")
+
+def create_indexes(db):
+    try:
+        db.species.create_index([("scientific_name", ASCENDING)], unique=True)
+        db.plots.create_index([("coordinates", ASCENDING)])
+        db.events.create_index([("climate.day", ASCENDING)])
+        print("📌 Índices criados com sucesso!")
+    except Exception as e:
+        print(f"Erro ao criar índices: {e}")
+
+def main():
+    db = MongoDB.get_database("reforestation")
+    if db is not None:
+        create_species_collection(db)
+        create_plots_collection(db)
+        create_events_collection(db)
+        create_indexes(db)
 
 if __name__ == "__main__":
-    db = mongo_connect("Agrodb")
-    create_collections(db)
+    main()
