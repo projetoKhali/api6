@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from pymongo import ASCENDING, MongoClient
 
 
@@ -8,9 +9,20 @@ class MongoDB:
     @classmethod
     def get_client(cls):
         """Connect to MongoDB using environment variables."""
-        if cls._client is None:
-            mongo_url = os.getenv("MONGO_URL", "mongodb://mongo:secret@localhost:27017/")
-            cls._client = MongoClient(mongo_url)
+        if cls._client is not None:
+            return
+
+        load_dotenv()
+
+        mongo_user = os.getenv("MONGO_USER", "mongodb")
+        mongo_password = os.getenv("MONGO_PASSWORD", "secret")
+        mongo_host = os.getenv("MONGO_HOST", "localhost")
+        mongo_port = os.getenv("MONGO_PORT", "27017")
+        mongo_db = os.getenv("MONGO_DB", "api6_mongo")
+
+        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+
+        cls._client = MongoClient(mongo_url)
         return cls._client
 
     @classmethod
