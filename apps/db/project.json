@@ -1,12 +1,6 @@
 {
   "name": "db",
   "targets": {
-    "add": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "poetry add {args.dep}"
-      }
-    },
     "install": {
       "executor": "nx:run-commands",
       "options": {
@@ -63,6 +57,7 @@
     },
     "lint": {
       "executor": "@nxlv/python:flake8",
+      "dependsOn": ["install"],
       "options": {
         "outputFile": "{projectRoot}/reports/pylint.txt"
       }
@@ -92,6 +87,13 @@
       "options": {
         "command": "poetry lock",
         "cwd": "{projectRoot}"
+      }
+    },
+    "add": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry add {args.dep}"
       }
     }
   }

@@ -14,17 +14,17 @@
         "command": "poetry run python {projectRoot}/main.py"
       }
     },
-    "add": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "poetry add {args.dep}"
-      }
-    },
     "lock": {
       "executor": "nx:run-commands",
       "options": {
         "command": "poetry lock",
         "cwd": "{projectRoot}"
+      }
+    },
+    "add": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry add {args.dep}"
       }
     }
   }
