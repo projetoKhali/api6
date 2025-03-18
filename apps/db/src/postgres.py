@@ -44,7 +44,7 @@ def test_connection(engine):
     except Exception as e:
         print("Erro ao conectar ao banco de dados:", e)
 
-if __name__ == "__main__":
+def initialize_postgres_database():
     engine = get_engine()
-    create_tables(engine)
     test_connection(engine)
+    create_tables(engine)

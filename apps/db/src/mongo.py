@@ -254,14 +254,12 @@ def create_indexes(db):
         print(f"Erro ao criar índices: {e}")
 
 
-def main():
-    db = MongoDB.get_database("reforestation")
-    if db is not None:
-        create_species_collection(db)
-        create_plots_collection(db)
-        create_events_collection(db)
-        create_indexes(db)
-
-
-if __name__ == "__main__":
-    main()
+def initialize_mongo_database():
+    db = MongoDB.get_database("api6_mongo")
+    if db is None:
+        print("Erro ao conectar ao banco de dados.")
+        return
+    create_species_collection(db)
+    create_plots_collection(db)
+    create_events_collection(db)
+    create_indexes(db)
