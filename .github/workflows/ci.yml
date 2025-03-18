@@ -39,10 +39,10 @@ jobs:
           python-version: '3.13'
 
       - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python3 -
-
-      - name: Ensure Poetry is in PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry lock
 
       - name: Set Shas for Nx Cache
         uses: nrwl/nx-set-shas@v4
