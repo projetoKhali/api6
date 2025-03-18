@@ -30,6 +30,7 @@ class MongoDB:
         client = cls.get_client()
         return client[db_name]
 
+
 # Uso:
 # from mongo import MongoDB
 # db = MongoDB.get_database("meu_banco")
@@ -46,16 +47,16 @@ def create_species_collection(db):
                 "water_requirement",
                 "unit_of_measurement_for_planting",
                 "unit_of_measurement_for_harvest",
-                "unit_of_measurement_for_loss"
+                "unit_of_measurement_for_loss",
             ],
             "properties": {
                 "scientific_name": {
                     "bsonType": "string",
-                    "description": "Nome científico da espécie"
+                    "description": "Nome científico da espécie",
                 },
                 "common_name": {
                     "bsonType": "string",
-                    "description": "Nome popular da espécie"
+                    "description": "Nome popular da espécie",
                 },
                 "growth_time": {
                     "bsonType": "object",
@@ -63,31 +64,31 @@ def create_species_collection(db):
                     "properties": {
                         "unit_of_measure": {
                             "bsonType": "string",
-                            "description": "Unidade de medida (meses, anos)"
+                            "description": "Unidade de medida (meses, anos)",
                         },
                         "value": {
                             "bsonType": "int",
-                            "description": "Valor numérico do tempo de crescimento"
-                        }
-                    }
+                            "description": "Valor numérico do tempo de crescimento",
+                        },
+                    },
                 },
                 "water_requirement": {
                     "bsonType": "double",
-                    "description": "Quantidade de água necessária para a espécie"
+                    "description": "Quantidade de água necessária para a espécie",
                 },
                 "unit_of_measurement_for_planting": {
                     "bsonType": "string",
-                    "description": "Unidade de medida para plantio"
+                    "description": "Unidade de medida para plantio",
                 },
                 "unit_of_measurement_for_harvest": {
                     "bsonType": "string",
-                    "description": "Unidade de medida para colheita"
+                    "description": "Unidade de medida para colheita",
                 },
                 "unit_of_measurement_for_loss": {
                     "bsonType": "string",
-                    "description": "Unidade de medida para perdas"
-                }
-            }
+                    "description": "Unidade de medida para perdas",
+                },
+            },
         }
     }
     try:
@@ -109,36 +110,25 @@ def create_plots_collection(db):
                     "properties": {
                         "unit_of_measure": {
                             "bsonType": "string",
-                            "description": "Unidade de medida (m², km², ha)"
+                            "description": "Unidade de medida (m², km², ha)",
                         },
                         "value": {
                             "bsonType": "double",
-                            "description": "Valor numérico da área"
-                        }
-                    }
+                            "description": "Valor numérico da área",
+                        },
+                    },
                 },
                 "coordinates": {
                     "bsonType": "array",
                     "minItems": 2,
                     "maxItems": 2,
-                    "items": {
-                        "bsonType": "double"
-                    },
-                    "description": "Coordenadas geográficas no formato [longitude, latitude]"
+                    "items": {"bsonType": "double"},
+                    "description": "Coordenadas geográficas no formato [longitude, latitude]",
                 },
-                "city": {
-                    "bsonType": "string",
-                    "description": "Cidade da área"
-                },
-                "state": {
-                    "bsonType": "string",
-                    "description": "Estado da área"
-                },
-                "country": {
-                    "bsonType": "string",
-                    "description": "País da área"
-                }
-            }
+                "city": {"bsonType": "string", "description": "Cidade da área"},
+                "state": {"bsonType": "string", "description": "Estado da área"},
+                "country": {"bsonType": "string", "description": "País da área"},
+            },
         }
     }
     try:
@@ -151,31 +141,43 @@ def create_plots_collection(db):
 def create_events_collection(db):
     climate_schema = {
         "bsonType": "object",
-        "required": ["day", "temperature", "humidity", "wind", "rain", "rain_probability"],
+        "required": [
+            "day",
+            "temperature",
+            "humidity",
+            "wind",
+            "rain",
+            "rain_probability",
+        ],
         "properties": {
-            "day": {
-                "bsonType": "date",
-                "description": "Data no formato ISODate"
-            },
+            "day": {"bsonType": "date", "description": "Data no formato ISODate"},
             "temperature": {
                 "bsonType": "object",
                 "required": ["min", "med", "max"],
                 "properties": {
                     "min": {"bsonType": "double"},
                     "med": {"bsonType": "double"},
-                    "max": {"bsonType": "double"}
-                }
+                    "max": {"bsonType": "double"},
+                },
             },
             "humidity": {"bsonType": "double"},
             "wind": {"bsonType": "double"},
             "rain": {"bsonType": "double"},
-            "rain_probability": {"bsonType": "double"}
-        }
+            "rain_probability": {"bsonType": "double"},
+        },
     }
 
     planting_schema = {
         "bsonType": "object",
-        "required": ["species_id", "plot_id", "type", "climate", "planted_area", "planted_quantity", "observations"],
+        "required": [
+            "species_id",
+            "plot_id",
+            "type",
+            "climate",
+            "planted_area",
+            "planted_quantity",
+            "observations",
+        ],
         "properties": {
             "species_id": {"bsonType": "objectId"},
             "plot_id": {"bsonType": "objectId"},
@@ -186,17 +188,27 @@ def create_events_collection(db):
                 "required": ["unit_of_measure", "value"],
                 "properties": {
                     "unit_of_measure": {"bsonType": "string"},
-                    "value": {"bsonType": "double"}
-                }
+                    "value": {"bsonType": "double"},
+                },
             },
             "planted_quantity": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
+            "observations": {"bsonType": "string"},
+        },
     }
 
     maintenance_schema = {
         "bsonType": "object",
-        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "dead_plants", "fertilizer", "pesticide", "observations"],
+        "required": [
+            "planting_id",
+            "species_id",
+            "plot_id",
+            "type",
+            "climate",
+            "dead_plants",
+            "fertilizer",
+            "pesticide",
+            "observations",
+        ],
         "properties": {
             "planting_id": {"bsonType": "objectId"},
             "species_id": {"bsonType": "objectId"},
@@ -206,13 +218,23 @@ def create_events_collection(db):
             "dead_plants": {"bsonType": "int"},
             "fertilizer": {"bsonType": "double"},
             "pesticide": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
+            "observations": {"bsonType": "string"},
+        },
     }
 
     harvest_schema = {
         "bsonType": "object",
-        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "price", "harvested_quantity", "losses", "observations"],
+        "required": [
+            "planting_id",
+            "species_id",
+            "plot_id",
+            "type",
+            "climate",
+            "price",
+            "harvested_quantity",
+            "losses",
+            "observations",
+        ],
         "properties": {
             "planting_id": {"bsonType": "objectId"},
             "species_id": {"bsonType": "objectId"},
@@ -222,19 +244,15 @@ def create_events_collection(db):
             "price": {"bsonType": "double"},
             "harvested_quantity": {"bsonType": "double"},
             "losses": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
+            "observations": {"bsonType": "string"},
+        },
     }
 
     # Utilizando 'oneOf' para aceitar os três tipos de evento
     events_validator = {
         "$jsonSchema": {
             "bsonType": "object",
-            "oneOf": [
-                planting_schema,
-                maintenance_schema,
-                harvest_schema
-            ]
+            "oneOf": [planting_schema, maintenance_schema, harvest_schema],
         }
     }
     try:
