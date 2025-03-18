@@ -7,6 +7,12 @@
         "command": "poetry add {args.dep}"
       }
     },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry install"
+      }
+    },
     "up": {
       "executor": "nx:run-commands",
       "options": {
