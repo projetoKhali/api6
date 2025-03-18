@@ -24,12 +24,16 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - run: corepack enable
-      - run: corepack prepare pnpm@9.10 --activate
+      - name: Install PNPM
+        run: corepack enable
+        run: corepack prepare pnpm@9.10 --activate
+        run: pnpm --version
 
-      - run: pnpm --version
+      - name: Install Nx and Dependencies
+        run: pnpm install --frozen-lockfile
 
-      - run: pnpm install --frozen-lockfile
-      - uses: nrwl/nx-set-shas@v4
+      - name: Set Shas for Nx Cache
+        uses: nrwl/nx-set-shas@v4
 
-      - run: pnpm nx affected -t lint test build
+      - name: Run Affected
+        run: pnpm nx affected -t lint test build
