@@ -22,6 +22,13 @@
         "outputFile": "{projectRoot}/reports/pylint.txt"
       }
     },
+    "fix-lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run black ."
+      }
+    },
     "test": {
       "executor": "@nxlv/python:run-commands",
       "dependsOn": ["install"],
