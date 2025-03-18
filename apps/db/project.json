@@ -8,6 +8,27 @@
         "command": "poetry install"
       }
     },
+    "init": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/main.py"
+      }
+    },
+    "init-pg": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/postgres.py"
+      }
+    },
+    "init-mongo": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/mongo.py"
+      }
+    },
     "up": {
       "executor": "nx:run-commands",
       "options": {
