@@ -4,7 +4,7 @@
     "install": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "[[ -d $(poetry env info --path 2>/dev/null) ]] || poetry install && poetry run python apps/api/main.py"
+        "command": "poetry install"
       }
     },
     "serve": {
