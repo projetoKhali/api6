@@ -8,11 +8,6 @@ def create_species_collection(db):
             "required": [
                 "scientific_name", 
                 "common_name", 
-                "growth_time", 
-                "water_requirement", 
-                "unit_of_measurement_for_planting", 
-                "unit_of_measurement_for_harvest", 
-                "unit_of_measurement_for_loss"
             ],
             "properties": {
                 "scientific_name": {
@@ -22,42 +17,12 @@ def create_species_collection(db):
                 "common_name": {
                     "bsonType": "string",
                     "description": "Nome popular da espécie"
-                },
-                "growth_time": {
-                    "bsonType": "object",
-                    "required": ["unit_of_measure", "value"],
-                    "properties": {
-                        "unit_of_measure": {
-                            "bsonType": "string",
-                            "description": "Unidade de medida (meses, anos)"
-                        },
-                        "value": {
-                            "bsonType": "int",
-                            "description": "Valor numérico do tempo de crescimento"
-                        }
-                    }
-                },
-                "water_requirement": {
-                    "bsonType": "double",
-                    "description": "Quantidade de água necessária para a espécie"
-                },
-                "unit_of_measurement_for_planting": {
-                    "bsonType": "string",
-                    "description": "Unidade de medida para plantio"
-                },
-                "unit_of_measurement_for_harvest": {
-                    "bsonType": "string",
-                    "description": "Unidade de medida para colheita"
-                },
-                "unit_of_measurement_for_loss": {
-                    "bsonType": "string",
-                    "description": "Unidade de medida para perdas"
                 }
             }
         }
     }
     try:
-        db.create_collection("species", validator=species_validator)
+        db.create_collection("species_collection", validator=species_validator)
         print("Coleção 'species' criada com validador.")
     except Exception as e:
         print(f"Erro ao criar ou atualizar a coleção 'species': {e}")
@@ -66,34 +31,11 @@ def create_plots_collection(db):
     plots_validator = {
         "$jsonSchema": {
             "bsonType": "object",
-            "required": ["area", "coordinates", "city", "state", "country"],
+            "required": ["area", "state", "country"],
             "properties": {
                 "area": {
-                    "bsonType": "object",
-                    "required": ["unit_of_measure", "value"],
-                    "properties": {
-                        "unit_of_measure": {
-                            "bsonType": "string",
-                            "description": "Unidade de medida (m², km², ha)"
-                        },
-                        "value": {
-                            "bsonType": "double",
-                            "description": "Valor numérico da área"
-                        }
-                    }
-                },
-                "coordinates": {
-                    "bsonType": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "items": {
-                        "bsonType": "double"
-                    },
-                    "description": "Coordenadas geográficas no formato [longitude, latitude]"
-                },
-                "city": {
-                    "bsonType": "string",
-                    "description": "Cidade da área"
+                    "bsonType": "double",
+                    "description": "Área da propriedade",
                 },
                 "state": {
                     "bsonType": "string",
@@ -107,122 +49,93 @@ def create_plots_collection(db):
         }
     }
     try:
-        db.create_collection("plots", validator=plots_validator)
+        db.create_collection("plots_collection", validator=plots_validator)
         print("Coleção 'plots' criada com validador.")
     except Exception as e:
         print(f"Erro ao criar ou atualizar a coleção 'plots': {e}")
 
-def create_events_collection(db):
-    climate_schema = {
-        "bsonType": "object",
-        "required": ["day", "temperature", "humidity", "wind", "rain", "rain_probability"],
-        "properties": {
-            "day": {
-                "bsonType": "date",
-                "description": "Data no formato ISODate"
-            },
-            "temperature": {
-                "bsonType": "object",
-                "required": ["min", "med", "max"],
-                "properties": {
-                    "min": {"bsonType": "double"},
-                    "med": {"bsonType": "double"},
-                    "max": {"bsonType": "double"}
-                }
-            },
-            "humidity": {"bsonType": "double"},
-            "wind": {"bsonType": "double"},
-            "rain": {"bsonType": "double"},
-            "rain_probability": {"bsonType": "double"}
-        }
-    }
-
-    planting_schema = {
-        "bsonType": "object",
-        "required": ["species_id", "plot_id", "type", "climate", "planted_area", "planted_quantity", "observations"],
-        "properties": {
-            "species_id": {"bsonType": "objectId"},
-            "plot_id": {"bsonType": "objectId"},
-            "type": {"enum": ["planting"]},
-            "climate": climate_schema,
-            "planted_area": {
-                "bsonType": "object",
-                "required": ["unit_of_measure", "value"],
-                "properties": {
-                    "unit_of_measure": {"bsonType": "string"},
-                    "value": {"bsonType": "double"}
-                }
-            },
-            "planted_quantity": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
-    }
-
-    maintenance_schema = {
-        "bsonType": "object",
-        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "dead_plants", "fertilizer", "pesticide", "observations"],
-        "properties": {
-            "planting_id": {"bsonType": "objectId"},
-            "species_id": {"bsonType": "objectId"},
-            "plot_id": {"bsonType": "objectId"},
-            "type": {"enum": ["maintenance"]},
-            "climate": climate_schema,
-            "dead_plants": {"bsonType": "int"},
-            "fertilizer": {"bsonType": "double"},
-            "pesticide": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
-    }
-
-    harvest_schema = {
-        "bsonType": "object",
-        "required": ["planting_id", "species_id", "plot_id", "type", "climate", "price", "harvested_quantity", "losses", "observations"],
-        "properties": {
-            "planting_id": {"bsonType": "objectId"},
-            "species_id": {"bsonType": "objectId"},
-            "plot_id": {"bsonType": "objectId"},
-            "type": {"enum": ["harvest"]},
-            "climate": climate_schema,
-            "price": {"bsonType": "double"},
-            "harvested_quantity": {"bsonType": "double"},
-            "losses": {"bsonType": "double"},
-            "observations": {"bsonType": "string"}
-        }
-    }
-
-    # Utilizando 'oneOf' para aceitar os três tipos de evento
-    events_validator = {
+def create_yield_collection(db):
+    yield_validator = {
         "$jsonSchema": {
             "bsonType": "object",
-            "oneOf": [
-                planting_schema,
-                maintenance_schema,
-                harvest_schema
-            ]
+            "required": ["crop", "crop_year", "season", "state", "area", "production", "annual_rainfall", "fertilizer", "pesticide", "yield"],
+            "properties": {
+                "crop": {
+                    "bsonType": "string",
+                    "description": "Nome da cultura cultivada"
+                },
+                "crop_year": {
+                    "bsonType": "int",
+                    "description": "Ano em que a safra foi cultivada"
+                },
+                "season": {
+                    "bsonType": "string",
+                    "enum": ["Whole Year","Spring","Autumn","Summer","Winter"],
+                    "description": "Estação do ano"
+                },
+                "state": {
+                    "bsonType": "string",
+                    "description": "Estado"
+                },
+                "area": {
+                    "bsonType": "double",
+                    "description": "A área total de terra (em hectares) cultivada para a cultura específica"
+                },
+                "production": {
+                    "bsonType": "number",
+                    "description": "Quantidade de cultura produzida"
+                },
+                "annual_rainfall": {
+                    "bsonType": "double",
+                    "description": "A precipitação anual recebida na região de cultivo (em mm)"
+                },
+                "fertilizer": {
+                    "bsonType": "double",
+                    "description": "A quantidade total de fertilizante usada na cultura (em quilogramas)"
+                },
+                "pesticide": {
+                    "bsonType": "double",
+                    "description": "A quantidade total de pesticida usado na cultura (em quilogramas)"
+                },
+                "yield": {
+                    "bsonType": "double",
+                    "description": "The calculated crop yield (production per unit area)"
+                }
+            }
         }
     }
     try:
-        db.create_collection("events", validator=events_validator)
-        print("Coleção 'events' criada com validador.")
+        db.create_collection("yield_collection", validator=yield_validator)
+        print("Coleção 'yield' criada com validador.")
     except Exception as e:
-        print(f"Erro ao criar ou atualizar a coleção 'events': {e}")
+        print(f"Erro ao criar ou atualizar a coleção 'yield': {e}")
 
 def create_indexes(db):
     try:
-        db.species.create_index([("scientific_name", ASCENDING)], unique=True)
-        db.plots.create_index([("coordinates", ASCENDING)])
-        db.events.create_index([("climate.day", ASCENDING)])
+        db.species_collection.create_index([("scientific_name", ASCENDING)], unique=True)
+        db.plots_collection.create_index([("area", ASCENDING)])
+        db.yield_collection.create_index([("production", ASCENDING)])
         print("📌 Índices criados com sucesso!")
     except Exception as e:
         print(f"Erro ao criar índices: {e}")
+
+def restart_collections(db):
+    db.species_collection.drop()
+    db.plots_collection.drop()
+    db.yield_collection.drop()
+    create_species_collection(db)
+    create_plots_collection(db)
+    create_yield_collection(db)
+    create_indexes(db)
 
 def main():
     db = MongoDB.get_database("reforestation")
     if db is not None:
         create_species_collection(db)
         create_plots_collection(db)
-        create_events_collection(db)
+        create_yield_collection(db)
         create_indexes(db)
+        # restart_collections(db)
 
 if __name__ == "__main__":
     main()
