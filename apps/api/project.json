@@ -23,7 +23,8 @@
     "lock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "poetry lock"
+        "command": "poetry lock",
+        "cwd": "{projectRoot}"
       }
     }
   }
