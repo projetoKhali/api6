@@ -19,6 +19,12 @@
       "options": {
         "command": "poetry add {args.dep}"
       }
+    },
+    "lock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry lock"
+      }
     }
   }
 }

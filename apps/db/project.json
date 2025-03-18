@@ -86,6 +86,12 @@
           "MONGO_URI": "mongodb://localhost:28017"
         }
       }
+    },
+    "lock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry lock"
+      }
     }
   }
 }
