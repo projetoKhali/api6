@@ -25,6 +25,10 @@ testcontainers = {extras = ["mongodb", "postgres"], version = "^4.9.2"}
 path = "apps/api"
 develop = true
 
+[tool.poetry.dependencies.db]
+path = "apps/db"
+develop = true
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
