@@ -3,6 +3,7 @@
   "targets": {
     "install": {
       "executor": "nx:run-commands",
+      "dependsOn": ["lock"],
       "options": {
         "command": "poetry install"
       }
