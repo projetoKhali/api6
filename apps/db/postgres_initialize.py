@@ -3,18 +3,17 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text, Column, Integer, String, Text, Sequence
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-load_dotenv()
-
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "secret")
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "postgres")
-
-DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-
 def get_engine():
-    return create_engine(DATABASE_URL, pool_size=10, max_overflow=20)
+    load_dotenv()
+
+    postgres_user = os.getenv("POSTGRES_USER", "postgres")
+    postgres_password = os.getenv("POSTGRES_PASSWORD", "secret")
+    postgres_host = os.getenv("POSTGRES_HOST", "localhost")
+    postgres_port = os.getenv("POSTGRES_PORT", "5432")
+    postgres_db = os.getenv("POSTGRES_DB", "api6_postgres")
+
+    database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
+    return create_engine(database_url, pool_size=10, max_overflow=20)
 
 Base = declarative_base()
 
