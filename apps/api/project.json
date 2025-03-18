@@ -14,6 +14,33 @@
         "command": "poetry run python {projectRoot}/main.py"
       }
     },
+    "lint": {
+      "executor": "@nxlv/python:flake8",
+      "dependsOn": ["install"],
+      "options": {
+        "outputFile": "{projectRoot}/reports/pylint.txt"
+      }
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest tests/",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test-integration": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest tests/",
+        "cwd": "{projectRoot}",
+        "env": {
+          "TEST_MONGO_IMAGE": "mongo:5",
+          "MONGO_URI": "mongodb://localhost:28017"
+        }
+      }
+    },
     "lock": {
       "executor": "nx:run-commands",
       "options": {
