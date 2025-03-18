@@ -111,7 +111,7 @@ def create_yield_collection(db):
 def create_indexes(db):
     try:
         db.species_collection.create_index([("scientific_name", ASCENDING)], unique=True)
-        db.plots_collection.create_index([("coordinates", ASCENDING)])
+        db.plots_collection.create_index([("area", ASCENDING)])
         db.yield_collection.create_index([("production", ASCENDING)])
         print("📌 Índices criados com sucesso!")
     except Exception as e:
