@@ -32,6 +32,17 @@ jobs:
       - name: Install Nx and Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Ensure Poetry is in PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Set Shas for Nx Cache
         uses: nrwl/nx-set-shas@v4
 
