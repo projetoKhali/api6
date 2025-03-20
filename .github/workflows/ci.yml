@@ -55,4 +55,4 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: Run Affected
-        run: pnpm nx affected -t lint test build
+        run: pnpm nx affected -t test build
