@@ -51,9 +51,9 @@ def create_species_collection(db):
                 },
                 "common_name": {
                     "bsonType": "string",
-                    "description": "Nome popular da espécie"
-                }
-            }
+                    "description": "Nome popular da espécie",
+                },
+            },
         }
     }
     try:
@@ -73,15 +73,9 @@ def create_plots_collection(db):
                     "bsonType": "double",
                     "description": "Área da propriedade",
                 },
-                "state": {
-                    "bsonType": "string",
-                    "description": "Estado da área"
-                },
-                "country": {
-                    "bsonType": "string",
-                    "description": "País da área"
-                }
-            }
+                "state": {"bsonType": "string", "description": "Estado da área"},
+                "country": {"bsonType": "string", "description": "País da área"},
+            },
         }
     }
     try:
@@ -95,50 +89,58 @@ def create_yield_collection(db):
     yield_validator = {
         "$jsonSchema": {
             "bsonType": "object",
-            "required": ["crop", "crop_year", "season", "state", "area", "production", "annual_rainfall", "fertilizer", "pesticide", "yield"],
+            "required": [
+                "crop",
+                "crop_year",
+                "season",
+                "state",
+                "area",
+                "production",
+                "annual_rainfall",
+                "fertilizer",
+                "pesticide",
+                "yield",
+            ],
             "properties": {
                 "crop": {
                     "bsonType": "string",
-                    "description": "Nome da cultura cultivada"
+                    "description": "Nome da cultura cultivada",
                 },
                 "crop_year": {
                     "bsonType": "int",
-                    "description": "Ano em que a safra foi cultivada"
+                    "description": "Ano em que a safra foi cultivada",
                 },
                 "season": {
                     "bsonType": "string",
-                    "enum": ["Whole Year","Spring","Autumn","Summer","Winter"],
-                    "description": "Estação do ano"
+                    "enum": ["Whole Year", "Spring", "Autumn", "Summer", "Winter"],
+                    "description": "Estação do ano",
                 },
-                "state": {
-                    "bsonType": "string",
-                    "description": "Estado"
-                },
+                "state": {"bsonType": "string", "description": "Estado"},
                 "area": {
                     "bsonType": "double",
-                    "description": "A área total de terra (em hectares) cultivada para a cultura específica"
+                    "description": "A área total de terra (em hectares) cultivada para a cultura específica",
                 },
                 "production": {
                     "bsonType": "number",
-                    "description": "Quantidade de cultura produzida"
+                    "description": "Quantidade de cultura produzida",
                 },
                 "annual_rainfall": {
                     "bsonType": "double",
-                    "description": "A precipitação anual recebida na região de cultivo (em mm)"
+                    "description": "A precipitação anual recebida na região de cultivo (em mm)",
                 },
                 "fertilizer": {
                     "bsonType": "double",
-                    "description": "A quantidade total de fertilizante usada na cultura (em quilogramas)"
+                    "description": "A quantidade total de fertilizante usada na cultura (em quilogramas)",
                 },
                 "pesticide": {
                     "bsonType": "double",
-                    "description": "A quantidade total de pesticida usado na cultura (em quilogramas)"
+                    "description": "A quantidade total de pesticida usado na cultura (em quilogramas)",
                 },
                 "yield": {
                     "bsonType": "double",
-                    "description": "The calculated crop yield (production per unit area)"
-                }
-            }
+                    "description": "The calculated crop yield (production per unit area)",
+                },
+            },
         }
     }
     try:
@@ -150,7 +152,9 @@ def create_yield_collection(db):
 
 def create_indexes(db):
     try:
-        db.species_collection.create_index([("scientific_name", ASCENDING)], unique=True)
+        db.species_collection.create_index(
+            [("scientific_name", ASCENDING)], unique=True
+        )
         db.plots_collection.create_index([("area", ASCENDING)])
         db.yield_collection.create_index([("production", ASCENDING)])
         print("📌 Índices criados com sucesso!")
