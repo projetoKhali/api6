@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, text, Column, Integer, String, Text, Sequence
+from sqlalchemy import ForeignKey, create_engine, text, Column, Integer, String, Text, Sequence
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = "postgresql://postgres:secret@localhost:5432/postgres"
@@ -12,9 +12,11 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
     name = Column(String)
+    email = Column(String, index=True, unique=True)
     login = Column(String, index=True, unique=True)
     password = Column(Text)
     version_terms_agreement = Column(String)
+    permission_id = Column(Integer, ForeignKey('permissions.id'))
 
 class Permission(Base):
     __tablename__ = 'permissions'
