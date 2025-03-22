@@ -45,7 +45,7 @@ const BrazilMapChart = () => {
 
       // Configuração do gráfico
       const mapChartData = {
-        title: { text: 'Mapa do Brasil' },
+        title: { text: 'Produção por Estado', left: 'center' },
         geo: {
           map: 'BR',
           roam: true, // Permite navegar pelo mapa
@@ -61,17 +61,17 @@ const BrazilMapChart = () => {
           max: 500,
           inRange: {
             color: [
-              '#313695',
-              '#4575b4',
-              '#74add1',
-              '#abd9e9',
-              '#e0f3f8',
-              '#ffffbf',
-              '#fee090',
-              '#fdae61',
-              '#f46d43',
-              '#d73027',
-              '#a50026'
+              '#026734',
+              '#4F9572',
+              '#6EA88A',
+              '#90BCA6',
+              '#B6D3C4',
+              '#D2FADC',
+              '#AEF5C0',
+              '#8EF1A7',
+              '#67ED89',
+              '#8EF1A7',
+              '#50EA77'
             ]
           },
           text: ['aaa', 'Low'],
@@ -104,7 +104,7 @@ const BrazilMapChart = () => {
     }
   }, [geoJsonData]);
 
-  return <div ref={chartRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={chartRef} style={{ width: '100%', height: '800px'}} />;
 };
 
 export default BrazilMapChart;

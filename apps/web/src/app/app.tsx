@@ -1,11 +1,12 @@
 import React from 'react';
 import Dashboard from '../pages/Dashboard';
+import '../styles.css';
 
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', height: '100vh', width: '100vw' }}>
-      <div style={{ height: '50%', width: '30%' }}>
+    <div className='main-container'>
+      <div style={{ height: '100%', width: '100%' }}>
         <Dashboard />
       </div>
     </div>
