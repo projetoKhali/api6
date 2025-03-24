@@ -3,6 +3,7 @@ import * as echarts from 'echarts';
 export interface BaseChartSchema extends echarts.EChartsOption {
   title?: {
     text: string;
+    left?: "center"
   };
   tooltip?: {
     trigger: 'axis' | 'item';
@@ -29,11 +30,21 @@ export interface LineChartSchema extends BaseChartSchema {
   yAxis: {
     type: 'value';
   };
+  grid: {
+    left: string,  // Reduz a margem esquerda
+    right: string, // Reduz a margem direita para ocupar mais espaço
+    top: string,
+    bottom: string,
+    containLabel: true, // Garante que os labels não saiam do gráfico
+  },
   series: Array<{
     name: string;
     type: 'line';
     stack?: string;
     data: number[];
+    itemStyle?: {
+      color: string;
+    };
   }>;
 }
 
@@ -45,14 +56,24 @@ export interface StackedBarChartSchema extends BaseChartSchema {
   yAxis: {
     type: 'value';
   };
+  grid: {
+    left: string,  // Reduz a margem esquerda
+    right: string, // Reduz a margem direita para ocupar mais espaço
+    top: string,
+    bottom: string,
+    containLabel: true, // Garante que os labels não saiam do gráfico
+  },
   series: Array<{
     name: string;
-    type: 'bar';
-    stack: 'Total';
+    type: 'bar' | 'line';
+    stack?: 'Total';
     emphasis?: {
       focus: 'series';
     };
     data: number[];
+    itemStyle?: {
+      color: string;
+    };
   }>;
 }
 
@@ -62,7 +83,9 @@ export interface PieChartSchema extends BaseChartSchema {
     type: 'pie';
     radius: string[];
     center?: string[];
-    data: Array<{ value: number; name: string }>;
+    data: Array<{ value: number; name: string, itemStyle?: {
+      color: string;
+    }; }>;
     avoidLabelOverlap?: false,
       itemStyle?: {
         borderRadius: 10,
@@ -97,5 +120,8 @@ export interface MapChartSchema extends BaseChartSchema {
       geoIndex: number;
       map: 'BR'; // Adicionando corretamente o campo 'map' aqui
       data: Array<{ name: string; value: number }>;
+      itemStyle?: {
+        color: string;
+      };
     }>;
   }
