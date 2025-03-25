@@ -1,17 +1,10 @@
-import sys
-import os
-from flask import Flask, jsonify, request
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+from flask import Blueprint, jsonify, request
 from apps.api.src.models.dashboard_model import DashboardModel
 
-app = Flask(__name__)
+# Cria um Blueprint para as rotas
+yield_bp = Blueprint('yield_routes', __name__)
 
-@app.route("/")
-def home():
-    return jsonify({"message": "API de Dados Agrícolas", "status": "online"})
-
-@app.route("/get_yield_data", methods=["POST"])
+@yield_bp.route('/get_yield_data', methods=['POST'])
 def get_yield_data():
     if not request.is_json:
         return jsonify({"error": "O corpo da requisição deve ser JSON"}), 400
@@ -46,6 +39,3 @@ def get_yield_data():
             "error": "Erro ao processar requisição",
             "details": str(e)
         }), 500
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
