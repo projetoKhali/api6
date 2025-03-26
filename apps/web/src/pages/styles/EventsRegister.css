@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 20px;
+    width: 100%;
+}
+
+.form-container {
+    flex: 1;
+    max-width: 300px;
+}
+
+.table-container {
+    flex: 2;
+    min-width: 600px;
+    background-color: none;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.separator {
+    width: 3px;
+    background-color: #63E77C;
+    height: auto;
+    min-height: 300px;
+}
