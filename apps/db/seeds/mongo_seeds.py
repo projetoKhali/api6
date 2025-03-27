@@ -1,7 +1,7 @@
 import pandas as pd
 from mongo_db import MongoDB
 
-db = MongoDB.get_database("reforestation")
+db = MongoDB.get_database("api6_mongo")
 df = pd.read_csv("apps/db/crop_yield.csv")
 
 # retirando valores nulos

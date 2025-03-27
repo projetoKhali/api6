@@ -27,7 +27,11 @@ class MongoDB:
 
     @classmethod
     def get_database(cls, db_name: str):
-        client = cls.get_client()
+        try:
+            client = cls.get_client()
+        except Exception as e:
+            print(f"Erro ao conectar ao MongoDB: {e}")
+            return None
         return client[db_name]
 
 
@@ -173,7 +177,7 @@ def restart_collections(db):
 
 
 def initialize_mongo_database():
-    db = MongoDB.get_database("reforestation")
+    db = MongoDB.get_database("api6_mongo")
     if db is None:
         print("Erro ao conectar ao banco de dados.")
         return
