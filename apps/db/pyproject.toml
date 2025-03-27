@@ -1,28 +1,23 @@
 [tool.coverage.run]
 branch = true
-source = ["apps/api"]
+source = ["apps/db"]
 
 [tool.coverage.report]
 exclude_lines = ["if TYPE_CHECKING:"]
 show_missing = true
 
 [tool.poetry]
-name = "api"
+name = "db"
 version = "1.0.0"
 license = "Proprietary"
 readme = "README.md"
-packages = [{ include = "api", from = "src" }]
+packages = [{ include = "db", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "*"
 dotenv = "*"
-flask = "*"
-flask-cors = "*"
 pymongo = "*"
 psycopg2 = "*"
-pydantic = "*"
-
-db = { path = "../db/" }
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
