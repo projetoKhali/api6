@@ -1,5 +1,5 @@
-from src.mongo import initialize_mongo_database
-from src.postgres import initialize_postgres_database
+from db.mongo import initialize_mongo_database
+from db.postgres import initialize_postgres_database
 
 
 def initialize_databases():

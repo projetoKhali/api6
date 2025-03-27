@@ -26,6 +26,7 @@ class User(Base):
     name = Column(String)
     login = Column(String, index=True, unique=True)
     password = Column(Text)
+    version_terms_agreement = Column(String)
 
 
 class Permission(Base):

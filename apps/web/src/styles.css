@@ -1,1 +1,66 @@
-/* You can add global styles to this file, and also import other style files */
+html, body, #root {
+  height: 100%;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* Permite rolagem vertical */
+  overflow-x: hidden;
+}
+
+/* Container principal */
+.main-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap; /* Permite que os componentes quebrem a linha */
+  gap: 16px; /* Espaçamento entre os componentes */
+  padding: 16px; /* Espaçamento interno */
+  box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+}
+
+/* Estilo do card */
+.card-dashboard {
+  height: 100%;
+  max-height: 70px;
+  width: 16%;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #026734;
+  border-radius: 10px;
+  min-width: 150px; /* Largura mínima para evitar que o card fique muito pequeno */
+  box-sizing: border-box;
+  font-family: "Mulish", sans-serif;
+  color: #fff
+}
+
+/* Estilo do título do card */
+.title-card-dash {
+  font-size: 0.7rem;
+  font-weight: normal;
+  margin: 0;
+  height: 20%;
+}
+
+/* Estilo do valor do card */
+.value-card-dash {
+  display: flex;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0;
+  height: 70%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.css-b62m3t-container{
+  width: 100%;
+  max-width: 24%;
+  min-width: 320px;
+  font-family: "Mulish", sans-serif;
+  color:#026734
+}

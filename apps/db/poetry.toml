@@ -2,4 +2,4 @@
 create = true
 virtualenv.force-create = true
 in-project = true
-path = ".venv"
+path = "../../.venv"

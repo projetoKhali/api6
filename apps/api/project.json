@@ -35,6 +35,9 @@
       "options": {
         "command": "poetry run pytest tests/",
         "cwd": "{projectRoot}"
+      },
+      "env": {
+        "POETRY_VIRTUALENVS_IN_PROJECT": "true"
       }
     },
     "test-integration": {
@@ -45,7 +48,8 @@
         "cwd": "{projectRoot}",
         "env": {
           "TEST_MONGO_IMAGE": "mongo:5",
-          "MONGO_URI": "mongodb://localhost:28017"
+          "MONGO_URI": "mongodb://localhost:28017",
+          "POETRY_VIRTUALENVS_IN_PROJECT": "true"
         }
       }
     },
@@ -57,10 +61,8 @@
       }
     },
     "add": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "poetry add {args.dep}"
-      }
+      "executor": "@nxlv/python:add",
+      "options": {}
     }
   }
 }

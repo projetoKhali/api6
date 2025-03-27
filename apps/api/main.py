@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from db.mongo import MongoDB
 
 app = Flask(__name__)
 

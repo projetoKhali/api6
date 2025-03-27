@@ -1,29 +1,35 @@
+[tool.coverage.run]
+branch = true
+source = ["apps/api"]
+
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
+show_missing = true
+
 [tool.poetry]
 name = "api"
-version = "0.1.0"
+version = "1.0.0"
+license = "Proprietary"
 readme = "README.md"
-package-mode = false
-
-[[tool.poetry.packages]]
-include = "api"
+packages = [{ include = "api", from = "src" }]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4.0"
+python = "*"
 dotenv = "*"
 flask = "*"
 flask-cors = "*"
 pymongo = "*"
 psycopg2 = "*"
-pydantic = "^2.10.6"
+pydantic = "*"
+
+db = { path = "../db/" }
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
 flake8 = "*"
-black = "*"
 pytest = "*"
 pytest-sugar = "*"
 pytest-cov = "*"
 pytest-html = "*"
 
-[tool.nx]
-autoActivate = true
+[tool.poetry-monorepo.deps]
