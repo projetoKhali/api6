@@ -19,14 +19,14 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/src/postgres.py"
+        "command": "poetry run python {projectRoot}/db/src/db/postgres.py"
       }
     },
     "init-mongo": {
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/src/mongo.py"
+        "command": "poetry run python {projectRoot}/db/src/db/mongo.py"
       }
     },
     "up": {
@@ -97,6 +97,9 @@
       "options": {
         "command": "poetry run pytest tests/",
         "cwd": "{projectRoot}"
+      },
+      "env": {
+        "POETRY_VIRTUALENVS_IN_PROJECT": "true"
       }
     },
     "test-integration": {
@@ -107,7 +110,8 @@
         "cwd": "{projectRoot}",
         "env": {
           "TEST_MONGO_IMAGE": "mongo:5",
-          "MONGO_URI": "mongodb://localhost:28017"
+          "MONGO_URI": "mongodb://localhost:28017",
+          "POETRY_VIRTUALENVS_IN_PROJECT": "true"
         }
       }
     },
@@ -116,13 +120,6 @@
       "options": {
         "command": "poetry lock && cd ../.. && poetry lock",
         "cwd": "{projectRoot}"
-      }
-    },
-    "add": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["install"],
-      "options": {
-        "command": "poetry add {args.dep}"
       }
     }
   }
