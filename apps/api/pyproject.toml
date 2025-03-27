@@ -31,5 +31,6 @@ pytest = "*"
 pytest-sugar = "*"
 pytest-cov = "*"
 pytest-html = "*"
+mongomock = "*"
 
 [tool.poetry-monorepo.deps]

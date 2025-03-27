@@ -29,6 +29,7 @@ pytest-sugar = "0.9.7"
 pytest-cov = "4.1.0"
 pytest-html = "3.2.0"
 black = "^25.1.0"
+mongomock = "^4.3.0"
 
 [tool.poetry.group.dev.dependencies.testcontainers]
 extras = ["mongodb", "postgres"]

@@ -1,12 +1,20 @@
 import pytest
 from unittest.mock import MagicMock, patch
+from mongomock import MongoClient
 from api.models.yield_model import (
     create_yield_event,
     get_yield_events_filter,
     update_yield_event,
 )
 
-from db.mongo import MongoDB  # Adjust the import based on your structure
+from db.mongo import MongoDB
+
+
+@pytest.fixture
+def mock_mongo():
+    client = MongoClient()
+    db = client['test_db']
+    yield db
 
 
 @patch.object(MongoDB, "get_client")
