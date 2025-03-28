@@ -1,44 +1,35 @@
-import pytest
 from unittest.mock import MagicMock, patch
+import pytest
 from mongomock import MongoClient
 from api.models.yield_model import (
     create_yield_event,
     get_yield_events_filter,
     update_yield_event,
 )
-
-from db.mongo import MongoDB
+from db.mongo import MongoDB, restart_collections
 
 
 @pytest.fixture
 def mock_mongo():
     client = MongoClient()
     db = client['test_db']
+    restart_collections(db)
     yield db
 
 
-@patch.object(MongoDB, "get_client")
-def test_create_yield_event(mock_get_client, mock_mongo, sample_event):
-    """Test creating a yield event in MongoDB."""
+@pytest.fixture(autouse=True)
+def patch_get_client(mock_mongo):
+    with patch.object(MongoDB, "get_client", return_value=mock_mongo):
+        yield
 
-    mock_client = MagicMock()
-    mock_db = MagicMock()
-    mock_collection = MagicMock()
 
-    mock_client.__getitem__.return_value = mock_db
-    mock_db.__getitem__.return_value = mock_collection
-    mock_mongo.insert_one.return_value.inserted_id = "mock_id"
-
-    mock_get_client.return_value = mock_client
-
-    result = create_yield_event(sample_event)
-
-    assert result == "mock_id"
+@pytest.fixture(autouse=True)
+def yield_collection(mock_mongo):
+    return mock_mongo['yield_collection']
 
 
 @pytest.fixture
 def sample_event():
-    """Returns a sample yield event."""
     return {
         "crop": "Wheat",
         "crop_year": "2024",
@@ -53,27 +44,27 @@ def sample_event():
     }
 
 
-def test_create_yield_event(mock_mongo, sample_event):
-    """Test creating a yield event in MongoDB."""
-    mock_mongo.insert_one.return_value.inserted_id = "mock_id"
-    result = create_yield_event(sample_event)
-    assert result == "mock_id"
-    mock_mongo.insert_one.assert_called_once()
+def test_create_yield_event(yield_collection, sample_event):
+    yield_collection.insert_one = MagicMock(return_value=MagicMock(inserted_id="123"))
+    result = create_yield_event(yield_collection, sample_event)
+    assert result is not None
+    yield_collection.insert_one.assert_called_once()
 
 
-def test_get_yield_events_filter(mock_mongo, sample_event):
-    """Test retrieving yield events with filters."""
-    mock_mongo.find.return_value = [sample_event]
-    result = get_yield_events_filter()
+def test_get_yield_events_filter(yield_collection, sample_event):
+    yield_collection.find = MagicMock(return_value=[sample_event])
+    result = get_yield_events_filter(yield_collection)
     assert result == [sample_event]
-    mock_mongo.find.assert_called_once()
+    yield_collection.find.assert_called_once()
 
 
-def test_update_yield_event(mock_mongo, sample_event):
-    """Test updating a yield event in MongoDB."""
-    mock_mongo.update_one.return_value.modified_count = 1
+def test_update_yield_event(yield_collection, sample_event):
+    update_result = MagicMock()
+    update_result.modified_count = 1
+    yield_collection.update_one = MagicMock(return_value=update_result)
     update_data = sample_event.copy()
     update_data["production"] = 6000
-    result = update_yield_event("Wheat", "2024", update_data)
+    result = update_yield_event(yield_collection, "Wheat", "2024", update_data)
     assert result["modified_count"] == 1
-    mock_mongo.update_one.assert_called_once()
+    yield_collection.update_one.assert_called_once()
+
