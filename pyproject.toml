@@ -11,6 +11,7 @@ flask-cors = ">=5.0.1,<6.0.0"
 dotenv = "^0.9.9"
 pymongo = ">=4.11.1,<5.0.0"
 psycopg2 = ">=2.9.10,<3.0.0"
+pydantic = "^2.10.6"
 
 [tool.poetry.dependencies.api]
 path = "apps/api"
@@ -28,6 +29,7 @@ pytest-sugar = "0.9.7"
 pytest-cov = "4.1.0"
 pytest-html = "3.2.0"
 black = "^25.1.0"
+mongomock = "^4.3.0"
 
 [tool.poetry.group.dev.dependencies.testcontainers]
 extras = ["mongodb", "postgres"]

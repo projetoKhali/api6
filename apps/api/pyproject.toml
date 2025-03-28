@@ -1,6 +1,6 @@
 [tool.coverage.run]
 branch = true
-source = ["apps/api"]
+source = ["api"]
 
 [tool.coverage.report]
 exclude_lines = ["if TYPE_CHECKING:"]
@@ -31,5 +31,6 @@ pytest = "*"
 pytest-sugar = "*"
 pytest-cov = "*"
 pytest-html = "*"
+mongomock = "*"
 
 [tool.poetry-monorepo.deps]

@@ -33,7 +33,7 @@
       "executor": "@nxlv/python:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run pytest tests/",
+        "command": "poetry run pytest -vv --cache-clear tests/",
         "cwd": "{projectRoot}"
       },
       "env": {
@@ -44,7 +44,7 @@
       "executor": "@nxlv/python:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run pytest tests/",
+        "command": "poetry run pytest -vv --cache-clear tests/",
         "cwd": "{projectRoot}",
         "env": {
           "TEST_MONGO_IMAGE": "mongo:5",
