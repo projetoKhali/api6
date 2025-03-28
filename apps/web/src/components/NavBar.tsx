@@ -8,7 +8,7 @@ const Navbar = () => {
             <div style={{
                 marginRight: "auto"
             }}>
-                <img src="../../public/kersys-removebg-preview.png" alt="" />
+                <img src="/kersys-removebg-preview.png" alt="" />
             </div>
             <div style={{
                 display: "flex",
@@ -19,22 +19,19 @@ const Navbar = () => {
                 padding: "20px",
                 color: "#fff"
             }}>
-                {/* <h3>Dasboard</h3> */}
-                <a href="" style={{textDecoration:"none", color:"#fff"}}>Dashboard</a>
+                <a href="/dashboard" style={{ textDecoration: "none", color: "#fff" }}>Dashboard</a>
                     <div style={{
                         height: "35px",
                         width: "3px",
                         backgroundColor: "#fff",
                     }}></div>
                 <a href="" style={{textDecoration:"none", color:"#fff"}}>Previsões</a>
-                {/* <h3>Previsões</h3> */}
                     <div style={{
                         height: "35px",
                         width: "3px",
                         backgroundColor: "#fff"
                     }}></div>
-                <a href="" style={{textDecoration:"none", color:"#fff"}}>Cadastro</a>
-                {/* <h3>Cadastro</h3> */}
+                <a href="/events-register" style={{ textDecoration: "none", color: "#fff" }}>Cadastro</a>
             </div>
         </main>
     )
