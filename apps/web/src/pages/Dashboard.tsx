@@ -63,6 +63,8 @@ const stackedBarChartData: StackedBarChartSchema = {
   ],
 };
 
+
+
 // Dados para o gráfico de pizza
 const pieChartData: PieChartSchema = {
   title: { text: 'Gráfico de Pizza', left: 'center' },
@@ -158,6 +160,23 @@ function App() {
     fetchData();
   }, [selectedFilters]);
 
+  const getScatterData = () => {
+    if (!yieldData?.data) return [];
+  
+    return yieldData.data.map(item => ({
+      name: item.crop,
+      value: [
+        item.fertilizer, // Eixo X (fertilizante)
+        item.yield,      // Eixo Y (rendimento)
+        item.area,       // Tamanho do ponto (área)
+        item.crop        // Cor (cultura)
+      ],
+      production: item.production,
+      state: item.state,
+      season: item.season
+    }));
+  };
+
   // Função para lidar com mudanças nos filtros
   const handleFilterChange = (filterName: keyof FilterParams, value: any) => {
     setSelectedFilters((prev) => ({
@@ -171,6 +190,74 @@ function App() {
       value: item,
       label: item,
     }));
+  };
+
+  const scatterChartOption: EChartsOption = {
+    title: {
+      text: 'Relação entre Fertilizante e Rendimento por Cultura',
+      left: 'center'
+    },
+    tooltip: {
+      formatter: (params: any) => {
+        const data = params.data;
+        return `
+          <strong>${data.name}</strong><br/>
+          Fertilizante: ${data.value[0]} kg<br/>
+          Rendimento: ${data.value[1]}<br/>
+          Área: ${data.value[2]} ha<br/>
+          Produção: ${data.production}<br/>
+          Estado: ${data.state}<br/>
+          Estação: ${data.season}
+        `;
+      }
+    },
+    grid: {
+      left: '10%',
+      right: '5%',
+      bottom: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      name: 'Fertilizante (kg)',
+      nameLocation: 'middle',
+      nameGap: 30,
+      type: 'value',
+      splitLine: {
+        lineStyle: {
+          type: 'dashed'
+        }
+      }
+    },
+    yAxis: {
+      name: 'Rendimento',
+      nameLocation: 'middle',
+      nameGap: 30,
+      type: 'value',
+      splitLine: {
+        lineStyle: {
+          type: 'dashed'
+        }
+      }
+    },
+    series: [
+      {
+        name: 'Culturas',
+        type: 'scatter',
+        symbolSize: function (data) {
+          // Ajusta o tamanho baseado na área (normalizado)
+          const minArea = Math.min(...(yieldData?.data.map(item => item.area) || [0]));
+          const maxArea = Math.max(...(yieldData?.data.map(item => item.area) || [1]));
+          return 10 + ((data[2] - minArea) / (maxArea - minArea)) * 30;
+        },
+        data: getScatterData(),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
   };
 
   const lineChartData: LineChartSchema = {
@@ -237,15 +324,6 @@ function App() {
 
   console.log('Dados formatados dos estados:', statesData);
 
-  const populationData = [
-    { name: 'São Paulo', value: 100 },
-    { name: 'Rio de Janeiro', value: 80 },
-    { name: 'Minas Gerais', value: 60 },
-    { name: 'Bahia', value: 6 },
-    { name: 'Pernambuco', value: 499 },
-    // Você pode adicionar mais dados de população aqui
-  ];
-
   const maxValue = Math.max(...statesData.map((item) => item.value));
   const minValue = Math.min(...statesData.map((item) => item.value));
 
@@ -260,7 +338,7 @@ function App() {
 
   // Configuração do gráfico
   const mapChartData: EChartsOption = {
-    title: { text: 'Produção por Estado (Escala Logarítmica)', left: 'center' },
+    title: { text: 'Produção por Estado', left: 'center' },
     tooltip: {
       trigger: 'item',
     },
@@ -280,16 +358,17 @@ function App() {
     },
     visualMap: {
       left: 'right',
-      min: 10000000,
-      max: 1000000000,
+      min: Math.min(...statesData.map(item => item.value)), // Valor mínimo
+      max: 1000000000, // Valor máximo
       inRange: {
-        color: ['#50EA77', '#026734'],
+        color: ['#50EA77', '#026734'] // Gradiente de cores
       },
-      text: ['aaa', 'Low'],
+      text: ['Alta produção', 'Baixa produção'],
       calculable: true,
-      itemHeight: 300, // Aumenta a altura da barra
-      width: 20, // Ajusta a largura da barra
+      itemHeight: 300,
+      width: 20
     },
+
     series: [
       {
         name: 'População por Estado',
@@ -297,7 +376,7 @@ function App() {
         map: 'BR',
         geoIndex: 0,
         data: statesData.map((item) => {
-          const color = getColor(item.value / 100000000000);
+          const color = getColor(item.value);
           console.log(
             `Estado: ${item.name}, Valor: ${item.value}, Cor:`,
             color
@@ -496,12 +575,12 @@ function App() {
         <div style={{ height: '200px', width: '30%' }}>
           <GenericChart option={pieChartData} />
         </div>
-        <div style={{ height: '200px', width: '30%' }}>
-          <GenericChart option={pieChartData} />
-        </div>
       </div>
       <div style={{ height: '300px', width: '1000px' }}>
         <BrazilMapChart option={mapChartData} />
+        <div style={{ height: '700px', width: '100%' }}>
+          <GenericChart option={scatterChartOption} />
+        </div>
       </div>
     </div>
   );

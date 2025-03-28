@@ -32,8 +32,9 @@ def get_filtered_yield_data(
     
     total_production = calculate_total_production(filtered_data)
     season_totals = get_yearly_season_totals(filtered_data)
+    states_totals = get_production_by_state(filtered_data)
         
-    return filtered_data, total_production, season_totals
+    return filtered_data, total_production, season_totals, states_totals
 
 
 def calculate_total_production(filtered_data: List[Dict]) -> float:
@@ -118,3 +119,41 @@ def get_yearly_season_totals(filtered_data: List[Dict]) -> Dict:
             result["total"][i] += production
 
     return result
+
+def get_production_by_state(filtered_data: List[Dict]) -> List[Dict[str, Union[str, float]]]:
+    """
+    Calcula o total de produção por estado
+    
+    Args:
+        filtered_data: Lista de dicionários com os dados de produção
+        
+    Returns:
+        Lista de dicionários no formato:
+        [
+            {"state": "Acre", "total_production": 4685.0},
+            {"state": "Alagoas", "total_production": 3200.0},
+            ...
+        ]
+        ordenado por estado (A-Z)
+    """
+    state_production = defaultdict(float)
+    
+    for item in filtered_data:
+        state = item.get('state')
+        production = item.get('production', 0)
+        
+        if state is not None and isinstance(production, (int, float)):
+            state_production[state] += production
+    
+    # Converte para lista de dicionários e ordena por nome do estado
+    result = [
+        {"state": state, "total_production": total}
+        for state, total in sorted(state_production.items())
+    ]
+    
+    return result
+
+def get_filter():
+    model = DashboardModel()
+    unique_values = model.get_all_unique_values()
+    return unique_values["crop_years"], unique_values["seasons"], unique_values["crops"], unique_values["states"]
