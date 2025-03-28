@@ -55,3 +55,35 @@ class DashboardModel:
             item["_id"] = str(item["_id"])
             
         return data
+    
+    def get_filter_possible_values(self, field: str) -> List[str]:
+        """
+        Retorna valores únicos possíveis para um campo específico
+        
+        Args:
+            field: Nome do campo
+        
+        Returns:
+            Lista de valores únicos
+        """
+        return self.collection.distinct(field)
+    
+    def get_all_unique_values(self) -> dict:
+        """
+        Retorna um dicionário com todos os valores únicos para os principais campos
+        
+        Returns:
+            Dicionário no formato:
+            {
+                "crop_years": [lista de anos],
+                "seasons": [lista de estações],
+                "crops": [lista de culturas],
+                "states": [lista de estados]
+            }
+        """
+        return {
+            "crop_years": sorted(self.get_filter_possible_values("crop_year")),
+            "seasons": sorted(self.get_filter_possible_values("season")),
+            "crops": sorted(self.get_filter_possible_values("crop")),
+            "states": sorted(self.get_filter_possible_values("state"))
+        }
