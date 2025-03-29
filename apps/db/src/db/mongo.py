@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
-from pymongo import ASCENDING, MongoClient
-
+from pymongo import MongoClient, ASCENDING
 
 class MongoDB:
     _client = None
@@ -10,30 +9,39 @@ class MongoDB:
     def get_client(cls):
         """Connect to MongoDB using environment variables."""
         if cls._client is not None:
-            return
+            return cls._client
 
         load_dotenv()
 
-        mongo_user = os.getenv("MONGO_USER", "mongodb")
+        # Valores padrão - verifique se correspondem ao seu MongoDB
+        mongo_user = os.getenv("MONGO_USER", "mongo")
         mongo_password = os.getenv("MONGO_PASSWORD", "secret")
         mongo_host = os.getenv("MONGO_HOST", "localhost")
         mongo_port = os.getenv("MONGO_PORT", "27017")
-        mongo_db = os.getenv("MONGO_DB", "api6_mongo")
+        auth_source = os.getenv("MONGO_AUTH_SOURCE", "admin")
 
-        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
-
-        cls._client = MongoClient(mongo_url)
-        return cls._client
+        try:
+            cls._client = MongoClient(
+                host=f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/",
+                authSource=auth_source,
+                authMechanism="SCRAM-SHA-256",
+                connectTimeoutMS=5000,
+                serverSelectionTimeoutMS=5000
+            )
+            # Teste de conexão
+            cls._client.admin.command('ping')
+            print("[SUCCESS] Connected to MongoDB")
+            return cls._client
+        except Exception as e:
+            print("[ERROR] MongoDB connection failed:", str(e))
+            raise
 
     @classmethod
     def get_database(cls, db_name: str):
-        try:
-            client = cls.get_client()
-        except Exception as e:
-            print(f"Erro ao conectar ao MongoDB: {e}")
-            return None
-        return client[db_name]
-
+        """Get database reference"""
+        if cls._client is None:
+            cls.get_client()
+        return cls._client[db_name]
 
 # Uso:
 # from mongo import MongoDB

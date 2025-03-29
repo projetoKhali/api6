@@ -1,6 +1,6 @@
 from bson import ObjectId
 from typing import Union, List, Optional
-from apps.db.mongo_db import MongoDB
+from apps.db.src.db.mongo import MongoDB
 
 class DashboardModel:
     def __init__(self, db_name: str = "reforestation"):
