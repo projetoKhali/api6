@@ -1,19 +1,20 @@
 import React from "react";
-import "./styles/TableComponent.css"
+import "./styles/TableComponent.css";
 
 export interface Column {
     key: string;
     label: string;
-    type: "text" | "number" | "date" | "select";
+    type: "text" | "number" | "date" | "select" | "actions";
 }
 
 interface TableProps {
     schema: Column[];
     data: Record<string, any>[];
     onRowSelect?: (row: Record<string, any>) => void;
+    onEdit?: (row: Record<string, any>) => void;
 }
 
-const TableComponent: React.FC<TableProps> = ({ schema, data, onRowSelect }) => {
+const TableComponent: React.FC<TableProps> = ({ schema, data, onRowSelect, onEdit }) => {
     return (
         <div className="table-container">
             <table className="custom-table">
@@ -29,7 +30,20 @@ const TableComponent: React.FC<TableProps> = ({ schema, data, onRowSelect }) => 
                         data.map((row, index) => (
                             <tr key={index} onClick={() => onRowSelect?.(row)}>
                                 {schema.map((col) => (
-                                    <td key={col.key}>{row[col.key]}</td>
+                                    <td key={col.key}>
+                                        {col.key === "actions" ? (
+                                            onEdit ? (
+                                                <button onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onEdit(row);
+                                                }}>
+                                                    Editar
+                                                </button>
+                                            ) : null
+                                        ) : (
+                                            row[col.key]
+                                        )}
+                                    </td>
                                 ))}
                             </tr>
                         ))
