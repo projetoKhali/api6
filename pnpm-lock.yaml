@@ -14,6 +14,9 @@ importers:
       echarts:
         specifier: ^5.6.0
         version: 5.6.0
+      flask-cors:
+        specifier: ^0.0.1
+        version: 0.0.1
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -3691,6 +3694,9 @@ packages:
   find-versions@5.1.0:
     resolution: {integrity: sha512-+iwzCJ7C5v5KgcBuueqVoNiHVoQpwiUK5XFLjf0affFTep+Wcw93tPvmb8tqujDNmzhBDPddnWV/qgWSXgq+Hg==}
     engines: {node: '>=12'}
+
+  flask-cors@0.0.1:
+    resolution: {integrity: sha512-ZEhUp1JH+Qxru2yOhsRhIgA18QR7D4S2wQtOqu28PvfeDFzz97Fu6M1fUXsjDwkEqSTuKdmJ34aCuYEr8dWthA==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -10506,6 +10512,8 @@ snapshots:
   find-versions@5.1.0:
     dependencies:
       semver-regex: 4.0.5
+
+  flask-cors@0.0.1: {}
 
   flat-cache@4.0.1:
     dependencies:

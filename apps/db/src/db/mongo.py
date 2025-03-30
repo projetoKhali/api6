@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from pymongo import ASCENDING, MongoClient
+from pymongo import MongoClient, ASCENDING
 
 
 class MongoDB:
