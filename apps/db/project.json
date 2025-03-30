@@ -1,0 +1,126 @@
+{
+  "name": "db",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["lock"],
+      "options": {
+        "command": "poetry install"
+      }
+    },
+    "init": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/main.py"
+      }
+    },
+    "init-pg": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/db/src/db/postgres.py"
+      }
+    },
+    "init-mongo": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/db/src/db/mongo.py"
+      }
+    },
+    "up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-up mongo-up"
+      }
+    },
+    "down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-down mongo-down"
+      }
+    },
+    "postgres-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres"
+      }
+    },
+    "mongo-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d mongo"
+      }
+    },
+    "postgres-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml down"
+      }
+    },
+    "mongo-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml down"
+      }
+    },
+    "pg-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-up"
+      }
+    },
+    "pg-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-down"
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:flake8",
+      "dependsOn": ["install"],
+      "options": {
+        "outputFile": "{projectRoot}/reports/pylint.txt"
+      }
+    },
+    "fix-lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run black ."
+      }
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest --cache-clear tests/",
+        "cwd": "{projectRoot}"
+      },
+      "env": {
+        "POETRY_VIRTUALENVS_IN_PROJECT": "true"
+      }
+    },
+    "test-integration": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest --cache-clear tests/",
+        "cwd": "{projectRoot}",
+        "env": {
+          "TEST_MONGO_IMAGE": "mongo:5",
+          "MONGO_URI": "mongodb://localhost:28017",
+          "POETRY_VIRTUALENVS_IN_PROJECT": "true"
+        }
+      }
+    },
+    "lock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry lock && cd ../.. && poetry lock",
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

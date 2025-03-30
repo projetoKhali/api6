@@ -7,4 +7,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/web',
+  setupFiles: ['./jest.setup.js'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/test/'],
 };

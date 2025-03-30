@@ -24,41 +24,12 @@ O desafio proposto pela empresa <a href="https://www.kersys.com.br/"> Kersys </a
 
 ## Proposta
 
-Nossa proposta consiste em um...
+Nossa proposta é a criação de uma **aplicação web inteligente** para **monitoramento e gestão de plantios**, permitindo que administradores e consultores acompanhem **métricas essenciais**, realizem **análises de produtividade** e **gerenciem eventos do plantio** de forma eficiente.  
 
-<span id="backlogproduto">
-
-## Backlog do produto
-
-<details>
-
-<summary>Confira nosso Backlog</summary>
-    
-| Épico  | Story | Prioridade | Critérios de aceite | Código do Requisito | Sprint |
-|-----------------|------------------------------|------------------------------------------------------|------------|----------------|----------------|
-|  -  | -   | -|  - | - | - |
+A plataforma visa integrar **dados de diferentes fontes**, aplicar **inteligência artificial para previsões de produtividade** e fornecer **insights estratégicos** para otimização do cultivo.
 
 
 </details>
-
-<details>
-<summary>Requisitos do projeto </summary>
-
-| Código  | Tipo           | Descrição                                                                                                        | Prioridade |
-|---------|----------------|------------------------------------------------------------------------------------------------------------------|------------|
-| RF-01   | Funcional      |              |       |
-| RF-02   | Funcional      |         |       |
-| RF-03   | Funcional      |  |      |
-| RF-04   | Funcional      |      |     |
-| RF-05   | Funcional      |  |    |
-| RF-06   | Funcional      |  |      |
-| RNF-01  | Não Funcional  |        |       |
-| RNF-02  | Não Funcional  |        |       |
-| RNF-03  | Não Funcional  |              |       |
-| RNF-04  | Não Funcional  |  |      |
-
-</details>
-
 
 <span id="backlogsprint">
     
@@ -68,26 +39,49 @@ Nossa proposta consiste em um...
 <summary>Sprint 1 </summary>
 
 
-| **Épico** | **Funcionalidade** | **Pontuação** |
+| **Épico** | **Funcionalidade** | **Prioridade** |
 | :-------- | :-------- | :-----------: |
-| -       | -     |  -   |
-| -         | -| - |
-
+| Dashboard para análise de dados | Eu como Administrador quero um dashboard para acompanhar as principais métricas das plantações | Alta       |
+| Dashboard para análise de dados | Eu como consultor quero um dashboard para acompanhar as principais métricas das plantações | Alta       |
+| Cadastro e gestão dos dados de plantio | Eu como Administrador quero cadastrar os principais eventos no meu plantio para o armazenamento e tomada de decisão | Média      |
 </details>
 
 <span id="entrega">
 
-
-## Entrega das sprints
+## Entregavéis das sprints
 
 <details>
 
-<summary>Sprint 1 - </summary>
+<summary>Sprint 1 - De 10/03 a 30/03 </summary>
+</br>
+Nesta sprint, serão entregues as seguintes funcionalidades:
 
-### De 10/03 a 30/03
-#
+## 📊 Dashboard de Métricas  
+Desenvolvimento de um painel para acompanhamento das principais métricas do plantio, incluindo:  
+- **Número total de espécies cadastradas**  
+- **Número total de lotes cadastrados**  
+- **Número total de plantios registrados**  
+- **Quantidade produzida ao longo do tempo**, conforme a unidade de medida cadastrada  
+- **Proporção de eficiência no plantio**, analisada por espécie e lote  
+- **Distribuição do uso de insumos**, incluindo:  
+  - Tipos de **irrigação** utilizados  
+  - Tipos de **adubo** aplicados  
+  - Tipos de **pragas** identificadas  
+
+## 📅 Gestão de Eventos  
+Implementação de uma interface para gerenciamento dos eventos do plantio, permitindo:  
+- **Cadastro de novos eventos**, com todas as informações necessárias  
+- **Atualização de eventos existentes**  
+- **Visualização dos eventos cadastrados**, com dados detalhados de cada ação registrada  
+
+Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos dados e possam gerenciar o plantio com mais eficiência. 
 
 </details>
+
+<br>
+
+>Confira nossa documentações completa: https://github.com/projetoKhali/api6-docs
+<br>
 
 <span id="burndown">
 
@@ -96,6 +90,7 @@ Nossa proposta consiste em um...
 <details>
 <summary> Sprint 1 </summary>
     
+![image](https://github.com/user-attachments/assets/0cf137d2-777b-4af9-9a00-024c44f1e0f4)
 
 
 </details>
@@ -108,19 +103,12 @@ Nossa proposta consiste em um...
 
 <a href="">Github Projects</a>
 
-<span id="documentacoes">
-
-## Documentações 
-
->Confira nossas documentações: https://github.com/projetoKhali/api6-docs
-<br>
-
 
 <span id="prototipo">
 
 ## Protótipo
 
-<a href="">Figma</a>
+<a href="https://www.figma.com/design/lZyPEM5hYIvt6F9vHXaxQG/API6?node-id=0-1&t=y3en5PjcW4iHrHrm-1">Figma</a>
 
 <span id="tecnologias">
 
