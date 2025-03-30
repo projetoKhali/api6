@@ -1,4 +1,3 @@
-import sys
 from flask import Flask, jsonify
 from api.routes import yield_routes
 from db.mongo import MongoDB
