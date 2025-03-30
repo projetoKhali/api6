@@ -7,7 +7,7 @@ description = "Atomic file writes."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" or python_version < \"3.10\""
+markers = "sys_platform == \"win32\" or python_version < \"3.11\""
 files = [
     {file = "atomicwrites-1.4.1.tar.gz", hash = "sha256:81b2c9071a49367a7f770170e5eec8cb66567cfbbc8c73d20ce5ca4a8d71cf11"},
 ]
@@ -19,7 +19,7 @@ description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "attrs-20.3.0-py2.py3-none-any.whl", hash = "sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6"},
     {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
@@ -57,7 +57,7 @@ description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=3.5"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "attrs-22.1.0-py2.py3-none-any.whl", hash = "sha256:86efa402f67bf2df34f51a335487cf46b1ec130d02b8d39fd248abfd30da551c"},
     {file = "attrs-22.1.0.tar.gz", hash = "sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"},
@@ -76,7 +76,7 @@ description = "A tool that automatically formats Python code to conform to the P
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "autopep8-1.5.5-py2.py3-none-any.whl", hash = "sha256:9e136c472c475f4ee4978b51a88a494bfcd4e3ed17950a44a988d9e434837bea"},
     {file = "autopep8-1.5.5.tar.gz", hash = "sha256:cae4bc0fb616408191af41d062d7ec7ef8679c7f27b068875ca3a9e2878d5443"},
@@ -93,7 +93,7 @@ description = "A tool that automatically formats Python code to conform to the P
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.10\" or python_version <= \"2.7\""
+markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "autopep8-1.5.7-py2.py3-none-any.whl", hash = "sha256:aa213493c30dcdac99537249ee65b24af0b2c29f2e83cd8b3f68760441ed0db9"},
     {file = "autopep8-1.5.7.tar.gz", hash = "sha256:276ced7e9e3cb22e5d7c14748384a5cf5d9002257c0ed50c0e075b68011bb6d0"},
@@ -127,7 +127,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version == \"3.4\""
+markers = "python_version == \"3.4\" and sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.1-py2.py3-none-any.whl", hash = "sha256:f8ac84de7840f5b9c4e3347b3c1eaa50f7e49c2b07596221daec5edaabbd7c48"},
     {file = "colorama-0.4.1.tar.gz", hash = "sha256:05eed71e2e327246ad6b38c540c4a3117230b19679b875190486ddd2d721422d"},
@@ -140,7 +140,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.10\" and python_version > \"2.7\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.11\""
 files = [
     {file = "colorama-0.4.5-py2.py3-none-any.whl", hash = "sha256:854bf444933e37f5824ae7bfc1e98d5bce2ebe4160d46b5edf346a89358e99da"},
     {file = "colorama-0.4.5.tar.gz", hash = "sha256:e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4"},
@@ -153,7 +153,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and (python_version <= \"2.7\" or python_version >= \"3.10\")"
+markers = "sys_platform == \"win32\" and (python_version <= \"2.7\" or python_version >= \"3.11\")"
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -196,7 +196,7 @@ description = "Code coverage measurement for Python"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, <4"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "coverage-4.5.4-cp26-cp26m-macosx_10_12_x86_64.whl", hash = "sha256:eee64c616adeff7db37cc37da4180a3a5b6177f5c46b187894e633f088fb5b28"},
     {file = "coverage-4.5.4-cp27-cp27m-macosx_10_12_x86_64.whl", hash = "sha256:ef824cad1f980d27f26166f86856efe11eff9912c4fed97d3804820d43fa550c"},
@@ -239,7 +239,7 @@ description = "Code coverage measurement for Python"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.10\" or python_version <= \"2.7\""
+markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "coverage-5.6b1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:b93fb9137070899b5f10d6487724f4427b5945983a785e1e2f1102c5e175c516"},
     {file = "coverage-5.6b1-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:e508bb216eee8350e77b436f9f99c4f2d8335ecb51483f5ffd8bf5e84aaa56d1"},
@@ -337,7 +337,7 @@ description = "the modular source code checker: pep8 pyflakes and co"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "flake8-3.8.4-py2.py3-none-any.whl", hash = "sha256:749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839"},
     {file = "flake8-3.8.4.tar.gz", hash = "sha256:aadae8761ec651813c24be05c6f7b4680857ef6afaae4651a4eccaef97ce6c3b"},
@@ -357,7 +357,7 @@ description = "the modular source code checker: pep8 pyflakes and co"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},
     {file = "flake8-3.9.2.tar.gz", hash = "sha256:07528381786f2a6237b061f6e96610a4167b226cb926e2aa2b6b1d78057c576b"},
@@ -389,7 +389,7 @@ description = "Read metadata from Python packages"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.8\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.8\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "importlib_metadata-1.1.3-py2.py3-none-any.whl", hash = "sha256:7c7f8ac40673f507f349bef2eed21a0e5f01ddf5b2a7356a6c65eb2099b53764"},
     {file = "importlib_metadata-1.1.3.tar.gz", hash = "sha256:7a99fb4084ffe6dae374961ba7a6521b79c1d07c658ab3a28aa264ee1d1b14e3"},
@@ -410,7 +410,7 @@ description = "Read metadata from Python packages"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.8\" or python_version <= \"2.7\""
+markers = "python_version < \"3.8\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\""
 files = [
     {file = "importlib_metadata-2.1.3-py2.py3-none-any.whl", hash = "sha256:52e65a0856f9ba7ea8f2c4ced253fb6c88d1a8c352cb1e916cff4eb17d5a693d"},
     {file = "importlib_metadata-2.1.3.tar.gz", hash = "sha256:02a9f62b02e9b1cc43871809ef99947e8f5d94771392d666ada2cafc4cd09d4f"},
@@ -433,7 +433,7 @@ description = "iniconfig: brain-dead simple config-ini parsing"
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
@@ -489,7 +489,7 @@ description = "More routines for operating on iterables, beyond itertools"
 optional = false
 python-versions = ">=3.4"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "more-itertools-7.2.0.tar.gz", hash = "sha256:409cd48d4db7052af495b09dec721011634af3753ae1ef92d2b32f73a745f832"},
     {file = "more_itertools-7.2.0-py3-none-any.whl", hash = "sha256:92b8c4b06dac4f0611c0729b2f2ede52b2e1bac1ab48f089c7ddc12e26bb60c4"},
@@ -502,7 +502,7 @@ description = "NumPy is the fundamental package for array computing with Python.
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version < \"3.10\" and sys_platform != \"win32\" or python_version <= \"2.7\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and sys_platform != \"win32\" or python_version <= \"2.7\""
 files = [
     {file = "numpy-1.16.6-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:08bf4f66f190822f4642e036accde8da810b87fffc0b9409e7a00d9e54760099"},
     {file = "numpy-1.16.6-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:d759ca1b76ac6f6b6159fb74984126035feb1dee9f68b4b961889b6dc090f33a"},
@@ -536,7 +536,7 @@ description = "NumPy is the fundamental package for array computing with Python.
 optional = false
 python-versions = ">=3.5"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.10\" and python_version > \"2.7\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.11\""
 files = [
     {file = "numpy-1.18.5-cp35-cp35m-macosx_10_9_intel.whl", hash = "sha256:e91d31b34fc7c2c8f756b4e902f901f856ae53a93399368d9a0dc7be17ed2ca0"},
     {file = "numpy-1.18.5-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:7d42ab8cedd175b5ebcb39b5208b25ba104842489ed59fbb29356f671ac93583"},
@@ -568,7 +568,7 @@ description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
-markers = "python_version >= \"3.10\""
+markers = "python_version >= \"3.11\""
 files = [
     {file = "numpy-2.2.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:8146f3550d627252269ac42ae660281d673eb6f8b32f113538e0cc2a9aed42b9"},
     {file = "numpy-2.2.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e642d86b8f956098b564a45e6f6ce68a22c2c97a04f5acd3f221f57b8cb850ae"},
@@ -649,7 +649,7 @@ description = "Powerful data structures for data analysis, time series,and stati
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "pandas-0.22.0-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:68ac484e857dcbbd07ea7c6f516cc67f7f143f5313d9bc661470e7f473528882"},
     {file = "pandas-0.22.0-cp27-cp27m-win32.whl", hash = "sha256:06efae5c00b9f4c6e6d3fe1eb52e590ff0ea8e5cb58032c724e04d31c540de53"},
@@ -679,7 +679,7 @@ description = "Powerful data structures for data analysis, time series, and stat
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version < \"3.10\" or python_version <= \"2.7\""
+markers = "python_version < \"3.11\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\""
 files = [
     {file = "pandas-0.24.2-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:17916d818592c9ec891cbef2e90f98cc85e0f1e89ed0924c9b5220dc3209c846"},
     {file = "pandas-0.24.2-cp27-cp27m-win32.whl", hash = "sha256:42e5ad741a0d09232efbc7fc648226ed93306551772fc8aecc6dce9f0e676794"},
@@ -714,7 +714,7 @@ description = "Powerful data structures for data analysis, time series, and stat
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
-markers = "python_version >= \"3.10\""
+markers = "python_version >= \"3.11\""
 files = [
     {file = "pandas-2.2.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1948ddde24197a0f7add2bdc4ca83bf2b1ef84a1bc8ccffd95eda17fd836ecb5"},
     {file = "pandas-2.2.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:381175499d3802cde0eabbaf6324cce0c4f5d52ca6f8c377c29ad442f50f6348"},
@@ -762,7 +762,6 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.22.4", markers = "python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version == \"3.11\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
@@ -876,7 +875,7 @@ description = "library with cross-python path, ini-parsing, io, code, log facili
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "py-1.10.0-py2.py3-none-any.whl", hash = "sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a"},
     {file = "py-1.10.0.tar.gz", hash = "sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3"},
@@ -889,7 +888,7 @@ description = "library with cross-python path, ini-parsing, io, code, log facili
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.10\" or python_version <= \"2.7\""
+markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
@@ -902,7 +901,7 @@ description = "Python style guide checker"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "pycodestyle-2.6.0-py2.py3-none-any.whl", hash = "sha256:2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367"},
     {file = "pycodestyle-2.6.0.tar.gz", hash = "sha256:c58a7d2815e0e8d7972bf1803331fb0152f867bd89adf8a01dfd55085434192e"},
@@ -915,7 +914,7 @@ description = "Python style guide checker"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.10\" or python_version <= \"2.7\""
+markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "pycodestyle-2.7.0-py2.py3-none-any.whl", hash = "sha256:514f76d918fcc0b55c6680472f0a37970994e07bbb80725808c17089be302068"},
     {file = "pycodestyle-2.7.0.tar.gz", hash = "sha256:c389c1d06bf7904078ca03399a4816f974a1d590090fecea0c63ec26ebaf1cef"},
@@ -941,7 +940,7 @@ description = "passive checker of Python programs"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "pyflakes-2.2.0-py2.py3-none-any.whl", hash = "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92"},
     {file = "pyflakes-2.2.0.tar.gz", hash = "sha256:35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8"},
@@ -954,7 +953,7 @@ description = "passive checker of Python programs"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "pyflakes-2.3.1-py2.py3-none-any.whl", hash = "sha256:7893783d01b8a89811dd72d7dfd4d84ff098e5eed95cfa8905b22bbffe52efc3"},
     {file = "pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db"},
@@ -1108,7 +1107,7 @@ description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version < \"3.10\" and sys_platform != \"win32\" or python_version <= \"2.7\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and sys_platform != \"win32\" or python_version <= \"2.7\""
 files = [
     {file = "pytest-4.6.11-py2.py3-none-any.whl", hash = "sha256:a00a7d79cbbdfa9d21e7d0298392a8dd4123316bfac545075e6f8f24c94d8c97"},
     {file = "pytest-4.6.11.tar.gz", hash = "sha256:50fa82392f2120cc3ec2ca0a75ee615be4c479e66669789771f1758332be4353"},
@@ -1144,7 +1143,7 @@ description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.5"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "pytest-6.1.2-py3-none-any.whl", hash = "sha256:4288fed0d9153d9646bfcdf0c0428197dba1ecb27a33bb6e031d002fa88653fe"},
     {file = "pytest-6.1.2.tar.gz", hash = "sha256:c0a7e94a8cdbc5422a51ccdad8e6f1024795939cc89159a0ae7f0b316ad3823e"},
@@ -1173,7 +1172,7 @@ description = "Pytest plugin for measuring coverage."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version > \"2.7\" and python_version < \"3.10\" and sys_platform != \"win32\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and python_version > \"2.7\" and sys_platform != \"win32\""
 files = [
     {file = "pytest-cov-2.8.1.tar.gz", hash = "sha256:cc6742d8bac45070217169f5f72ceee1e0e55b0221f54bcf24845972d3a47f2b"},
     {file = "pytest_cov-2.8.1-py2.py3-none-any.whl", hash = "sha256:cdbdef4f870408ebdbfeb44e63e07eb18bb4619fae852f6e760645fa36172626"},
@@ -1193,7 +1192,7 @@ description = "Pytest plugin for measuring coverage."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 groups = ["dev"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.10\" or python_version <= \"2.7\""
+markers = "sys_platform == \"win32\" and python_version != \"3.4\" or python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "pytest-cov-2.12.1.tar.gz", hash = "sha256:261ceeb8c227b726249b376b8526b600f38667ee314f910353fa318caa01f4d7"},
     {file = "pytest_cov-2.12.1-py2.py3-none-any.whl", hash = "sha256:261bb9e47e65bd099c89c3edf92972865210c36813f80ede5277dceb77a4a62a"},
@@ -1230,7 +1229,7 @@ description = "pytest plugin for test session metadata"
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "python_version > \"2.7\" and python_version < \"3.10\""
+markers = "python_version < \"3.11\" and python_version > \"2.7\""
 files = [
     {file = "pytest-metadata-1.8.0.tar.gz", hash = "sha256:2071a59285de40d7541fde1eb9f1ddea1c9db165882df82781367471238b66ba"},
     {file = "pytest_metadata-1.8.0-py2.py3-none-any.whl", hash = "sha256:c29a1fb470424926c63154c1b632c02585f2ba4282932058a71d35295ff8c96d"},
@@ -1246,7 +1245,7 @@ description = "pytest plugin for test session metadata"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 groups = ["dev"]
-markers = "python_version <= \"2.7\" or python_version >= \"3.10\""
+markers = "python_version <= \"2.7\" or python_version >= \"3.11\""
 files = [
     {file = "pytest-metadata-1.11.0.tar.gz", hash = "sha256:71b506d49d34e539cc3cfdb7ce2c5f072bea5c953320002c95968e0238f8ecf1"},
     {file = "pytest_metadata-1.11.0-py2.py3-none-any.whl", hash = "sha256:576055b8336dd4a9006dd2a47615f76f2f8c30ab12b1b1c039d99e834583523f"},
@@ -1294,7 +1293,7 @@ description = "Read key-value pairs from a .env file and set them as environment
 optional = false
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.4\" or python_version < \"3.10\" and sys_platform != \"win32\" or python_version <= \"2.7\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and sys_platform != \"win32\" or python_version <= \"2.7\""
 files = [
     {file = "python-dotenv-0.18.0.tar.gz", hash = "sha256:effaac3c1e58d89b3ccb4d04a40dc7ad6e0275fda25fd75ae9d323e2465e202d"},
     {file = "python_dotenv-0.18.0-py2.py3-none-any.whl", hash = "sha256:dd8fe852847f4fbfadabf6183ddd4c824a9651f02d51714fa075c95561959c7d"},
@@ -1313,7 +1312,7 @@ description = "Read key-value pairs from a .env file and set them as environment
 optional = false
 python-versions = ">=3.5"
 groups = ["main"]
-markers = "sys_platform == \"win32\" and python_version != \"3.4\" and python_version > \"2.7\" or python_version >= \"3.10\""
+markers = "python_version > \"2.7\" and sys_platform == \"win32\" and python_version != \"3.4\" or python_version >= \"3.11\""
 files = [
     {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
     {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
@@ -1329,7 +1328,7 @@ description = "World timezone definitions, modern and historical"
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "python_version >= \"3.10\""
+markers = "python_version >= \"3.11\""
 files = [
     {file = "pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00"},
     {file = "pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"},
@@ -1413,7 +1412,7 @@ description = "Provider of IANA time zone data"
 optional = false
 python-versions = ">=2"
 groups = ["dev"]
-markers = "python_version >= \"3.10\""
+markers = "python_version >= \"3.11\""
 files = [
     {file = "tzdata-2025.2-py2.py3-none-any.whl", hash = "sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8"},
     {file = "tzdata-2025.2.tar.gz", hash = "sha256:b60a638fcc0daffadf82fe0f57e53d06bdec2f36c4df66280ae79bce6bd6f2b9"},
@@ -1426,7 +1425,7 @@ description = "Measures the displayed width of unicode strings in a terminal"
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "python_version == \"3.4\" or python_version < \"3.10\" and sys_platform != \"win32\" or python_version <= \"2.7\""
+markers = "python_version == \"3.4\" or python_version < \"3.11\" and sys_platform != \"win32\" or python_version <= \"2.7\""
 files = [
     {file = "wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859"},
     {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
