@@ -14,7 +14,7 @@ class MongoDB:
 
         load_dotenv()
 
-        mongo_user = os.getenv("MONGO_USER", "mongodb")
+        mongo_user = os.getenv("MONGO_USER", "mongo")
         mongo_password = os.getenv("MONGO_PASSWORD", "secret")
         mongo_host = os.getenv("MONGO_HOST", "localhost")
         mongo_port = os.getenv("MONGO_PORT", "27017")
