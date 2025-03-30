@@ -18,6 +18,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo
       MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: api6_mongo
     ports:
       - "27017:27017"
     volumes:
