@@ -1,8 +1,8 @@
 from flask import Flask, jsonify
 from api.routes import yield_routes
+from api.routes import dashboard_routes
 from db.mongo import MongoDB
 from dev import print_routes
-from api.routes.dashboard_route import create_blueprint as dashboard_blueprint
 
 
 def create_app():
@@ -16,12 +16,10 @@ def create_app():
     def home():
         return jsonify({"message": "Hello from Flask!"})
 
-    blueprints = [
-        yield_routes.create_blueprint(db),  # Mantém o existente
-        dashboard_blueprint(db)             # Adiciona o novo
-    ]
-
-    for blueprint in blueprints:
+    for blueprint in [
+        yield_routes.create_blueprint(db),
+        dashboard_routes.create_blueprint(db),
+    ]:
         app.register_blueprint(blueprint)
 
     return app
