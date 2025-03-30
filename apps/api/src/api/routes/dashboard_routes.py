@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from api.service.dashboard_service import (
     get_filtered_yield_data,
     get_filter,
@@ -9,12 +8,6 @@ from api.service.dashboard_service import (
 def create_blueprint(db):
     dashboard_blueprint = Blueprint(
         'yield_dashboard', __name__, url_prefix="/api")
-
-    # Configuração CORS para rotas específicas
-    CORS(dashboard_blueprint, resources={
-        r"/api/get_yield_data": {"origins": "*", "methods": ["POST", "OPTIONS"]},
-        r"/api/get_filters": {"origins": "*", "methods": ["GET", "OPTIONS"]}
-    })
 
     @dashboard_blueprint.route("/get_yield_data", methods=["POST", "OPTIONS"])
     def get_yield_data():

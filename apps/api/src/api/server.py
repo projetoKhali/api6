@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from api.routes import yield_routes
 from api.routes import dashboard_routes
 from db.mongo import MongoDB
@@ -11,6 +12,7 @@ def create_app():
     MongoDB.test()
 
     app = Flask(__name__)
+    CORS(app)
 
     @app.route("/")
     def home():
