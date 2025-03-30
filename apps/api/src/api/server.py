@@ -1,3 +1,4 @@
+import sys
 from flask import Flask, jsonify
 from api.routes import yield_routes
 from db.mongo import MongoDB
@@ -6,6 +7,8 @@ from dev import print_routes
 
 def create_app():
     db = MongoDB.connect()
+
+    MongoDB.test()
 
     app = Flask(__name__)
 
