@@ -32,5 +32,6 @@ pytest-sugar = "*"
 pytest-cov = "*"
 pytest-html = "*"
 mongomock = "*"
+colorama = "*"
 
 [tool.poetry-monorepo.deps]
