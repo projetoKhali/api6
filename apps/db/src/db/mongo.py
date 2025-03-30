@@ -25,6 +25,16 @@ class MongoDB:
         cls._client = MongoClient(mongo_url)[mongo_db]
         return cls._client
 
+    @classmethod
+    def test(cls):
+        """Test the connection to MongoDB."""
+        try:
+            db = cls.connect()
+            db.command("ping")
+            print("Conexão bem-sucedida.")
+        except Exception as e:
+            print(f"Erro ao conectar ao banco de dados: {e}")
+
 # Uso:
 # from mongo import MongoDB
 # db = MongoDB.connect()
