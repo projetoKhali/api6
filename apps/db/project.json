@@ -19,14 +19,14 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/db/src/db/postgres.py"
+        "command": "poetry run python {projectRoot}/src/db/postgres.py"
       }
     },
     "init-mongo": {
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/db/src/db/mongo.py"
+        "command": "poetry run python {projectRoot}/seeds/mongo_seeds.py"
       }
     },
     "up": {
