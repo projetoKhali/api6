@@ -181,4 +181,3 @@ def initialize_mongo_database():
     create_plots_collection(db)
     create_yield_collection(db)
     create_indexes(db)
-    # restart_collections(db)
