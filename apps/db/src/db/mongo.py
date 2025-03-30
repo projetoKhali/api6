@@ -28,12 +28,8 @@ class MongoDB:
     @classmethod
     def test(cls):
         """Test the connection to MongoDB."""
-        try:
-            db = cls.connect()
-            db.command("ping")
-            print("Conexão bem-sucedida.")
-        except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
+        db = cls.connect()
+        db.command("ping")
 
 # Uso:
 # from mongo import MongoDB
