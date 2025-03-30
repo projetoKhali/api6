@@ -20,7 +20,7 @@ class MongoDB:
         mongo_port = os.getenv("MONGO_PORT", "27017")
         mongo_db = os.getenv("MONGO_DB", "api6_mongo")
 
-        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
         cls._client = MongoClient(mongo_url)[mongo_db]
         return cls._client
