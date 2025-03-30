@@ -1,5 +1,5 @@
 from typing import List, Dict, Tuple, Union, Optional
-from apps.api.src.models.dashboard_model import DashboardModel  # ajuste o import conforme sua estrutura
+from api.models.dashboard_model import DashboardModel  # ajuste o import conforme sua estrutura
 
 def get_filtered_yield_data(
     crop_year: Optional[Union[int, List[int]]] = None,

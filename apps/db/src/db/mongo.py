@@ -6,11 +6,11 @@ class MongoDB:
     _client = None
 
     @classmethod
-    def get_client(cls):
+    def connect(cls):
         """Connect to MongoDB using environment variables."""
         if cls._client is not None:
             return cls._client
-
+        
         load_dotenv()
 
         # Valores padrão - verifique se correspondem ao seu MongoDB
@@ -19,22 +19,12 @@ class MongoDB:
         mongo_host = os.getenv("MONGO_HOST", "localhost")
         mongo_port = os.getenv("MONGO_PORT", "27017")
         auth_source = os.getenv("MONGO_AUTH_SOURCE", "admin")
+        mongo_db = os.getenv("MONGO_DB", "reflorestation")
 
-        try:
-            cls._client = MongoClient(
-                host=f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/",
-                authSource=auth_source,
-                authMechanism="SCRAM-SHA-256",
-                connectTimeoutMS=5000,
-                serverSelectionTimeoutMS=5000
-            )
-            # Teste de conexão
-            cls._client.admin.command('ping')
-            print("[SUCCESS] Connected to MongoDB")
-            return cls._client
-        except Exception as e:
-            print("[ERROR] MongoDB connection failed:", str(e))
-            raise
+        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
+
+        cls._client = MongoClient(mongo_url)[mongo_db]
+        return cls._client
 
     @classmethod
     def get_database(cls, db_name: str):
@@ -45,7 +35,7 @@ class MongoDB:
 
 # Uso:
 # from mongo import MongoDB
-# db = MongoDB.get_database("meu_banco")
+# db = MongoDB.connect()
 
 
 def create_species_collection(db):
