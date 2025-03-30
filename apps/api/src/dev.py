@@ -10,16 +10,19 @@ def print_routes(app):
     from colorama import init, Fore
     init(autoreset=True)
 
-    terminal_width = shutil.get_terminal_size().columns
+    try:
+        terminal_width = shutil.get_terminal_size().columns
+    except:
+        terminal_width = 80  # Fallback para caso de erro
+
     border = "=" * terminal_width
 
-    print(f"\n{Fore.GREEN}📌 Registered Routes:{Fore.RESET}")
+    print(f"\n{Fore.GREEN} Registered Routes:{Fore.RESET}")
     print(border)
 
     for blueprint, rules in group_routes_by_blueprint(app):
-        print(f"{Fore.CYAN}📂 {blueprint or 'Default Blueprint'}:{Fore.RESET}")
+        print(f"{Fore.CYAN} {blueprint or 'Default Blueprint'}:{Fore.RESET}")
         for rule in rules:
-
             route = rule.rule
             title = rule.endpoint
             if blueprint:
@@ -36,7 +39,7 @@ def print_routes(app):
 
             for method in methods.split(","):
                 print(
-                    f"    {method_colors.get(method, Fore.WHITE)}📍 {title:25} ➝ {method:7} {route}{Fore.RESET}")
+                    f"    {method_colors.get(method, Fore.WHITE)} {title:25} -> {method:7} {route}{Fore.RESET}")
 
     print(border, "\n")
 
@@ -46,10 +49,8 @@ def group_routes_by_blueprint(app):
     blueprint_routes = {}
 
     for rule in app.url_map.iter_rules():
-
         if "static" not in rule.endpoint:
-            blueprint_name = rule.endpoint.split(
-                '.')[0] if '.' in rule.endpoint else None
+            blueprint_name = rule.endpoint.split('.')[0] if '.' in rule.endpoint else None
             blueprint_routes.setdefault(blueprint_name, []).append(rule)
 
     return blueprint_routes.items()
