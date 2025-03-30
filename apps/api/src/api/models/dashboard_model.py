@@ -3,22 +3,23 @@ from bson import ObjectId
 from pymongo.errors import PyMongoError
 from db.mongo import MongoDB
 
+
 class DashboardModel:
     def __init__(self, db_name: str = "reforestation"):
         """
         Inicializa o modelo com a conexão existente
         """
         try:
-            # Conexão mantida conforme sua implementação original
-            self.db = MongoDB.connect()  # Usa o método connect() diretamente
+            self.db = MongoDB.connect()
             self.collection = self.db["yield_collection"]
-            
+
             # Verificação segura da coleção
             if not hasattr(self.collection, 'name') or self.collection.name != "yield_collection":
                 raise ValueError("Coleção yield_collection não está acessível")
-                
+
         except Exception as e:
-            raise RuntimeError(f"Falha ao inicializar DashboardModel: {str(e)}")
+            raise RuntimeError(
+                f"Falha ao inicializar DashboardModel: {str(e)}")
 
     def get_filtered_data(
         self,
@@ -50,7 +51,7 @@ class DashboardModel:
     ) -> Dict[str, Any]:
         """Constroi a query de forma segura"""
         query = {}
-        
+
         # Tratamento especial para crop_year
         if crop_year is not None:
             if isinstance(crop_year, list):
@@ -85,7 +86,7 @@ class DashboardModel:
                         query[field] = {"$in": valid_values}
                 else:
                     query[field] = value
-                    
+
         return query
 
     def _convert_documents(self, cursor) -> List[Dict[str, Any]]:
@@ -120,10 +121,10 @@ class DashboardModel:
             "crops": "crop",
             "states": "state"
         }
-        
+
         results = {}
         for result_key, field in fields_mapping.items():
             values = self.get_filter_possible_values(field)
             results[result_key] = sorted(values) if values else []
-                
+
         return results
