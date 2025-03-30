@@ -32,6 +32,9 @@ interface Calculations {
 export interface StatesTotals {
   state: string;
   total_production: number;
+  efficiency: number;
+  total_area: number;
+
 }
 
 export interface filterListSchema {
@@ -47,7 +50,8 @@ export interface YieldDataResponse {
   season_totals: SeasonTotalsStrict;
   states_totals: StatesTotals[];
   yearly_crop_stats: YearlyCropStatistics;
-  metrics: Metrics
+  metrics: Metrics,
+  crops_totals: cropsTotalsSchema[];
 }
 
 interface CropStatistics {
@@ -69,4 +73,11 @@ export interface Metrics {
   total_production: number;
   total_species: number;
   total_states: number;
+}
+
+export interface cropsTotalsSchema{
+    crop: string,
+    efficiency: number,
+    total_area: number,
+    total_production: number
 }

@@ -22,7 +22,7 @@ class DashboardModel:
 
     def get_filtered_data(
         self,
-        crop_year: Optional[Union[int, List[int]]] = None,
+        crop_year: Optional[Union[int, str, List[Union[int, str]]]] = None,
         season: Optional[Union[str, List[str]]] = None,
         crop: Optional[Union[str, List[str]]] = None,
         state: Optional[Union[str, List[str]]] = None
@@ -43,15 +43,35 @@ class DashboardModel:
 
     def _build_query(
         self,
-        crop_year: Optional[Union[int, List[int]]],
+        crop_year: Optional[Union[int, str, List[Union[int, str]]]],
         season: Optional[Union[str, List[str]]],
         crop: Optional[Union[str, List[str]]],
         state: Optional[Union[str, List[str]]]
     ) -> Dict[str, Any]:
         """Constroi a query de forma segura"""
         query = {}
+        
+        # Tratamento especial para crop_year
+        if crop_year is not None:
+            if isinstance(crop_year, list):
+                # Converte strings para inteiros
+                valid_years = []
+                for year in crop_year:
+                    try:
+                        valid_years.append(int(year))
+                    except (ValueError, TypeError):
+                        continue
+                if valid_years:
+                    query['crop_year'] = {"$in": valid_years}
+            else:
+                # Se for um único valor, tenta converter para inteiro
+                try:
+                    query['crop_year'] = int(crop_year)
+                except (ValueError, TypeError):
+                    pass
+
+        # Processa os outros filtros normalmente
         filters = {
-            'crop_year': crop_year,
             'season': season,
             'crop': crop,
             'state': state
@@ -65,6 +85,7 @@ class DashboardModel:
                         query[field] = {"$in": valid_values}
                 else:
                     query[field] = value
+                    
         return query
 
     def _convert_documents(self, cursor) -> List[Dict[str, Any]]:

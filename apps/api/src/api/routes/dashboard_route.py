@@ -33,7 +33,7 @@ def create_blueprint(db):
                 return jsonify({"error": "crop_year deve ser inteiro ou lista"}), 400
             
             # Chama o service
-            data, total_production, season_totals, states_totals, yearly_crop_stats, metrics = get_filtered_yield_data(
+            data, total_production, season_totals, states_totals, yearly_crop_stats, metrics, crops_totals = get_filtered_yield_data(
                 crop_year=crop_year,
                 season=season,
                 crop=crop,
@@ -49,7 +49,8 @@ def create_blueprint(db):
                 "season_totals": season_totals,
                 "states_totals": states_totals,
                 "yearly_crop_stats": yearly_crop_stats,
-                "metrics": metrics
+                "metrics": metrics,
+                "crops_totals": crops_totals
             })
             
             return _corsify_actual_response(response), 200

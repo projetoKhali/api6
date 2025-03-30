@@ -35,9 +35,10 @@ def get_filtered_yield_data(
     states_totals = get_production_by_state(filtered_data)
     yearly_crop_stats = get_yearly_crop_statistics(filtered_data)
     metrics = get_general_metrics(filtered_data)
+    crops_totals = get_production_by_crop(filtered_data)
 
         
-    return filtered_data, total_production, season_totals, states_totals, yearly_crop_stats, metrics
+    return filtered_data, total_production, season_totals, states_totals, yearly_crop_stats, metrics, crops_totals
 
 def calculate_total_production(filtered_data: List[Dict]) -> float:
     """
@@ -148,7 +149,7 @@ def get_yearly_season_totals(filtered_data: List[Dict]) -> Dict:
 
 def get_production_by_state(filtered_data: List[Dict]) -> List[Dict[str, Union[str, float]]]:
     """
-    Calcula o total de produção por estado
+    Calcula o total de produção, área e eficiência por estado, ordenando por eficiência (maior para menor)
     
     Args:
         filtered_data: Lista de dicionários com os dados de produção
@@ -156,26 +157,48 @@ def get_production_by_state(filtered_data: List[Dict]) -> List[Dict[str, Union[s
     Returns:
         Lista de dicionários no formato:
         [
-            {"state": "Acre", "total_production": 4685.0},
-            {"state": "Alagoas", "total_production": 3200.0},
+            {
+                "state": "Santa Catarina", 
+                "total_production": 5685.0,
+                "total_area": 1200.0,
+                "efficiency": 4.74  # produção/área
+            },
+            {
+                "state": "Paraná", 
+                "total_production": 7200.0,
+                "total_area": 2000.0,
+                "efficiency": 3.60
+            },
             ...
         ]
-        ordenado por estado (A-Z)
+        ordenado por eficiência (decrescente)
     """
-    state_production = defaultdict(float)
+    state_stats = defaultdict(lambda: {'production': 0.0, 'area': 0.0})
     
     for item in filtered_data:
         state = item.get('state')
         production = item.get('production', 0)
+        area = item.get('area', 0)
         
-        if state is not None and isinstance(production, (int, float)):
-            state_production[state] += production
+        if state is not None:
+            if isinstance(production, (int, float)):
+                state_stats[state]['production'] += production
+            if isinstance(area, (int, float)):
+                state_stats[state]['area'] += area
     
-    # Converte para lista de dicionários e ordena por nome do estado
-    result = [
-        {"state": state, "total_production": total}
-        for state, total in sorted(state_production.items())
-    ]
+    # Converte para lista de dicionários e calcula eficiência
+    result = []
+    for state, stats in state_stats.items():
+        efficiency = stats['production'] / stats['area'] if stats['area'] > 0 else 0.0
+        result.append({
+            "state": state, 
+            "total_production": stats['production'],
+            "total_area": stats['area'],
+            "efficiency": round(efficiency, 2)
+        })
+    
+    # Ordena por eficiência (decrescente) e depois por nome do estado (caso empate)
+    result.sort(key=lambda x: (-x['efficiency'], x['state']))
     
     return result
 
@@ -320,3 +343,59 @@ def get_general_metrics(filtered_data: List[Dict]) -> Dict[str, Union[float, int
         "total_species": len(unique_species),
         "total_states": len(unique_states)
     }
+    
+    
+def get_production_by_crop(filtered_data: List[Dict]) -> List[Dict[str, Union[str, float]]]:
+    """
+    Calcula o total de produção, área e eficiência por cultura, ordenando por eficiência (maior para menor)
+    
+    Args:
+        filtered_data: Lista de dicionários com os dados de produção
+        
+    Returns:
+        Lista de dicionários no formato:
+        [
+            {
+                "crop": "Soja", 
+                "total_production": 15000.0,
+                "total_area": 3000.0,
+                "efficiency": 5.0  # produção/área
+            },
+            {
+                "crop": "Milho", 
+                "total_production": 12000.0,
+                "total_area": 4000.0,
+                "efficiency": 3.0
+            },
+            ...
+        ]
+        ordenado por eficiência (decrescente)
+    """
+    crop_stats = defaultdict(lambda: {'production': 0.0, 'area': 0.0})
+    
+    for item in filtered_data:
+        crop = item.get('crop')
+        production = item.get('production', 0)
+        area = item.get('area', 0)
+        
+        if crop is not None:
+            if isinstance(production, (int, float)):
+                crop_stats[crop]['production'] += production
+            if isinstance(area, (int, float)):
+                crop_stats[crop]['area'] += area
+    
+    # Converte para lista de dicionários e calcula eficiência
+    result = []
+    for crop, stats in crop_stats.items():
+        efficiency = stats['production'] / stats['area'] if stats['area'] > 0 else 0.0
+        result.append({
+            "crop": crop, 
+            "total_production": stats['production'],
+            "total_area": stats['area'],
+            "efficiency": round(efficiency, 2)
+        })
+    
+    # Ordena por eficiência (decrescente) e depois por nome da cultura (caso empate)
+    result.sort(key=lambda x: (-x['efficiency'], x['crop']))
+    
+    return result

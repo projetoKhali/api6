@@ -15,6 +15,7 @@ import {
   getFilterData,
 } from '../service/DashboardService';
 import {
+  cropsTotalsSchema,
   filterListSchema,
   Metrics,
   StatesTotals,
@@ -24,40 +25,6 @@ import * as echarts from 'echarts';
 import type { EChartsOption } from 'echarts';
 
 
-const stackedBarChartData: StackedBarChartSchema = {
-  title: { text: 'Gráfico de Barras Empilhadas', left: 'center' },
-  tooltip: { trigger: 'axis' },
-  legend: {
-    data: ['Em cultivo', 'Perdido', 'Colhido'],
-    top: '90%',
-    left: 'center',
-  },
-  xAxis: {
-    type: 'category',
-    data: ['Manga', 'Dacueba', 'bom', 'ciriguela', 'zeruela'],
-  },
-  yAxis: { type: 'value' },
-  grid: {
-    left: '1%',
-    right: '1%',
-    top: '15%',
-    bottom: '10%',
-    containLabel: true, // Garante que os labels não saiam do gráfico
-  },
-  series: [
-    {
-      name: 'Perdido',
-      type: 'bar',
-      stack: 'Total',
-      data: [0.5, 1.7, 1.6, 2.9, 1.7],
-      itemStyle: {
-        color: '#8FFD24',
-      },
-    },
-  ],
-};
-
-// Dados para o gráfico de pizza
 const pieChartData: PieChartSchema = {
   title: { text: 'Gráfico de Pizza', left: 'center' },
   tooltip: { trigger: 'item' },
@@ -104,6 +71,7 @@ function App() {
   const [stateData, setStateData] = useState<StatesTotals[] | null>(null);
   const [filtersData, setFiltersData] = useState<filterListSchema | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<FilterParams>({});
+  const [cropData, setCropData] = useState<cropsTotalsSchema[] | null>(null);
   const [metrics, setMetrics] = useState<Metrics>({
     production_efficiency: 0,
     total_cultivated_area: 0,
@@ -113,16 +81,21 @@ function App() {
   });
 
   useEffect(() => {
-    fetchYieldData({})
-      .then((response) => {
-        setYieldData(response);
-        setStateData(response.states_totals);
-        console.log('Dados recebidos:', response);
-      })
-      .catch((error) => {
-        console.error('Erro:', error);
-      });
-  }, []);
+    const fetchData = async () => {
+      try {
+        const data = await fetchYieldData(selectedFilters);
+        const dataMetrics = data.metrics;
+        setYieldData(data);
+        setStateData(data.states_totals); // Adicione esta linha
+        setMetrics(dataMetrics);
+        setCropData(data.crops_totals);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+      }
+    };
+  
+    fetchData();
+  }, [selectedFilters]);
 
   useEffect(() => {
     getFilterData()
@@ -203,7 +176,7 @@ function App() {
         type: 'line',
         data: yieldData?.season_totals.production_average?.map(Number) || [],
         itemStyle: {
-          color: 'black',
+          color: '#918f61',
         },
       },
     ],
@@ -215,6 +188,8 @@ function App() {
       containLabel: true,
     },
   };
+
+  
 
   const getScatterDataByYear = () => {
     if (!yieldData?.yearly_crop_stats) return [];
@@ -239,6 +214,272 @@ function App() {
     }
 
     return scatterData;
+  };
+
+  const getCropAreaChartData = (cropsData: cropsTotalsSchema[] | null): EChartsOption => {
+    if (!cropsData || cropsData.length === 0) {
+      return {
+        title: {
+          text: 'Nenhum dado disponível',
+          left: 'center'
+        }
+      };
+    }
+  
+    // Ordena as culturas por produção (decrescente)
+    const sortedData = [...cropsData].sort((a, b) => b.total_production - a.total_production);
+    
+    return {
+      title: {
+        text: 'Produção e Eficiência por Cultura',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          crossStyle: {
+            color: '#999'
+          }
+        },
+        formatter: (params: any) => {
+          const crop = params[0].name;
+          const cropInfo = sortedData.find(c => c.crop === crop);
+          const production = params[0].value;
+          const efficiency = params[1].value;
+          
+          return `
+            <strong>${crop}</strong><br/>
+            Produção total: ${formatBrazilianValue(production)}<br/>
+            Eficiência: ${efficiency.toFixed(2)} (produção/área)<br/>
+            Área total: ${formatBrazilianValue(cropInfo?.total_area || 0)} m²
+          `;
+        }
+      },
+      legend: {
+        data: ['Produção Total', 'Eficiência'],
+        top: '30'
+      },
+      grid: {
+        left: '1%',
+        right: '1%',
+        bottom: '10%',
+        top: '20%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: sortedData.map(item => item.crop),
+        axisLabel: {
+          interval: 0,
+          rotate: 30, // Rotaciona os labels para melhor legibilidade
+          fontSize: 10
+        },
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: 'Produção Total',
+          position: 'left',
+          axisLine: {
+            lineStyle: {
+              color: '#026734'
+            }
+          },
+          axisLabel: {
+            formatter: (value: number) => formatBrazilianValue(value)
+          }
+        },
+        {
+          type: 'value',
+          name: 'Eficiência',
+          position: 'right',
+          axisLine: {
+            lineStyle: {
+              color: '#8FFD24'
+            }
+          },
+          axisLabel: {
+            formatter: (value: number) => value.toFixed(2)
+          },
+          splitLine: {
+            show: false
+          }
+        }
+      ],
+      series: [
+        {
+          name: 'Produção Total',
+          type: 'bar',
+          barWidth: '40%',
+          data: sortedData.map(item => item.total_production),
+          itemStyle: {
+            color: '#79dd7e'
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params: any) => formatBrazilianValue(params.value)
+          }
+        },
+        {
+          name: 'Eficiência',
+          type: 'line',
+          yAxisIndex: 1,
+          data: sortedData.map(item => item.efficiency),
+          symbol: 'circle',
+          symbolSize: 8,
+          itemStyle: {
+            color: '#caf729'
+          },
+          lineStyle: {
+            width: 3
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params: any) => params.value.toFixed(2)
+          }
+        }
+      ]
+    };
+  };
+
+  const getStatesBarChartData = (statesData: StatesTotals[] | null): EChartsOption => {
+    if (!statesData || statesData.length === 0) {
+      return {
+        title: {
+          text: 'Nenhum dado disponível',
+          left: 'center'
+        }
+      };
+    }
+  
+    // Ordena os estados por eficiência (decrescente)
+    const sortedData = [...statesData].sort((a, b) => a.efficiency - b.efficiency);
+    
+    return {
+      title: {
+        text: 'Área Cultivada e Eficiência por Estado',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: (params: any) => {
+          const state = params[0].name;
+          const stateInfo = sortedData.find(s => s.state === state);
+          const area = params[0].value;
+          const efficiency = params[1].value;
+          
+          return `
+            <strong>${state}</strong><br/>
+            Área total: ${formatBrazilianValue(area)} m²<br/>
+            Eficiência: ${efficiency.toFixed(2)} (produção/área)<br/>
+            Produção total: ${formatBrazilianValue(stateInfo?.total_production || 0)}
+          `;
+        }
+      },
+      legend: {
+        data: ['Área Cultivada (m²)', 'Eficiência (produção/área)'],
+        top: '30'
+      },
+      grid: {
+        left: '5%',
+        right: '10%',
+        bottom: '10%',
+        top: '10%',
+        containLabel: true
+      },
+      yAxis: {
+        type: 'category',
+        data: sortedData.map(item => item.state),
+        axisLabel: {
+          interval: 0,
+          fontSize: 15
+        }
+      },
+      xAxis: [
+        {
+          type: 'value',
+          name: 'Área (m²)',
+          position: 'bottom',
+          nameLocation: 'middle',
+          nameGap: 25,
+          axisLabel: {
+            formatter: (value: number) => formatBrazilianValue(value)
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'black'
+            }
+          },
+          splitLine: {
+            show: false
+          }
+        },
+        {
+          type: 'value',
+          name: 'Eficiência',
+          position: 'top',
+          nameLocation: 'middle',
+          nameGap: 25,
+          min: 0,
+          max: Math.max(...sortedData.map(item => item.efficiency)) * 1.2,
+          axisLabel: {
+            formatter: (value: number) => value.toFixed(1)
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'black'
+            }
+          },
+          splitLine: {
+            show: false
+          }
+        }
+      ],
+      series: [
+        {
+          name: 'Área Cultivada (m²)',
+          type: 'bar',
+          data: sortedData.map(item => item.total_area),
+          itemStyle: {
+            color: '#7a907c'
+          },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: (params: any) => formatBrazilianValue(params.value)
+          },
+          barWidth: '40%'
+        },
+        {
+          name: 'Eficiência (produção/área)',
+          type: 'line',
+          data: sortedData.map(item => item.efficiency),
+          xAxisIndex: 1, // Usa o segundo eixo X (topo)
+          symbol: 'circle',
+          symbolSize: 8,
+          itemStyle: {
+            color: '#9ae07d'
+          },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: (params: any) => params.value.toFixed(2)
+          },
+          lineStyle: {
+            width: 3
+          }
+        }
+      ]
+    };
   };
 
   // Nova função para obter dados de pesticida vs rendimento
@@ -982,34 +1223,17 @@ const pesticideScatterOption: EChartsOption = {
           justifyContent: 'space-evenly',
         }}
       >
-        <div style={{ height: '300px', width: '45%' }}>
-          <GenericChart option={stackedBarChartData} />
-        </div>
-        <div style={{ height: '300px', width: '45%' }}>
-          <GenericChart option={stackedBarChartData} />
+        <div style={{ height: '300px', minWidth: '100%' }}>
+          <GenericChart option={getCropAreaChartData(cropData)} />
         </div>
       </div>
-      <div
-        style={{
-          backgroundColor: '#f0f0f0',
-          height: '100%',
-          minHeight: '240px',
-          display: 'flex',
-          flexDirection: 'row',
-          padding: '20px',
-          gap: '20px',
-          justifyContent: 'space-evenly',
-        }}
-      >
-        <div style={{ height: '200px', width: '30%' }}>
-          <GenericChart option={pieChartData} />
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'space-evenly',width: '100%' }}>
+        <div style={{ width: '100%',border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+         <GenericChart option={getStatesBarChartData(stateData)} />
         </div>
-        <div style={{ height: '200px', width: '30%' }}>
-          <GenericChart option={pieChartData} />
+        <div style={{ width: '100%',border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+          <BrazilMapChart option={mapChartData} />
         </div>
-      </div>
-      <div style={{ border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
-        <BrazilMapChart option={mapChartData} />
       </div>
       <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
           <GenericChart option={scatterChartOption} />
