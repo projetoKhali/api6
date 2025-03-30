@@ -19,9 +19,9 @@ class MongoDB:
         mongo_host = os.getenv("MONGO_HOST", "localhost")
         mongo_port = os.getenv("MONGO_PORT", "27017")
         auth_source = os.getenv("MONGO_AUTH_SOURCE", "admin")
-        mongo_db = os.getenv("MONGO_DB", "reflorestation")
+        mongo_db = os.getenv("MONGO_DB", "api6_mongo")
 
-        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
+        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
 
         cls._client = MongoClient(mongo_url)[mongo_db]
         return cls._client
