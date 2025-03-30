@@ -18,8 +18,8 @@ def mock_mongo():
 
 
 @pytest.fixture(autouse=True)
-def patch_get_client(mock_mongo):
-    with patch.object(MongoDB, "get_client", return_value=mock_mongo):
+def patch_connect(mock_mongo):
+    with patch.object(MongoDB, "connect", return_value=mock_mongo):
         yield
 
 
@@ -45,7 +45,8 @@ def sample_event():
 
 
 def test_create_yield_event(yield_collection, sample_event):
-    yield_collection.insert_one = MagicMock(return_value=MagicMock(inserted_id="123"))
+    yield_collection.insert_one = MagicMock(
+        return_value=MagicMock(inserted_id="123"))
     result = create_yield_event(yield_collection, sample_event)
     assert result is not None
     yield_collection.insert_one.assert_called_once()
@@ -67,4 +68,3 @@ def test_update_yield_event(yield_collection, sample_event):
     result = update_yield_event(yield_collection, "Wheat", "2024", update_data)
     assert result["modified_count"] == 1
     yield_collection.update_one.assert_called_once()
-

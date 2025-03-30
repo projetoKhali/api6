@@ -7,10 +7,10 @@ class MongoDB:
     _client = None
 
     @classmethod
-    def get_client(cls):
+    def connect(cls):
         """Connect to MongoDB using environment variables."""
         if cls._client is not None:
-            return
+            return cls._client
 
         load_dotenv()
 
@@ -22,22 +22,12 @@ class MongoDB:
 
         mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
 
-        cls._client = MongoClient(mongo_url)
+        cls._client = MongoClient(mongo_url)[mongo_db]
         return cls._client
-
-    @classmethod
-    def get_database(cls, db_name: str):
-        try:
-            client = cls.get_client()
-        except Exception as e:
-            print(f"Erro ao conectar ao MongoDB: {e}")
-            return None
-        return client[db_name]
-
 
 # Uso:
 # from mongo import MongoDB
-# db = MongoDB.get_database("meu_banco")
+# db = MongoDB.connect()
 
 
 def create_species_collection(db):

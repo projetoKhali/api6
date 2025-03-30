@@ -65,7 +65,8 @@ def test_species_crud(test_mongo):
     updated_species = species_collection.find_one({"_id": species_id})
     assert updated_species["common_name"] == "Potato (Updated)"
 
-    deleted_count = species_collection.delete_one({"_id": species_id}).deleted_count
+    deleted_count = species_collection.delete_one(
+        {"_id": species_id}).deleted_count
     assert deleted_count == 1
 
 
