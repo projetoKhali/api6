@@ -36,6 +36,8 @@ def get_filtered_yield_data(
     yearly_crop_stats = get_yearly_crop_statistics(filtered_data)
     metrics = get_general_metrics(filtered_data)
     crops_totals = get_production_by_crop(filtered_data)
+    
+    filtered_data = filtered_data[0:500]
 
         
     return filtered_data, total_production, season_totals, states_totals, yearly_crop_stats, metrics, crops_totals
