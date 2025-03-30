@@ -19,13 +19,13 @@ def create_blueprint(db):
     @yield_blueprint.route('/', methods=['POST'])
     def create():
         data = request.json
-        result = create_yield_event(data)
+        result = create_yield_event(yield_collection, data)
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['GET'])
     def read():
         filters = request.args.to_dict()
-        result = get_yield_events_filter(filters)
+        result = get_yield_events_filter(yield_collection, filters)
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['PUT'])
@@ -34,7 +34,8 @@ def create_blueprint(db):
         crop = data.get('crop')
         crop_year = data.get('crop_year')
         update_data = data.get('update_data')
-        result = update_yield_event(crop, crop_year, update_data)
+        result = update_yield_event(
+            yield_collection, crop, crop_year, update_data)
         return jsonify(result)
 
     return yield_blueprint
