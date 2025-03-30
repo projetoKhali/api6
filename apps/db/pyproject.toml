@@ -26,5 +26,6 @@ pytest = "*"
 pytest-sugar = "*"
 pytest-cov = "*"
 pytest-html = "*"
+pandas = "*"
 
 [tool.poetry-monorepo.deps]

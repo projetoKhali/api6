@@ -31,6 +31,7 @@ pytest-html = "3.2.0"
 black = "^25.1.0"
 mongomock = "^4.3.0"
 colorama = "^0.4.6"
+pandas = "^2.2.3"
 
 [tool.poetry.group.dev.dependencies.testcontainers]
 extras = ["mongodb", "postgres"]
