@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from api.routes import yield_routes
-from api.routes import dashboard_routes
+from api.routes import create_blueprints
 from db.mongo import MongoDB
 from dev import print_routes
 
@@ -18,10 +17,7 @@ def create_app():
     def home():
         return jsonify({"message": "Hello from Flask!"})
 
-    for blueprint in [
-        yield_routes.create_blueprint(db),
-        dashboard_routes.create_blueprint(db),
-    ]:
+    for blueprint in create_blueprints(db):
         app.register_blueprint(blueprint)
 
     return app
