@@ -37,7 +37,7 @@ const BrazilMapChart = ({ option }: EchartProps) => {
     }
   }, [geoJsonData, option]);
 
-  return <div ref={chartRef} style={{ width: '100%', height: '800px'}} />;
+  return <div ref={chartRef} style={{ width: '100%', height: '800px', background: 'white', paddingTop: '10px', borderRadius: '10px'}} />;
 };
 
 export default BrazilMapChart;
