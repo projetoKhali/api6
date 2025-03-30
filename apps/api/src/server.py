@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from api.routes import yield_routes
 from db.mongo import MongoDB
 from dev import print_routes
 
@@ -11,6 +12,9 @@ def create_app():
     @app.route("/")
     def home():
         return jsonify({"message": "Hello from Flask!"})
+
+    for blueprint in [yield_routes, ]:
+        app.register_blueprint(blueprint.create_blueprint(db))
 
     return app
 
