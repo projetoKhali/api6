@@ -15,6 +15,7 @@ import {
   getFilterData,
 } from '../service/DashboardService';
 import {
+  AgriculturalData,
   cropsTotalsSchema,
   filterListSchema,
   Metrics,
@@ -23,6 +24,7 @@ import {
 } from '../schemas/DashboardSchema';
 import * as echarts from 'echarts';
 import type { EChartsOption } from 'echarts';
+import TableComponent, { Column } from '../components/TableComponent';
 
 
 const pieChartData: PieChartSchema = {
@@ -72,6 +74,7 @@ function App() {
   const [filtersData, setFiltersData] = useState<filterListSchema | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<FilterParams>({});
   const [cropData, setCropData] = useState<cropsTotalsSchema[] | null>(null);
+  const [data, setData] = useState<AgriculturalData[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({
     production_efficiency: 0,
     total_cultivated_area: 0,
@@ -89,6 +92,7 @@ function App() {
         setStateData(data.states_totals); // Adicione esta linha
         setMetrics(dataMetrics);
         setCropData(data.crops_totals);
+        setData(data.data);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       }
@@ -117,6 +121,21 @@ function App() {
 
     fetchData();
   }, [selectedFilters]);
+
+  const tableSchema: Column[] = [
+      { key: "crop", label: "Espécie", type: "text" },
+      { key: "area", label: "Area total", type: "text" },
+      { key: "crop_year", label: "Ano", type: "number" },
+      { key: "fertilizer", label: "Fertilizante", type: "number" },
+      { key: "pesticide", label: "Pesticida", type: "number" },
+      { key: "production", label: "Produção", type: "number" },
+      { key: "season", label: "Estação", type: "text" },
+      { key: "state", label: "Estado", type: "text" },
+  ];
+
+  function handleRowSelect(row: Record<string, any>) {
+    console.log("Linha selecionada:", row);
+}
 
   const handleFilterChange = (filterName: keyof FilterParams, value: any) => {
     setSelectedFilters((prev) => ({
@@ -1072,6 +1091,7 @@ const pesticideScatterOption: EChartsOption = {
         width: '100%',
         minHeight: '100vh',
         gap: '12px',
+        paddingBottom: '30px'
       }}
     >
       <div
@@ -1243,6 +1263,14 @@ const pesticideScatterOption: EChartsOption = {
         </div>
         <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
           <GenericChart option={rainfallScatterOption} />
+        </div>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            maxHeight: '500px',
+        }}>
+                <TableComponent schema={tableSchema} data={data} onRowSelect={handleRowSelect} />
         </div>
     </div>
     

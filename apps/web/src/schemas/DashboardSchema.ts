@@ -1,5 +1,5 @@
 // Interface para cada item de dados agrícolas
-interface AgriculturalData {
+export interface AgriculturalData {
   _id: string;
   annual_rainfall: number;
   area: number;
