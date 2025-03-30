@@ -6,6 +6,7 @@ html, body, #root {
   padding: 0;
   overflow-y: auto; /* Permite rolagem vertical */
   overflow-x: hidden;
+  font-family: "Mulish", sans-serif;
 }
 
 /* Container principal */
@@ -22,16 +23,17 @@ html, body, #root {
 /* Estilo do card */
 .card-dashboard {
   height: 100%;
-  max-height: 70px;
+  max-height: 150px;
   width: 16%;
   padding-top: 8px;
+  padding-bottom: 8px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  background-color: #026734;
+  background-color: #1bb857;
   border-radius: 10px;
-  min-width: 150px; /* Largura mínima para evitar que o card fique muito pequeno */
+  min-width: 180px; /* Largura mínima para evitar que o card fique muito pequeno */
   box-sizing: border-box;
   font-family: "Mulish", sans-serif;
   color: #fff
@@ -39,16 +41,22 @@ html, body, #root {
 
 /* Estilo do título do card */
 .title-card-dash {
-  font-size: 0.7rem;
+  display: flex;
+  font-size: 0.9em;
   font-weight: normal;
   margin: 0;
   height: 20%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  text-align: center;
 }
 
 /* Estilo do valor do card */
 .value-card-dash {
   display: flex;
-  font-size: 30px;
+  font-size: 34px;
   font-weight: bold;
   margin: 0;
   height: 70%;
@@ -61,6 +69,5 @@ html, body, #root {
   width: 100%;
   max-width: 24%;
   min-width: 320px;
-  font-family: "Mulish", sans-serif;
   color:#026734
 }

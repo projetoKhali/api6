@@ -17,10 +17,7 @@
   "nxCloudId": "67be5b38b03dd173f694b81e",
   "plugins": [
     {
-      "plugin": "@nxlv/python",
-      "options": {
-        "packageManager": "uv"
-      }
+      "plugin": "@nxlv/python"
     },
     {
       "plugin": "@nx/vite/plugin",
@@ -63,6 +60,17 @@
       "library": {
         "style": "css",
         "linter": "eslint"
+      }
+    }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "cacheableOperations": ["test", "build", "lint"],
+        "env": {
+          "VIRTUAL_ENV": "{workspaceRoot}/.venv",
+          "PATH": "{workspaceRoot}/.venv/bin:{env.PATH}"
+        }
       }
     }
   }

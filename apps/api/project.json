@@ -3,22 +3,66 @@
   "targets": {
     "install": {
       "executor": "nx:run-commands",
+      "dependsOn": ["lock"],
       "options": {
-        "command": "[[ -d $(poetry env info --path 2>/dev/null) ]] || poetry install && poetry run python apps/api/main.py"
+        "command": "poetry install"
       }
     },
     "serve": {
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python apps/api/main.py"
+        "command": "poetry run python {projectRoot}/main.py"
+      }
+    },
+    "lint": {
+      "executor": "@nxlv/python:flake8",
+      "dependsOn": ["install"],
+      "options": {
+        "outputFile": "{projectRoot}/reports/pylint.txt"
+      }
+    },
+    "fix-lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run black ."
+      }
+    },
+    "test": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest -vv --cache-clear tests/",
+        "cwd": "{projectRoot}"
+      },
+      "env": {
+        "POETRY_VIRTUALENVS_IN_PROJECT": "true"
+      }
+    },
+    "test-integration": {
+      "executor": "@nxlv/python:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run pytest -vv --cache-clear tests/",
+        "cwd": "{projectRoot}",
+        "env": {
+          "TEST_MONGO_IMAGE": "mongo:5",
+          "MONGO_URI": "mongodb://localhost:28017",
+          "POETRY_VIRTUALENVS_IN_PROJECT": "true"
+        }
+      }
+    },
+    "lock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry lock && cd ../.. && poetry lock",
+        "cwd": "{projectRoot}"
       }
     },
     "add": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "poetry add {args.dep}"
-      }
+      "executor": "@nxlv/python:add",
+      "options": {}
     }
   }
 }

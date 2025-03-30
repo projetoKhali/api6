@@ -90,6 +90,7 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 <details>
 <summary> Sprint 1 </summary>
     
+![image](https://github.com/user-attachments/assets/0cf137d2-777b-4af9-9a00-024c44f1e0f4)
 
 
 </details>
@@ -107,7 +108,7 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 
 ## Protótipo
 
-<a href="">Figma</a>
+<a href="https://www.figma.com/design/lZyPEM5hYIvt6F9vHXaxQG/API6?node-id=0-1&t=y3en5PjcW4iHrHrm-1">Figma</a>
 
 <span id="tecnologias">
 

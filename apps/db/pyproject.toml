@@ -1,0 +1,31 @@
+[tool.coverage.run]
+branch = true
+source = ["db"]
+
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
+show_missing = true
+
+[tool.poetry]
+name = "db"
+version = "1.0.0"
+license = "Proprietary"
+readme = "README.md"
+packages = [{ include = "db", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "*"
+dotenv = "*"
+pymongo = "*"
+psycopg2 = "*"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "*"
+flake8 = "*"
+pytest = "*"
+pytest-sugar = "*"
+pytest-cov = "*"
+pytest-html = "*"
+pandas = "*"
+
+[tool.poetry-monorepo.deps]
