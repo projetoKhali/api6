@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export type FieldType = 'text' | 'number' | 'date' | 'select' | 'actions';
 
 export interface FieldSchema {
