@@ -3,7 +3,6 @@ import {
   YieldDataResponse,
 } from '../schemas/DashboardSchema';
 
-// Adicione esta interface para os parâmetros de filtro
 export interface FilterParams {
   crop_year?: number | number[];
   season?: string | string[];
@@ -11,14 +10,11 @@ export interface FilterParams {
   state?: string | string[];
 }
 
-// Função de exemplo para consumir a API
 export async function fetchYieldData(
   filters: FilterParams = {}
 ): Promise<YieldDataResponse> {
-  // Prepara o corpo da requisição
   const requestBody: any = {};
 
-  // Adiciona apenas os filtros que existem
   if (filters.crop_year) requestBody.crop_year = filters.crop_year;
   if (filters.season) requestBody.season = filters.season;
   if (filters.crop) requestBody.crop = filters.crop;
