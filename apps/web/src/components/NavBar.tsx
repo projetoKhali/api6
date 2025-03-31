@@ -8,7 +8,7 @@ const Navbar = () => {
             <div style={{
                 marginRight: "auto"
             }}>
-                <img src="/kersys-removebg-preview.png" alt="" />
+                <img src="/kersys-logo.png" alt="" />
             </div>
             <div style={{
                 display: "flex",
