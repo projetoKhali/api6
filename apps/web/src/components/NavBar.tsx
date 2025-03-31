@@ -12,7 +12,9 @@ const Navbar = () => {
           marginRight: 'auto',
         }}
       >
-        <img src="/kersys-logo.png" alt="" />
+        <a href="/">
+          <img src="/kersys-logo.png" alt="" />
+        </a>
       </div>
       <div
         style={{
@@ -35,7 +37,10 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a href="" style={{ textDecoration: 'none', color: '#fff' }}>
+        <a
+          href="/predictions"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
           Previsões
         </a>
         <div
@@ -45,10 +50,7 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a
-          href="/events-register"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
+        <a href="/register" style={{ textDecoration: 'none', color: '#fff' }}>
           Cadastro
         </a>
       </div>

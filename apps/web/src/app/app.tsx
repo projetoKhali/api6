@@ -1,5 +1,9 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import Dashboard from '../pages/Dashboard';
 import EventsRegister from '../pages/EventsRegister';
@@ -20,7 +24,13 @@ function App() {
         <div style={{ height: '100%', width: '100%' }}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/events-register" element={<EventsRegister />} />
+            <Route
+              path="/register"
+              element={<Navigate to="/register/events" replace />}
+            />
+            <Route path="/register">
+              <Route path="events" element={<EventsRegister />} index />
+            </Route>
           </Routes>
         </div>
       </div>
