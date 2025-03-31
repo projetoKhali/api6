@@ -2,6 +2,7 @@ import {
   filterListSchema,
   YieldDataResponse,
 } from '../schemas/DashboardSchema';
+import { API_BASE_URL } from './service';
 
 export interface FilterParams {
   crop_year?: number | number[];
@@ -20,7 +21,7 @@ export async function fetchYieldData(
   if (filters.crop) requestBody.crop = filters.crop;
   if (filters.state) requestBody.state = filters.state;
 
-  const response = await fetch('http://127.0.0.1:5000/api/get_yield_data', {
+  const response = await fetch(`${API_BASE_URL}/api/get_yield_data`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ export async function fetchYieldData(
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  const response = await fetch('http://127.0.0.1:5000/api/get_filters', {
+  const response = await fetch(`${API_BASE_URL}/api/get_filters`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

@@ -1,15 +1,14 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://127.0.0.1:5000/yields';
+import { API_BASE_URL } from './service';
 
 export const YieldService = {
   async getAll(): Promise<any[]> {
-    const response = await axios.get(API_BASE_URL);
+    const response = await axios.get(`${API_BASE_URL}/yields`);
     return response.data.data;
   },
 
   async create(data: Record<string, any>): Promise<any> {
-    const response = await axios.post(API_BASE_URL, data);
+    const response = await axios.post(`${API_BASE_URL}/yields`, data);
     return response.data;
   },
 
