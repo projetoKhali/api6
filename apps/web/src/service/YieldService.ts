@@ -1,25 +1,21 @@
 import { processGET, processPOST, processRequest } from './service';
+import { Yield } from '../schemas/yield';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type YieldSchema = any;
+export const getAllYields = async (): Promise<Yield[]> => {
+  return await processGET<Yield[]>(`/yield`);
+};
 
-export const YieldService = {
-  async getAll(): Promise<YieldSchema[]> {
-    return await processGET<YieldSchema[]>(`/yields`);
-  },
+export const createYield = async (data: Yield): Promise<Yield> => {
+  return await processPOST<Yield, Yield>(`/yield`, data);
+};
 
-  async create(data: YieldSchema): Promise<YieldSchema> {
-    return await processPOST<YieldSchema, YieldSchema>(`/yields`, data);
-  },
-
-  async update(
-    id: string,
-    updatedFields: Partial<YieldSchema>
-  ): Promise<YieldSchema> {
-    return await processRequest<Partial<YieldSchema>, YieldSchema>(
-      'PUT',
-      `/yields/${id}`,
-      updatedFields
-    );
-  },
+export const updateYield = async (
+  id: string,
+  updatedFields: Partial<Yield>
+): Promise<Yield> => {
+  return await processRequest<Partial<Yield>, Yield>(
+    'PUT',
+    `/yield/${id}`,
+    updatedFields
+  );
 };

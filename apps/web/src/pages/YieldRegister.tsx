@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { schema, tableSchema, initialValues } from '../schemas/FormsSchema';
+import { getAllYields, createYield } from '../service/YieldService';
 import './styles/EventsRegister.css';
-import { YieldService } from '../service/YieldService';
 
 interface YieldData {
   id: string;
@@ -18,14 +18,12 @@ function YieldRegister() {
   const [data, setData] = useState<YieldData[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const result: YieldData[] = await YieldService.getAll();
-        setData(result);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-      }
-    }
+    const fetchData = async () => {
+      const allYields = await getAllYields();
+
+      setData(allYields);
+    };
+
     fetchData();
   }, []);
 
@@ -38,7 +36,8 @@ function YieldRegister() {
         age: Number(formData.age),
         production: Number(formData.production),
       };
-      const newData: YieldData = await YieldService.create(transformedData);
+
+      const newData: Yield = await createYield(transformedData);
       setData((prevData) => [...prevData, newData]);
     } catch (error) {
       console.error('Erro ao adicionar registro:', error);
