@@ -2,7 +2,7 @@ import {
   filterListSchema,
   YieldDataResponse,
 } from '../schemas/DashboardSchema';
-import { API_BASE_URL } from './service';
+import { processGET, processPOST } from './service';
 
 export interface FilterParams {
   crop_year?: number | number[];
@@ -21,33 +21,12 @@ export async function fetchYieldData(
     ...(filters.state && { state: filters.state }),
   };
 
-  const response = await fetch(`${API_BASE_URL}/api/get_yield_data`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    throw new Error('Erro na requisição');
-  }
-
-  return await response.json();
+  return await processPOST<FilterParams, YieldDataResponse>(
+    '/api/get_yield_data',
+    requestBody
+  );
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  const response = await fetch(`${API_BASE_URL}/api/get_filters`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Erro na requisição');
-  }
-
-  const data: filterListSchema = await response.json();
-  return data;
+  return await processGET<filterListSchema>('/api/get_filters');
 }

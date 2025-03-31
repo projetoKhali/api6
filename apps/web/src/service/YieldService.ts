@@ -1,22 +1,25 @@
-import axios from 'axios';
-import { API_BASE_URL } from './service';
+import { processGET, processPOST, processRequest } from './service';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type YieldSchema = any;
 
 export const YieldService = {
-  async getAll(): Promise<any[]> {
-    const response = await axios.get(`${API_BASE_URL}/yields`);
-    return response.data.data;
+  async getAll(): Promise<YieldSchema[]> {
+    return await processGET<YieldSchema[]>(`/yields`);
   },
 
-  async create(data: Record<string, any>): Promise<any> {
-    const response = await axios.post(`${API_BASE_URL}/yields`, data);
-    return response.data;
+  async create(data: YieldSchema): Promise<YieldSchema> {
+    return await processPOST<YieldSchema, YieldSchema>(`/yields`, data);
   },
 
   async update(
     id: string,
-    updatedFields: Partial<Record<string, any>>
-  ): Promise<any> {
-    const response = await axios.put(`${API_BASE_URL}/${id}`, updatedFields);
-    return response.data;
+    updatedFields: Partial<YieldSchema>
+  ): Promise<YieldSchema> {
+    return await processRequest<Partial<YieldSchema>, YieldSchema>(
+      'PUT',
+      `/yields/${id}`,
+      updatedFields
+    );
   },
 };
