@@ -1,4 +1,4 @@
-import React from 'react';
+import { CSSProperties } from 'react';
 import './styles/TableComponent.css';
 
 export interface Column {
@@ -7,21 +7,26 @@ export interface Column {
   type: 'text' | 'number' | 'date' | 'select' | 'actions';
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = Record<string, any>;
+
 interface TableProps {
   schema: Column[];
-  data: Record<string, any>[];
-  onRowSelect?: (row: Record<string, any>) => void;
-  onEdit?: (row: Record<string, any>) => void;
+  data: Row[];
+  onRowSelect?: (row: Row) => void;
+  onEdit?: (row: Row) => void;
+  style?: CSSProperties;
 }
 
-const TableComponent: React.FC<TableProps> = ({
+const TableComponent = ({
   schema,
   data,
   onRowSelect,
   onEdit,
-}) => {
+  style,
+}: TableProps) => {
   return (
-    <div className="table-container">
+    <div className="table-container" style={style}>
       <table className="custom-table">
         <thead>
           <tr>

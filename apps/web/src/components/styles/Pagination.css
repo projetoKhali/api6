@@ -1,0 +1,9 @@
+.pagination-input::-webkit-outer-spin-button,
+.pagination-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pagination-input[type='number'] {
+  -moz-appearance: textfield;
+}
