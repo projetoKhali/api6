@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "http://127.0.0.1:5000/yields";
+const API_BASE_URL = 'http://127.0.0.1:5000/yields';
 
 export const YieldService = {
   // Buscar todos os registros
@@ -16,8 +16,11 @@ export const YieldService = {
   },
 
   // Atualizar um registro existente
-  async update(id: string, updatedFields: Partial<Record<string, any>>): Promise<any> {
+  async update(
+    id: string,
+    updatedFields: Partial<Record<string, any>>
+  ): Promise<any> {
     const response = await axios.put(`${API_BASE_URL}/${id}`, updatedFields);
     return response.data;
-  }
+  },
 };

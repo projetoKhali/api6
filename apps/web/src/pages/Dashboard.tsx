@@ -97,7 +97,7 @@ function App() {
         console.error('Erro ao buscar dados:', error);
       }
     };
-  
+
     fetchData();
   }, [selectedFilters]);
 
@@ -123,19 +123,19 @@ function App() {
   }, [selectedFilters]);
 
   const tableSchema: Column[] = [
-      { key: "crop", label: "Espécie", type: "text" },
-      { key: "area", label: "Area total", type: "text" },
-      { key: "crop_year", label: "Ano", type: "number" },
-      { key: "fertilizer", label: "Fertilizante", type: "number" },
-      { key: "pesticide", label: "Pesticida", type: "number" },
-      { key: "production", label: "Produção", type: "number" },
-      { key: "season", label: "Estação", type: "text" },
-      { key: "state", label: "Estado", type: "text" },
+    { key: "crop", label: "Espécie", type: "text" },
+    { key: "area", label: "Area total", type: "text" },
+    { key: "crop_year", label: "Ano", type: "number" },
+    { key: "fertilizer", label: "Fertilizante", type: "number" },
+    { key: "pesticide", label: "Pesticida", type: "number" },
+    { key: "production", label: "Produção", type: "number" },
+    { key: "season", label: "Estação", type: "text" },
+    { key: "state", label: "Estado", type: "text" },
   ];
 
   function handleRowSelect(row: Record<string, any>) {
     console.log("Linha selecionada:", row);
-}
+  }
 
   const handleFilterChange = (filterName: keyof FilterParams, value: any) => {
     setSelectedFilters((prev) => ({
@@ -148,7 +148,7 @@ function App() {
     title: { text: 'Volume produzido por estação do ano', left: 'center' },
     tooltip: { trigger: 'axis' },
     legend: {
-      data: ['Verão', 'Outono', 'Inverno', 'Primavera', "Trimestre (Produções Anuais)"],	
+      data: ['Verão', 'Outono', 'Inverno', 'Primavera', "Trimestre (Produções Anuais)"],
       top: '90%',
       left: 'center',
     },
@@ -208,7 +208,7 @@ function App() {
     },
   };
 
-  
+
 
   const getScatterDataByYear = () => {
     if (!yieldData?.yearly_crop_stats) return [];
@@ -244,10 +244,10 @@ function App() {
         }
       };
     }
-  
+
     // Ordena as culturas por produção (decrescente)
     const sortedData = [...cropsData].sort((a, b) => b.total_production - a.total_production);
-    
+
     return {
       title: {
         text: 'Produção e Eficiência por Cultura',
@@ -266,7 +266,7 @@ function App() {
           const cropInfo = sortedData.find(c => c.crop === crop);
           const production = params[0].value;
           const efficiency = params[1].value;
-          
+
           return `
             <strong>${crop}</strong><br/>
             Produção total: ${formatBrazilianValue(production)}<br/>
@@ -376,10 +376,10 @@ function App() {
         }
       };
     }
-  
+
     // Ordena os estados por eficiência (decrescente)
     const sortedData = [...statesData].sort((a, b) => a.efficiency - b.efficiency);
-    
+
     return {
       title: {
         text: 'Área Cultivada e Eficiência por Estado',
@@ -395,7 +395,7 @@ function App() {
           const stateInfo = sortedData.find(s => s.state === state);
           const area = params[0].value;
           const efficiency = params[1].value;
-          
+
           return `
             <strong>${state}</strong><br/>
             Área total: ${formatBrazilianValue(area)} m²<br/>
@@ -502,82 +502,82 @@ function App() {
   };
 
   // Nova função para obter dados de pesticida vs rendimento
-const getPesticideScatterData = () => {
-  if (!yieldData?.yearly_crop_stats) return [];
+  const getPesticideScatterData = () => {
+    if (!yieldData?.yearly_crop_stats) return [];
 
-  const scatterData = [];
+    const scatterData = [];
 
-  for (const [year, crops] of Object.entries(yieldData.yearly_crop_stats)) {
-    for (const crop of crops) {
-      scatterData.push({
-        name: crop.crop,
-        year: parseInt(year),
-        value: [
-          crop.total_pesticide || 0, // Eixo X (pesticida total)
-          crop.total_production, // Eixo Y (rendimento = produção/área)
-          crop.avg_area, // Tamanho do ponto (área média)
-          crop.crop, // Cor (cultura)
-        ],
-        total_production: crop.total_production,
-        avg_rainfall: crop.avg_rainfall,
-      });
+    for (const [year, crops] of Object.entries(yieldData.yearly_crop_stats)) {
+      for (const crop of crops) {
+        scatterData.push({
+          name: crop.crop,
+          year: parseInt(year),
+          value: [
+            crop.total_pesticide || 0, // Eixo X (pesticida total)
+            crop.total_production, // Eixo Y (rendimento = produção/área)
+            crop.avg_area, // Tamanho do ponto (área média)
+            crop.crop, // Cor (cultura)
+          ],
+          total_production: crop.total_production,
+          avg_rainfall: crop.avg_rainfall,
+        });
+      }
     }
-  }
 
-  return scatterData;
-};
+    return scatterData;
+  };
 
-// Nova função para linha de tendência de pesticida
-const getPesticideRegressionLine = () => {
-  const scatterData = getPesticideScatterData();
-  if (scatterData.length === 0) return null;
+  // Nova função para linha de tendência de pesticida
+  const getPesticideRegressionLine = () => {
+    const scatterData = getPesticideScatterData();
+    if (scatterData.length === 0) return null;
 
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  const n = scatterData.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    const n = scatterData.length;
 
-  scatterData.forEach((item) => {
-    const x = Number(item.value[0]); // pesticida
-    const y = Number(item.value[1]); // rendimento
+    scatterData.forEach((item) => {
+      const x = Number(item.value[0]); // pesticida
+      const y = Number(item.value[1]); // rendimento
 
-    if (!isNaN(x)) sumX += x;
-    if (!isNaN(y)) {
-      sumY += y;
-      sumXY += x * y;
-    }
-    sumX2 += x * x;
-  });
+      if (!isNaN(x)) sumX += x;
+      if (!isNaN(y)) {
+        sumY += y;
+        sumXY += x * y;
+      }
+      sumX2 += x * x;
+    });
 
-  const denominator = n * sumX2 - sumX * sumX;
-  if (denominator === 0) return null;
+    const denominator = n * sumX2 - sumX * sumX;
+    if (denominator === 0) return null;
 
-  const b = (n * sumXY - sumX * sumY) / denominator;
-  const a = (sumY - b * sumX) / n;
+    const b = (n * sumXY - sumX * sumY) / denominator;
+    const a = (sumY - b * sumX) / n;
 
-  const xValues = scatterData
-    .map((item) => Number(item.value[0]))
-    .filter((x) => !isNaN(x));
-  if (xValues.length === 0) return null;
+    const xValues = scatterData
+      .map((item) => Number(item.value[0]))
+      .filter((x) => !isNaN(x));
+    if (xValues.length === 0) return null;
 
-  const minX = Math.min(...xValues);
-  const maxX = Math.max(...xValues);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
 
-  return [
-    [minX, a + b * minX],
-    [maxX, a + b * maxX],
-  ];
-};
+    return [
+      [minX, a + b * minX],
+      [maxX, a + b * maxX],
+    ];
+  };
 
-// Configuração do novo gráfico de pesticida
-const pesticideScatterOption: EChartsOption = {
-  title: {
-    text: 'Relação entre Uso de Pesticidas e Rendimento por Cultura',
-    left: 'center',
-    top: '0',
-  },
-  tooltip: {
-    formatter: (params: any) => {
-      const data = params.data;
-      return `
+  // Configuração do novo gráfico de pesticida
+  const pesticideScatterOption: EChartsOption = {
+    title: {
+      text: 'Relação entre Uso de Pesticidas e Rendimento por Cultura',
+      left: 'center',
+      top: '0',
+    },
+    tooltip: {
+      formatter: (params: any) => {
+        const data = params.data;
+        return `
         <strong>${data.name} (${data.year})</strong><br/>
         Pesticida total: ${formatBrazilianValue(data.value[0])} kg<br/>
         Rendimento: ${formatBrazilianValue(data.value[1])}<br/>
@@ -585,82 +585,82 @@ const pesticideScatterOption: EChartsOption = {
         Produção total: ${formatBrazilianValue(data.total_production)}<br/>
         Chuva média: ${formatBrazilianValue(data.avg_rainfall)} mm
       `;
-    },
-  },
-  legend: {
-    data: ['Dados', 'Linha de Tendência'],
-    top: '30',
-  },
-  grid: {
-    left: '5%',
-    right: '5%',
-    bottom: '15%',
-    top: '80',
-    containLabel: true,
-  },
-  xAxis: {
-    name: 'Pesticida Total (kg)',
-    nameLocation: 'middle',
-    nameGap: 30,
-    type: 'value',
-    splitLine: {
-      lineStyle: {
-        type: 'dashed',
       },
     },
-  },
-  yAxis: {
-    name: 'Produção (Kg)',
-    nameLocation: 'middle',
-    nameGap: 110,
-    type: 'value',
-    splitLine: {
-      lineStyle: {
-        type: 'dashed',
-      },
+    legend: {
+      data: ['Dados', 'Linha de Tendência'],
+      top: '30',
     },
-  },
-  series: [
-    {
-      name: 'Dados',
-      type: 'scatter',
-      symbolSize: function (data) {
-        const areas = getPesticideScatterData().map((item) => item.value[2]);
-        const minArea = Math.min(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
-        const maxArea = Math.max(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
-        return 10 + ((data[2] - minArea) / (maxArea - minArea)) * 30;
-      },
-      data: getPesticideScatterData(),
-      itemStyle: {
-        color: function (params: any) {
-          const colors = ['#026734', '#8FFD24', '#50EA77', '#1a8703', '#A89059'];
-          const index = params.data.name.charCodeAt(0) % colors.length;
-          return colors[index];
+    grid: {
+      left: '5%',
+      right: '5%',
+      bottom: '15%',
+      top: '80',
+      containLabel: true,
+    },
+    xAxis: {
+      name: 'Pesticida Total (kg)',
+      nameLocation: 'middle',
+      nameGap: 30,
+      type: 'value',
+      splitLine: {
+        lineStyle: {
+          type: 'dashed',
         },
       },
-      emphasis: {
+    },
+    yAxis: {
+      name: 'Produção (Kg)',
+      nameLocation: 'middle',
+      nameGap: 110,
+      type: 'value',
+      splitLine: {
+        lineStyle: {
+          type: 'dashed',
+        },
+      },
+    },
+    series: [
+      {
+        name: 'Dados',
+        type: 'scatter',
+        symbolSize: function(data) {
+          const areas = getPesticideScatterData().map((item) => item.value[2]);
+          const minArea = Math.min(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
+          const maxArea = Math.max(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
+          return 10 + ((data[2] - minArea) / (maxArea - minArea)) * 30;
+        },
+        data: getPesticideScatterData(),
         itemStyle: {
-          shadowBlur: 10,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
+          color: function(params: any) {
+            const colors = ['#026734', '#8FFD24', '#50EA77', '#1a8703', '#A89059'];
+            const index = params.data.name.charCodeAt(0) % colors.length;
+            return colors[index];
+          },
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.5)',
+          },
         },
       },
-    },
-    {
-      name: 'Linha de Tendência',
-      type: 'line',
-      lineStyle: {
-        color: '#ff6666',
-        width: 2,
-        type: 'dashed',
+      {
+        name: 'Linha de Tendência',
+        type: 'line',
+        lineStyle: {
+          color: '#ff6666',
+          width: 2,
+          type: 'dashed',
+        },
+        data: getPesticideRegressionLine() || [],
+        symbol: 'none',
+        tooltip: {
+          show: false,
+        },
       },
-      data: getPesticideRegressionLine() || [],
-      symbol: 'none',
-      tooltip: {
-        show: false,
-      },
-    },
-  ],
-};
+    ],
+  };
 
   const getRegressionLine = () => {
     const scatterData = getScatterDataByYear();
@@ -764,7 +764,7 @@ const pesticideScatterOption: EChartsOption = {
       {
         name: 'Dados',
         type: 'scatter',
-        symbolSize: function (data) {
+        symbolSize: function(data) {
           // Ajusta o tamanho baseado na área (normalizado)
           const areas = getScatterDataByYear().map((item) => item.value[2]);
           const minArea = Math.min(
@@ -781,7 +781,7 @@ const pesticideScatterOption: EChartsOption = {
         },
         data: getScatterDataByYear(),
         itemStyle: {
-          color: function (params: any) {
+          color: function(params: any) {
             // Cores diferentes para cada cultura
             const colors = [
               '#026734', '#8FFD24', '#50EA77', '#1a8703', '#A89059'
@@ -816,25 +816,25 @@ const pesticideScatterOption: EChartsOption = {
 
   const formatBrazilianValue = (value: number, decimalPlaces = 2): string => {
     if (typeof value !== 'number') return String(value);
-    
+
     const absValue = Math.abs(value);
     const isInteger = Number.isInteger(value);
-    
+
     // Bilhões
     if (absValue >= 1_000_000_000) {
       const formatted = (value / 1_000_000_000).toFixed(decimalPlaces).replace('.', ',');
       return `${formatted.replace(/,00$/, '')} B`; // Remove ,00 se existir
-    } 
+    }
     // Milhões
     else if (absValue >= 1_000_000) {
       const formatted = (value / 1_000_000).toFixed(decimalPlaces).replace('.', ',');
       return `${formatted.replace(/,00$/, '')} M`; // Remove ,00 se existir
-    } 
+    }
     // Milhares
     else if (absValue >= 1_000) {
       const formatted = (value / 1_000).toFixed(decimalPlaces).replace('.', ',');
       return `${formatted.replace(/,00$/, '')} K`; // Remove ,00 se existir
-    } 
+    }
     // Valores pequenos
     else {
       const options: Intl.NumberFormatOptions = {
@@ -843,14 +843,14 @@ const pesticideScatterOption: EChartsOption = {
       };
       return value.toLocaleString('pt-BR', options);
     }
-};
+  };
 
 
   const getRainfallScatterData = () => {
     if (!yieldData?.yearly_crop_stats) return [];
-  
+
     const scatterData = [];
-  
+
     for (const [year, crops] of Object.entries(yieldData.yearly_crop_stats)) {
       for (const crop of crops) {
         scatterData.push({
@@ -868,22 +868,22 @@ const pesticideScatterOption: EChartsOption = {
         });
       }
     }
-  
+
     return scatterData;
   };
-  
+
   // Função para linha de tendência de precipitação
   const getRainfallRegressionLine = () => {
     const scatterData = getRainfallScatterData();
     if (scatterData.length === 0) return null;
-  
+
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
     const n = scatterData.length;
-  
+
     scatterData.forEach((item) => {
       const x = Number(item.value[0]); // precipitação
       const y = Number(item.value[1]); // rendimento
-  
+
       if (!isNaN(x)) sumX += x;
       if (!isNaN(y)) {
         sumY += y;
@@ -891,27 +891,27 @@ const pesticideScatterOption: EChartsOption = {
       }
       sumX2 += x * x;
     });
-  
+
     const denominator = n * sumX2 - sumX * sumX;
     if (denominator === 0) return null;
-  
+
     const b = (n * sumXY - sumX * sumY) / denominator;
     const a = (sumY - b * sumX) / n;
-  
+
     const xValues = scatterData
       .map((item) => Number(item.value[0]))
       .filter((x) => !isNaN(x));
     if (xValues.length === 0) return null;
-  
+
     const minX = Math.min(...xValues);
     const maxX = Math.max(...xValues);
-  
+
     return [
       [minX, a + b * minX],
       [maxX, a + b * maxX],
     ];
   };
-  
+
   // Configuração do gráfico de precipitação
   const rainfallScatterOption: EChartsOption = {
     title: {
@@ -970,7 +970,7 @@ const pesticideScatterOption: EChartsOption = {
       {
         name: 'Dados',
         type: 'scatter',
-        symbolSize: function (data) {
+        symbolSize: function(data) {
           const areas = getRainfallScatterData().map((item) => item.value[2]);
           const minArea = Math.min(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
           const maxArea = Math.max(...areas.map((area) => typeof area === 'number' ? area : parseFloat(area as string)));
@@ -978,7 +978,7 @@ const pesticideScatterOption: EChartsOption = {
         },
         data: getRainfallScatterData(),
         itemStyle: {
-          color: function (params: any) {
+          color: function(params: any) {
             const colors = ['#026734', '#8FFD24', '#50EA77', '#1a8703', '#A89059'];
             const index = params.data.name.charCodeAt(0) % colors.length;
             return colors[index];
@@ -1247,33 +1247,33 @@ const pesticideScatterOption: EChartsOption = {
           <GenericChart option={getCropAreaChartData(cropData)} />
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'space-evenly',width: '100%' }}>
-        <div style={{ width: '100%',border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
-         <GenericChart option={getStatesBarChartData(stateData)} />
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', justifyContent: 'space-evenly', width: '100%' }}>
+        <div style={{ width: '100%', border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+          <GenericChart option={getStatesBarChartData(stateData)} />
         </div>
-        <div style={{ width: '100%',border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+        <div style={{ width: '100%', border: '2px solid #ccc', borderRadius: '10px', padding: '20px', background: '#f0f0f0', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
           <BrazilMapChart option={mapChartData} />
         </div>
       </div>
       <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
-          <GenericChart option={scatterChartOption} />
-        </div>
-        <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
-          <GenericChart option={pesticideScatterOption} />
-        </div>
-        <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
-          <GenericChart option={rainfallScatterOption} />
-        </div>
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            width: '100%',
-            maxHeight: '500px',
-        }}>
-                <TableComponent schema={tableSchema} data={data} onRowSelect={handleRowSelect} />
-        </div>
+        <GenericChart option={scatterChartOption} />
+      </div>
+      <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+        <GenericChart option={pesticideScatterOption} />
+      </div>
+      <div style={{ height: '400px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px', boxShadow: '0px 4px 0px rgba(0, 0, 0, 0.1)' }}>
+        <GenericChart option={rainfallScatterOption} />
+      </div>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        maxHeight: '500px',
+      }}>
+        <TableComponent schema={tableSchema} data={data} onRowSelect={handleRowSelect} />
+      </div>
     </div>
-    
+
   );
 }
 

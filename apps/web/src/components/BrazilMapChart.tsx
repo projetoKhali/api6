@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
 
-
 export interface EchartProps {
   option: echarts.EChartsOption;
 }
@@ -13,10 +12,10 @@ const BrazilMapChart = ({ option }: EchartProps) => {
   useEffect(() => {
     // Carregar o arquivo GeoJSON do Brasil
     fetch('/brazil-states.geojson')
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         setGeoJsonData(data);
-      });  
+      });
   }, []);
 
   useEffect(() => {
@@ -37,7 +36,18 @@ const BrazilMapChart = ({ option }: EchartProps) => {
     }
   }, [geoJsonData, option]);
 
-  return <div ref={chartRef} style={{ width: '100%', height: '800px', background: 'white', paddingTop: '10px', borderRadius: '10px'}} />;
+  return (
+    <div
+      ref={chartRef}
+      style={{
+        width: '100%',
+        height: '800px',
+        background: 'white',
+        paddingTop: '10px',
+        borderRadius: '10px',
+      }}
+    />
+  );
 };
 
 export default BrazilMapChart;

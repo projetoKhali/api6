@@ -8,11 +8,13 @@ import '../styles.css';
 function App() {
   return (
     <Router>
-      <div className='main-container'>
-        <div style={{
-          width: "100%",
-          backgroundColor: "#026734"
-        }}>
+      <div className="main-container">
+        <div
+          style={{
+            width: '100%',
+            backgroundColor: '#026734',
+          }}
+        >
           <Navbar />
         </div>
         <div style={{ height: '100%', width: '100%' }}>
