@@ -1,16 +1,15 @@
 <br id="topo">
 
-![API6](https://github.com/user-attachments/assets/a9f5c228-61f2-4c7e-834c-c37635a21f42)
+![7](https://github.com/user-attachments/assets/d0217c10-db11-470b-a029-f8b664cf4cd2)
+
 
 
 <p align="center">
     <a href="#sobre">Sobre</a> |
-    <a href="#backlogproduto">Backlog do produto</a>  |
     <a href="#backlogsprint">Backlog da sprint </a> |
     <a href="#entrega">Entrega das Sprints</a>  |
     <a href="#burndown">Burndown</a>  |
     <a href="#gerenciamento">Gerenciamento do projeto</a>  |
-    <a href="#documentacoes">Documentações</a>  |
     <a href="#prototipo">Protótipo</a>     |
     <a href="#tecnologias">Tecnologias</a>  |
     <a href="#equipe">Equipe</a>        
@@ -137,7 +136,8 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 <span id="equipe">
 
 
-![API6 equipe](https://github.com/user-attachments/assets/5bb59915-c8c6-4d2f-96f4-ff4d2a9e15d6)
+![9](https://github.com/user-attachments/assets/4fd8cb6f-2049-42fc-8104-284531c9bcf0)
+
 
 
 <table style="width:100%; border-collapse: collapse;">
@@ -176,14 +176,6 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
         <td style="text-align: center; padding: 10px;">
             <a href="https://www.linkedin.com/in/nicolem-souza/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
             <a href="https://github.com/NicSouza"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
-        </td>
-    </tr>
-    <tr>
-        <td style="text-align: center; padding: 10px;">Developer</td>
-        <td style="text-align: center; padding: 10px;">Tânia Cruz</td>
-        <td style="text-align: center; padding: 10px;">
-            <a href="https://www.linkedin.com/in/tânia-cruz-30ab5812a/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
-            <a href="https://github.com/taniacruzz"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
         </td>
     </tr>
 </table>
