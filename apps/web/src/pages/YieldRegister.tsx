@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { schema, tableSchema, initialValues } from '../schemas/FormsSchema';

@@ -1,4 +1,3 @@
-import React from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent, { Column } from '../components/TableComponent';
 import { initialValues, schema } from '../schemas/FormsSchema';
