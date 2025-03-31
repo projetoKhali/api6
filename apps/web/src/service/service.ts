@@ -13,20 +13,20 @@ type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export const processRequest = async <R, T>(
   method: Method,
   path: string,
-  body: R
+  body?: R
 ): Promise<T> => {
   const response = await axios.request<T>({
     url: `${API_BASE_URL}${path}`,
     method,
-    data: body,
     headers: headers.headers,
+    ...(body && { data: body }),
   });
 
   return response.data;
 };
 
-export const processGET = async <T>(path: string): Promise<T> =>
-  await processRequest('GET', path, {});
+export const processGET = async <Response>(path: string): Promise<Response> =>
+  await processRequest('GET', path);
 
-export const processPOST = async <R, T>(path: string, body: R): Promise<T> =>
+export const processPOST = async <Body, Response>(path: string, body: Body): Promise<Response> =>
   await processRequest('POST', path, body);
