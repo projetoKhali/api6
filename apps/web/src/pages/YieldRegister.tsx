@@ -3,19 +3,11 @@ import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { schema, tableSchema, initialValues } from '../schemas/FormsSchema';
 import { getAllYields, createYield } from '../service/YieldService';
+import { Yield, Season } from '../schemas/yield';
 import './styles/EventsRegister.css';
 
-interface YieldData {
-  id: string;
-  plot: string;
-  species: string;
-  date: string;
-  age: number;
-  production: number;
-}
-
 function YieldRegister() {
-  const [data, setData] = useState<YieldData[]>([]);
+  const [data, setData] = useState<Yield[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,20 +20,21 @@ function YieldRegister() {
   }, []);
 
   async function handleFormSubmit(formData: Record<string, string>) {
-    try {
-      const transformedData: Omit<YieldData, 'id'> = {
-        plot: formData.plot,
-        species: formData.species,
-        date: formData.date,
-        age: Number(formData.age),
-        production: Number(formData.production),
-      };
+    const transformedData: Omit<Yield, 'id'> = {
+      crop: formData.crop,
+      crop_year: formData.crop_year,
+      season: formData.season as Season,
+      state: formData.state,
+      area: Number(formData.area),
+      production: Number(formData.production),
+      annual_rainfall: Number(formData.annual_rainfall),
+      fertilizer: Number(formData.fertilizer),
+      pesticide: Number(formData.pesticide),
+      yield_: Number(formData.yield_),
+    };
 
-      const newData: Yield = await createYield(transformedData);
-      setData((prevData) => [...prevData, newData]);
-    } catch (error) {
-      console.error('Erro ao adicionar registro:', error);
-    }
+    const newData: Yield = await createYield(transformedData);
+    setData((prevData) => [...prevData, newData]);
   }
 
   return (
