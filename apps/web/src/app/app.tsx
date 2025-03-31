@@ -29,7 +29,8 @@ function App() {
               element={<Navigate to="/register/events" replace />}
             />
             <Route path="/register">
-              <Route path="events" element={<EventsRegister />} index />
+              <Route path="yield" element={<YieldRegister />} />
+              <Route path="event" element={<EventsRegister />} />
             </Route>
           </Routes>
         </div>
