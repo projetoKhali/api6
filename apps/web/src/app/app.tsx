@@ -8,6 +8,7 @@ import Navbar from '../components/NavBar';
 import Dashboard from '../pages/Dashboard';
 import EventsRegister from '../pages/EventsRegister';
 import '../styles.css';
+import YieldRegister from '../pages/YieldRegister';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route
               path="/register"
-              element={<Navigate to="/register/events" replace />}
+              element={<Navigate to="/register/yield" replace />}
             />
             <Route path="/register">
               <Route path="yield" element={<YieldRegister />} />
