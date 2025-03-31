@@ -14,12 +14,12 @@ export interface FilterParams {
 export async function fetchYieldData(
   filters: FilterParams = {}
 ): Promise<YieldDataResponse> {
-  const requestBody: any = {};
-
-  if (filters.crop_year) requestBody.crop_year = filters.crop_year;
-  if (filters.season) requestBody.season = filters.season;
-  if (filters.crop) requestBody.crop = filters.crop;
-  if (filters.state) requestBody.state = filters.state;
+  const requestBody = {
+    ...(filters.crop_year && { crop_year: filters.crop_year }),
+    ...(filters.season && { season: filters.season }),
+    ...(filters.crop && { crop: filters.crop }),
+    ...(filters.state && { state: filters.state }),
+  };
 
   const response = await fetch(`${API_BASE_URL}/api/get_yield_data`, {
     method: 'POST',
