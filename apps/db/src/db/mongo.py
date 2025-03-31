@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient, ASCENDING
 
+
 class MongoDB:
     _client = None
 
@@ -10,28 +11,25 @@ class MongoDB:
         """Connect to MongoDB using environment variables."""
         if cls._client is not None:
             return cls._client
-        
+
         load_dotenv()
 
-        # Valores padrão - verifique se correspondem ao seu MongoDB
         mongo_user = os.getenv("MONGO_USER", "mongo")
         mongo_password = os.getenv("MONGO_PASSWORD", "secret")
         mongo_host = os.getenv("MONGO_HOST", "localhost")
         mongo_port = os.getenv("MONGO_PORT", "27017")
-        auth_source = os.getenv("MONGO_AUTH_SOURCE", "admin")
         mongo_db = os.getenv("MONGO_DB", "api6_mongo")
 
-        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}"
+        mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
         cls._client = MongoClient(mongo_url)[mongo_db]
         return cls._client
 
     @classmethod
-    def get_database(cls, db_name: str):
-        """Get database reference"""
-        if cls._client is None:
-            cls.get_client()
-        return cls._client[db_name]
+    def test(cls):
+        """Test the connection to MongoDB."""
+        db = cls.connect()
+        db.command("ping")
 
 # Uso:
 # from mongo import MongoDB
@@ -183,4 +181,3 @@ def initialize_mongo_database():
     create_plots_collection(db)
     create_yield_collection(db)
     create_indexes(db)
-    # restart_collections(db)
