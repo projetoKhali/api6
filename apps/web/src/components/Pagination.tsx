@@ -33,6 +33,10 @@ export const Pagination = ({
   return (
     <div className="pagination">
       <button
+        className={
+          'pagination-button ' +
+          (conditions.first() ? '' : 'pagination-button-disabled')
+        }
         disabled={!conditions.first()}
         onClick={() => {
           if (getPage() > 1) pageChange(1);
@@ -41,6 +45,10 @@ export const Pagination = ({
         {'first'}
       </button>
       <button
+        className={
+          'pagination-button ' +
+          (conditions.previous() ? '' : 'pagination-button-disabled')
+        }
         disabled={!conditions.previous()}
         onClick={() => {
           const page = getPage();
@@ -69,6 +77,10 @@ export const Pagination = ({
           }}
         />
         <button
+          className={
+            'pagination-button ' +
+            (conditions.target() ? '' : 'pagination-button-disabled')
+          }
           disabled={!conditions.target()}
           onClick={() => {
             if (targetPage) {
@@ -82,6 +94,10 @@ export const Pagination = ({
         {' / ' + getTotalPages()}
       </span>
       <button
+        className={
+          'pagination-button ' +
+          (conditions.next() ? '' : 'pagination-button-disabled')
+        }
         disabled={!conditions.next()}
         onClick={() => {
           const page = getPage();
@@ -91,6 +107,10 @@ export const Pagination = ({
         {'next'}
       </button>
       <button
+        className={
+          'pagination-button ' +
+          (conditions.last() ? '' : 'pagination-button-disabled')
+        }
         disabled={!conditions.last()}
         onClick={() => {
           if (getPage() < getTotalPages()) pageChange(getTotalPages());

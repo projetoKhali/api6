@@ -47,7 +47,7 @@ function YieldRegister() {
   }
 
   return (
-    <div className="container"style={{ width: '100%' }}>
+    <div className="container" style={{ width: '100%' }}>
       <div className="form-container">
         <DynamicForm
           schema={schema}
