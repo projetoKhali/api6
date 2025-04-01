@@ -59,7 +59,7 @@ export const Pagination = ({
       >
         {'previous'}
       </button>
-      <span>
+      <span className='pagination-input-group'>
         <input
           className="pagination-input"
           type="number"
@@ -80,7 +80,7 @@ export const Pagination = ({
         />
         <button
           className={
-            'pagination-button ' +
+            'pagination-input-button pagination-button ' +
             (conditions.target() ? '' : 'pagination-button-disabled')
           }
           disabled={!conditions.target()}
