@@ -1,7 +1,6 @@
 /* Container da tabela */
 .table-container {
   width: 100%;
-  overflow-x: auto;
   padding: 10px;
 }
 
