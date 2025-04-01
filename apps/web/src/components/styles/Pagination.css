@@ -8,6 +8,35 @@
   -moz-appearance: textfield;
 }
 
+.pagination {
+  width: 100%;
+}
+
+.pagination,
+.pagination-input-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination-input-group {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.pagination-input,
+.pagination-input-button,
+.pagination-button {
+  margin: 0;
+  height: 100%;
+}
+
+.pagination-input-button {
+  padding: .25rem;
+}
+
 .pagination-button-disabled {
   color: gray;
   background-color: white;
