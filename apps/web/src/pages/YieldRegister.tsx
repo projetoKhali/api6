@@ -25,8 +25,8 @@ function YieldRegister() {
   };
 
   useEffect(() => {
-    fetchPage(1);
-  }, []);
+    fetchPage(page);
+  }, [page]);
 
   async function handleFormSubmit(formData: Record<string, string>) {
     const transformedData: Omit<Yield, 'id'> = {

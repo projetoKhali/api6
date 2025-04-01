@@ -16,19 +16,38 @@ export const Pagination = ({
 }: PaginationProps) => {
   const [targetPage, setTargetPage] = useState<number>(getPage());
 
+  const pageChange = (page: number) => {
+    setPage(page);
+    setTargetPage(page);
+    onPageChange(page);
+  };
+
+  const conditions = {
+    first: () => getPage() > 1,
+    previous: () => getPage() > 1,
+    target: () => !!targetPage && targetPage !== getPage(),
+    next: () => getPage() < getTotalPages(),
+    last: () => getPage() < getTotalPages(),
+  };
+
   return (
     <div className="pagination">
       <button
+        disabled={!conditions.first()}
         onClick={() => {
-          const page = getPage();
-          if (page > 1) {
-            setPage(page - 1);
-            setTargetPage(page - 1);
-            onPageChange(page - 1);
-          }
+          if (getPage() > 1) pageChange(1);
         }}
       >
-        {'<'}
+        {'first'}
+      </button>
+      <button
+        disabled={!conditions.previous()}
+        onClick={() => {
+          const page = getPage();
+          if (page > 1) pageChange(page - 1);
+        }}
+      >
+        {'previous'}
       </button>
       <span>
         <input
@@ -49,31 +68,35 @@ export const Pagination = ({
             );
           }}
         />
-        {!!targetPage && targetPage !== getPage() && (
-          <button
-            onClick={() => {
-              if (targetPage) {
-                setPage(targetPage);
-                onPageChange(targetPage);
-              }
-            }}
-          >
-            <span>Go</span>
-          </button>
-        )}
+        <button
+          disabled={!conditions.target()}
+          onClick={() => {
+            if (targetPage) {
+              setPage(targetPage);
+              onPageChange(targetPage);
+            }
+          }}
+        >
+          <span>Go</span>
+        </button>
         {' / ' + getTotalPages()}
       </span>
       <button
+        disabled={!conditions.next()}
         onClick={() => {
           const page = getPage();
-          if (page < getTotalPages()) {
-            setPage(page + 1);
-            setTargetPage(page + 1);
-            onPageChange(page + 1);
-          }
+          if (page < getTotalPages()) pageChange(page + 1);
         }}
       >
-        {'>'}
+        {'next'}
+      </button>
+      <button
+        disabled={!conditions.last()}
+        onClick={() => {
+          if (getPage() < getTotalPages()) pageChange(getTotalPages());
+        }}
+      >
+        {'last'}
       </button>
     </div>
   );
