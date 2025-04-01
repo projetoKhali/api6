@@ -6,6 +6,7 @@ type PaginationProps = {
   setPage: (page: number) => void;
   getTotalPages: () => number;
   onPageChange: (page: number) => void;
+  style?: React.CSSProperties;
 };
 
 export const Pagination = ({
@@ -13,6 +14,7 @@ export const Pagination = ({
   setPage,
   getTotalPages,
   onPageChange,
+  style,
 }: PaginationProps) => {
   const [targetPage, setTargetPage] = useState<number>(getPage());
 
@@ -31,7 +33,7 @@ export const Pagination = ({
   };
 
   return (
-    <div className="pagination">
+    <div style={style} className="pagination">
       <button
         className={
           'pagination-button ' +
