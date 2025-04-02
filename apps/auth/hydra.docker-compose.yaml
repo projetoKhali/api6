@@ -1,0 +1,29 @@
+---
+services:
+  hydra-migrate:
+    image: oryd/hydra:v2.3.0
+    command: migrate sql up --yes "postgres://postgres:secret@api6_postgres:5432/postgres?sslmode=disable"
+    environment:
+      - DSN=postgres://hydra:secret@api6_postgres:5432/hydra?sslmode=disable
+    networks:
+      - db_api6
+
+  hydra:
+    image: oryd/hydra:v2.3.0
+    command:
+      serve all --dev
+    ports:
+      - '4444:4444' # Public
+      - '4445:4445' # Admin
+    environment:
+      - DSN=postgres://postgres:secret@api6_postgres:5432/postgres?sslmode=disable
+      - HYDRA_DEV=true
+      - URLS_SELF_ISSUER=http://localhost:4444
+      - URLS_CONSENT=http://localhost:3000/consent
+      - URLS_LOGIN=http://localhost:3000/login
+    networks:
+      - db_api6
+
+networks:
+  db_api6:
+    external: true

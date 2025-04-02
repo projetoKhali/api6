@@ -11,6 +11,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - api6
 
   mongo:
     image: mongo:latest
@@ -23,7 +25,13 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - api6
 
 volumes:
   postgres_data:
   mongo_data:
+
+networks:
+  api6:
+    driver: bridge
