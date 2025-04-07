@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from api.middleware.auth import require_auth
 from api.models.yield_model import (
     create_yield_event,
     get_yield_events_filter,
@@ -23,6 +24,7 @@ def create_blueprint(db):
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['GET'])
+    @require_auth
     def read():
         filters = request.args.to_dict()
         result = get_yield_events_filter(yield_collection, filters)

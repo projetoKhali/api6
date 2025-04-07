@@ -26,7 +26,7 @@
         }
       ],
       "options": {
-        "command": "docker-compose -f {projectRoot}/hydra.docker-compose.yaml up -d"
+        "command": "docker-compose -f {projectRoot}/hydra.docker-compose.yaml up -d --build"
       }
     },
     "hydra-down": {
