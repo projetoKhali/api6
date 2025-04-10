@@ -37,12 +37,12 @@ class Permission(Base):
 class Deleted_User(Base):
     __tablename__ = "deleted_users"
     usr_id = Column(Integer, primary_key=True, name="usr_id")
+    delete_date = Column(Date, name="delete_date", default=text("now()"))
 
 class User_Key(Base):
     __tablename__ = "user_key"
     usr_id = Column(
         Integer,
-        ForeignKey("users.usr_id", ondelete="CASCADE"),
         primary_key=True
     )
     key = Column(String, unique=True)
