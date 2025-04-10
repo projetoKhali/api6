@@ -11,6 +11,7 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "secret")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
+DOCKER_CONTAINER = os.getenv("DB_CONTAINER", "api6_postgres")
 
 if os.path.exists("./bkp"): 
     BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
@@ -41,24 +42,31 @@ def find_backup_file(backup_file_name=None):
 def backup_restore(backup_path):
     create_backup("backup_before_restore_")
     os.environ["PGPASSWORD"] = DB_PASSWORD
-
-    command = [
-        "pg_restore",
-        "-U", DB_USER,
-        "-h", DB_HOST,
-        "-p", DB_PORT,
-        "-d", DB_NAME,
-        "-c",
-        "--no-owner",
-        "--no-comments",
-        "--no-acl",
-        "-t", "users",
-        "-t", "permissions",
-        backup_path
-    ]
+    file_name = os.path.basename(backup_path)
+    container_path = f"/var/lib/postgresql/data/{file_name}"
 
     try:
+        subprocess.run(["docker", "cp", backup_path, f"{DOCKER_CONTAINER}:{container_path}"], check=True)
+
+        command = [
+            "docker", "exec",
+            "-e", f"PGPASSWORD={DB_PASSWORD}",
+            DOCKER_CONTAINER,
+            "pg_restore",
+            "-U", DB_USER,
+            "-p", DB_PORT,
+            "-d", DB_NAME,
+            "-c",                # drop + create
+            "--no-owner",
+            "--no-comments",
+            "--no-acl",
+            "-t", "users",
+            "-t", "permissions",
+            container_path
+        ]
+
         subprocess.run(command, check=True)
+        subprocess.run(["docker", "exec", DOCKER_CONTAINER, "rm", container_path], check=True)
     except subprocess.CalledProcessError as e:
         raise
 

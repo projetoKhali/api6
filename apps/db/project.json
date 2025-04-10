@@ -26,7 +26,35 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
+        "command": "poetry run python {projectRoot}/src/db/mongo_seeds.py"
+      }
+    },
+    "pg-seeds": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/seeds/postgres_seeds.py"
+      }
+    },
+    "mongo-seeds": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
         "command": "poetry run python {projectRoot}/seeds/mongo_seeds.py"
+      }
+    },
+    "pg-backup": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/db/daily_backup.py"
+      }
+    },
+    "pg-restore": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/db/restore_backup.py"
       }
     },
     "up": {
