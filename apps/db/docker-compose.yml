@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: api6_postgres
     environment:
       POSTGRES_USER: postgres
