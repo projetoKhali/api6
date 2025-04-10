@@ -10,7 +10,7 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "secret")
 DB_PORT = os.getenv("DB_PORT", "5432")
 BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
-DOCKER_CONTAINER = os.getenv("DB_CONTAINER", "api6_postgres")
+DOCKER_CONTAINER = os.getenv("container_name", "api6_postgres")
 
 TABELAS = ["users", "permissions"]
 
