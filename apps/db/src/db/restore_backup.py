@@ -13,11 +13,9 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DOCKER_CONTAINER = os.getenv("DB_CONTAINER", "api6_postgres")
 
-if os.path.exists("./bkp"): 
-    BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
-else:
-    os.makedirs("./bkp")
-    BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
+BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")  
+if not os.path.exists(BACKUP_DIR):  
+    os.makedirs(BACKUP_DIR)  
 
 def find_backup_file(backup_file_name=None):
     """
