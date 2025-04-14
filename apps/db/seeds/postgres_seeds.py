@@ -8,11 +8,9 @@ from sqlalchemy.orm import sessionmaker
 from faker import Faker
 from cryptography.fernet import Fernet
 
-from apps.db.src.db.postgres import Base, User, Permission, Deleted_User, User_Key
+from apps.db.src.db.postgres import Base, User, Permission, Deleted_User, User_Key, get_engine
 
-DB_URL = os.getenv("SEED_DB_URL", "postgresql+psycopg2://postgres:secret@localhost:5432/postgres")
-
-engine = create_engine(DB_URL)
+engine = get_engine()
 Session = sessionmaker(bind=engine)
 session = Session()
 
