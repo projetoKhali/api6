@@ -6,7 +6,7 @@ from daily_backup import create_backup
 
 load_dotenv()
 
-DB_NAME = os.getenv("DB_NAME", "postgres")
+DB_NAME = os.getenv("DB_NAME", "api6_postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "secret")
 DB_HOST = os.getenv("DB_HOST", "localhost")

@@ -10,7 +10,7 @@ def get_engine():
     postgres_password = os.getenv("POSTGRES_PASSWORD", "secret")
     postgres_host = os.getenv("POSTGRES_HOST", "localhost")
     postgres_port = os.getenv("POSTGRES_PORT", "5432")
-    postgres_db = os.getenv("POSTGRES_DB", "postgres")
+    postgres_db = os.getenv("POSTGRES_DB", "api6_postgres")
 
     database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
     return create_engine(database_url, pool_size=10, max_overflow=20)

@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
-      POSTGRES_DB: postgres
+      POSTGRES_DB: api6_postgres
     ports:
       - "5432:5432"
     volumes:
