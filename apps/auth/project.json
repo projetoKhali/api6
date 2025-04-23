@@ -7,7 +7,6 @@
     "serve": {
       "executor": "@monodon/rust:run",
       "outputs": ["{options.target-dir}"],
-      "dependsOn": ["hydra-up"],
       "options": {
         "target-dir": "dist/target/auth"
       },
@@ -15,36 +14,6 @@
         "production": {
           "release": true
         }
-      }
-    },
-    "hydra-up": {
-      "executor": "nx:run-commands",
-      "dependsOn": [
-        {
-          "target": "pg-up",
-          "projects": "db"
-        }
-      ],
-      "options": {
-        "command": "docker-compose -f {projectRoot}/hydra.docker-compose.yaml up -d --build"
-      }
-    },
-    "hydra-down": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "docker-compose -f {projectRoot}/hydra.docker-compose.yaml down"
-      }
-    },
-    "up": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t hydra-up"
-      }
-    },
-    "down": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t hydra-down"
       }
     },
     "build": {

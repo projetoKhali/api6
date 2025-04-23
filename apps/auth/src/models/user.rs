@@ -1,8 +1,11 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
+use utoipa::ToSchema;
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct User {
-    pub id: i32,
+    pub id: Uuid,
     pub email: String,
-    pub password: String,
+    pub hashed_password: String,
 }
