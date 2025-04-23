@@ -1,7 +1,6 @@
 import { NewUser, User } from '../src/schemas/UserSchema';
 import { Page } from '../src/schemas/pagination';
 import {
-    getAllUsers,
     getUsers,
     getUser,
     createUser,
@@ -19,23 +18,6 @@ jest.mock('../src/service/service');
 describe('UserService', () => {
     afterEach(() => {
         jest.clearAllMocks();
-    });
-
-    it('should fetch all users', async () => {
-        const mockUsers: User[] = [{ 
-                id: 1, 
-                name: 'John Doe',
-                login: 'johndoe',
-                email: 'johndoe@email.com',
-                version_terms_agreement: '1.0',
-                permission_id: 1
-            }];
-        (processGET as jest.Mock).mockResolvedValue(mockUsers);
-
-        const result = await getAllUsers();
-
-        expect(processGET).toHaveBeenCalledWith('/user/all');
-        expect(result).toEqual(mockUsers);
     });
 
     it('should fetch paginated users', async () => {

@@ -7,10 +7,6 @@ import {
 import { NewUser, User } from '../schemas/UserSchema';
 import { Page } from '../schemas/pagination';
 
-export const getAllUsers = async (): Promise<User[]> => {
-  return await processGET<User[]>(`/user/all`);
-};
-
 export const getUsers = async (
   page: number,
   size = 50
@@ -37,3 +33,6 @@ export const updateUser = async (
   );
 };
 
+export const deleteUser = async (id: string): Promise<void> => {
+  return await processRequest<void, void>('DELETE', `/user/${id}`);
+}
