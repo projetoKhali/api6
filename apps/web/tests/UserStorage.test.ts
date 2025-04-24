@@ -3,7 +3,7 @@ import {
     setUserToLocalStorage,
     clearUserFromLocalStorage,
     isUserLoggedIn,
-    } from '../src/store/UserStorage';
+} from '../src/store/UserStorage';
 
 
 
