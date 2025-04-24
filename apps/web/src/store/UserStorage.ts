@@ -1,24 +1,18 @@
-import { User } from "../schemas/UserSchema";
-
-let userCache: User | null = null;
-
-export const getUserFromLocalStorage = (): User | null => {
-    const userString = localStorage.getItem("user");
-    if (userString) {
-        return JSON.parse(userString);
+export const getUserFromLocalStorage = (): string | null => {
+    const userToken = localStorage.getItem("utoken");
+    if (userToken) {
+        return JSON.parse(userToken);
     }
     return null;
 };
 
-export const setUserToLocalStorage = (user: User): void => {
+export const setUserToLocalStorage = (token: string): void => {
     const safeUser =
-        localStorage.setItem("user", JSON.stringify(user));
-    userCache = user;
+        localStorage.setItem("utoken", JSON.stringify(token));
 };
 
 export const clearUserFromLocalStorage = (): void => {
-    localStorage.removeItem("user");
-    userCache = null;
+    localStorage.removeItem("utoken");
 };
 
 export const isUserLoggedIn = (): boolean => {
