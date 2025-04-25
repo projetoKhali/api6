@@ -53,8 +53,7 @@ def test_connection(engine):
     try:
         with engine.connect() as connection:
             sql_query = "SELECT 1"
-            result = connection.execute(text(sql_query))
-            print("Conexão bem-sucedida", result.fetchone())
+            connection.execute(text(sql_query))
     except Exception as e:
         print("Erro ao conectar ao banco de dados:", e)
 
