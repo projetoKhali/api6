@@ -99,4 +99,5 @@ def seed_populate(df):
         return
 
 
-seed_populate(df)
+if __name__ == "__main__":
+    seed_populate(df)
