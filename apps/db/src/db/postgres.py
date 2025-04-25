@@ -62,3 +62,7 @@ def initialize_postgres_database():
     engine = get_engine()
     test_connection(engine)
     create_tables(engine)
+
+
+if __name__ == "__main__":
+    initialize_postgres_database()
