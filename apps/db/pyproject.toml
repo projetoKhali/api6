@@ -18,6 +18,7 @@ python = "*"
 dotenv = "*"
 pymongo = "*"
 psycopg2 = "*"
+sqlalchemy = "*"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
