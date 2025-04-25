@@ -12,9 +12,15 @@ def get_engine():
     postgres_host = os.getenv("POSTGRES_HOST", "localhost")
     postgres_port = os.getenv("POSTGRES_PORT", "5432")
     postgres_db = os.getenv("POSTGRES_DB", "api6_postgres")
+    postgres_debug = os.getenv("POSTGRES_DEBUG", 'False').lower() in ('true', '1', 't')
 
     database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
-    return create_engine(database_url, pool_size=10, max_overflow=20)
+    return create_engine(
+        database_url,
+        echo=postgres_debug,
+        pool_size=10,
+        max_overflow=20
+    )
 
 
 Base = declarative_base()
