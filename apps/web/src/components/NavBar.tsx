@@ -38,7 +38,7 @@ const Navbar = () => {
           }}
         ></div>
         <a
-          href="/predictions"
+          href="/projection"
           style={{ textDecoration: 'none', color: '#fff' }}
         >
           Previsões
