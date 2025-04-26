@@ -9,6 +9,7 @@ import Dashboard from '../pages/Dashboard';
 import EventsRegister from '../pages/EventsRegister';
 import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
+import ProjectionPage from '../pages/ProjectionPage';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <div style={{ height: '100%', width: '100%' }}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/projection" element={<ProjectionPage />} />
             <Route
               path="/register"
               element={<Navigate to="/register/yield" replace />}
