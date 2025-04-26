@@ -14,35 +14,44 @@ type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export const processRequest = async <R, T>(
   method: Method,
   path: string,
-  body?: R
+  body?: R,
+  token?: string,
 ): Promise<T> => {
+  const authHeaders = {
+    ...headers.headers,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+
   const response = await axios.request<T>({
     url: `${API_BASE_URL}${path}`,
     method,
-    headers: headers.headers,
+    headers: authHeaders,
     ...(body && { data: body }),
   });
 
   return response.data;
 };
 
-export const processGET = async <Response>(path: string): Promise<Response> =>
-  await processRequest('GET', path);
+export const processGET = async <Response>(path: string, token?: string): Promise<Response> =>
+  await processRequest('GET', path, undefined, token);
 
 export const processPOST = async <Body, Response>(
   path: string,
-  body: Body
-): Promise<Response> => await processRequest('POST', path, body);
+  body: Body,
+  token?: string
+): Promise<Response> => await processRequest('POST', path, body, token);
 
 export const processPaginatedRequest = async <Body, Response>(
   path: string,
-  body: PageRequest & Body
+  body: PageRequest & Body,
+  token?: string
 ): Promise<Page<Response>> =>
-  (await processRequest('POST', path, body)) || emptyPage();
+  (await processRequest('POST', path, body, token)) || emptyPage();
 
 export const processPaginatedGET = async <Response>(
   path: string,
   page: number,
-  size: number
+  size: number,
+  token?: string
 ): Promise<Page<Response>> =>
-  await processPaginatedRequest(path, { page, size });
+  await processPaginatedRequest(path, { page, size }, token);
