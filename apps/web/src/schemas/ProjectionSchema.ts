@@ -68,3 +68,27 @@ function isAgriculturalData(data: any): data is AgriculturalData {
     typeof data.yield === 'number'
   );
 }
+
+
+export interface PredictCustomRequest {
+  state?: string;
+  crop?: string;
+  season?: string;
+  area?: number;
+  fertilizer?: number;
+  pesticide?: number;
+  annual_rainfall?: number;
+  year?: number;
+}
+
+export interface PredictCustomResponseItem {
+  Annual_Rainfall: number;
+  Area: number;
+  Crop: string;
+  Predicted_Fertilizer: number;
+  Predicted_Pesticide: number;
+  Predicted_Production: number;
+  Season: string;
+  State: string;
+  Year: number;
+}
