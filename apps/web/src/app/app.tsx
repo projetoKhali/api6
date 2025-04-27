@@ -10,6 +10,7 @@ import EventsRegister from '../pages/EventsRegister';
 import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
+import UserManagementPage from '../pages/UserManagementPage';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               path="/register"
               element={<Navigate to="/register/yield" replace />}
             />
+            <Route path="/user" element={<UserManagementPage />} />
             <Route path="/register">
               <Route path="yield" element={<YieldRegister />} />
               <Route path="event" element={<EventsRegister />} />

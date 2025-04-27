@@ -49,6 +49,7 @@ function YieldRegister() {
   return (
     <div className="container" style={{ width: '100%' }}>
       <div className="form-container">
+        <h2>Cadastro de Rendimento</h2>
         <DynamicForm
           schema={schema}
           initialValues={initialValues}
@@ -56,7 +57,7 @@ function YieldRegister() {
         />
       </div>
       <div className="separator"></div>
-      <div className="table-container" style={{ width: '100%' }}>
+      <div className="table-container" style={{ width: '100%'}}>
         <TableComponent
           style={{ width: '100%' }}
           schema={tableSchema}
@@ -67,6 +68,7 @@ function YieldRegister() {
           setPage={(newPage) => setPage(newPage)}
           getTotalPages={() => totalPages}
           onPageChange={async (newPage) => fetchPage(newPage)}
+          style={{ marginTop: '30px', gap: '10px' }}
         />
       </div>
     </div>

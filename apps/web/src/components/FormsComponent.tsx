@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FieldSchema } from '../schemas/FormsSchema';
 import './styles/FormsComponent.css';
 
@@ -7,10 +7,13 @@ interface DynamicFormProps {
   initialValues: Record<string, string>;
   onSubmit: (data: Record<string, string>) => void;
 }
-
 function DynamicForm({ schema, initialValues, onSubmit }: DynamicFormProps) {
-  const [formData, setFormData] =
-    useState<Record<string, string>>(initialValues);
+  const [formData, setFormData] = useState<Record<string, string>>(initialValues);
+
+  // Sempre que initialValues mudar, atualizar o estado
+  useEffect(() => {
+    setFormData(initialValues);
+  }, [initialValues]);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -26,19 +29,18 @@ function DynamicForm({ schema, initialValues, onSubmit }: DynamicFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Cadastro de colheita</h2>
       {schema.map((field) => (
         <div key={field.name}>
           <label>{field.label}</label>
           <input
             type={field.type}
             name={field.name}
-            value={formData[field.name]}
+            value={formData[field.name] || ''}
             onChange={handleChange}
           />
         </div>
       ))}
-      <button type="submit">Cadastrar</button>
+      <button type="submit">Confirmar</button>
     </form>
   );
 }

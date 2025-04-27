@@ -1,7 +1,6 @@
 /* Container da tabela */
 .table-container {
   width: 100%;
-  padding: 10px;
 }
 
 /* Estilização da tabela */
@@ -17,7 +16,6 @@
 .custom-table thead {
   background-color: #026734;
   color: white;
-  font-family: Arial, sans-serif;
 }
 
 .custom-table th {
