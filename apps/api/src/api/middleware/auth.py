@@ -2,7 +2,8 @@ import requests
 from functools import wraps
 from flask import request, jsonify
 
-AUTH_INTROSPECT_URL = "http://localhost:3000/introspect"
+AUTH_INTROSPECT_URL = "http://localhost:3000/validate"
+
 
 def require_auth(f):
     @wraps(f)
