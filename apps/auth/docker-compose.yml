@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: api6_auth
+    build:
+      context: ../../.
+      dockerfile: apps/auth/Dockerfile
+    ports:
+      - '3000:3000'
+    networks:
+      - db_api6
+
+networks:
+  db_api6:
+    external: true
