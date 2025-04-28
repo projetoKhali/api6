@@ -9,6 +9,8 @@ from db.postgres import (
     get_engine,
     test_connection,
     User,
+    UserKey,
+    DeletedUser,
     Permission
 )
 from sqlalchemy.orm import sessionmaker
@@ -76,7 +78,7 @@ def insert_users(session, permissoes):
     # Gera chaves para cada usuário
     for user in users:
         chave = Fernet.generate_key().decode()
-        keys.append(User_Key(
+        keys.append(UserKey(
             usr_id=user.id,
             key=chave
         ))
@@ -91,7 +93,7 @@ def insert_deleted_users(session, users):
     excluidos = random.sample(users, NUM_HARD_DELETED)
 
     ids_excluidos = [user.id for user in excluidos]
-    deleted = [Deleted_User(usr_id=id_) for id_ in ids_excluidos]
+    deleted = [DeletedUser(usr_id=id_) for id_ in ids_excluidos]
 
     # Remove os usuários selecionados
     for id_ in ids_excluidos:

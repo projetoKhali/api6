@@ -63,13 +63,13 @@ class Permission(Base):
     description = Column(Text, name="pm_description")
 
 
-class Deleted_User(Base):
+class DeletedUser(Base):
     __tablename__ = "deleted_users"
     usr_id = Column(BigInteger, primary_key=True, name="usr_id")
     delete_date = Column(Date, name="delete_date", default=text("now()"))
 
 
-class User_Key(Base):
+class UserKey(Base):
     __tablename__ = "user_key"
     usr_id = Column(
         BigInteger,
