@@ -32,8 +32,12 @@ class User(Base):
     id = Column(Integer, Sequence("user_id_seq"), primary_key=True)
     name = Column(String)
     login = Column(String, index=True, unique=True)
+    email = Column(String, index=True)
     password = Column(Text)
     version_terms_agreement = Column(String)
+    disabled_since = Column(String)
+
+    permission_id = Column(BigInteger, ForeignKey("permissions.id"))
 
 
 class Permission(Base):
