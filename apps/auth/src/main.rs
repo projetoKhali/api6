@@ -33,8 +33,13 @@ use utoipa::OpenApi;
 )]
 
 pub struct ApiDoc;
+use infra::{config, server};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    server::create_server()?.await
+    let config = config::setup();
+
+    let server = server::create_server(config).await?;
+
+    server.await
 }

@@ -2,30 +2,24 @@ use crate::{routes, ApiDoc};
 use actix_web::{dev::Server, web, App, HttpServer};
 use utoipa_swagger_ui::SwaggerUi;
 
-use dotenv::dotenv;
-use std::env;
 use utoipa::OpenApi;
 
-use super::db;
+use super::{config::Config, db};
 
-pub fn create_server() -> std::io::Result<Server> {
-    dotenv().ok();
+pub async fn create_server(config: Config) -> std::io::Result<Server> {
+    let server_port = config.server_port;
 
-    let port: u16 = env::var("AUTH_PORT")
-        .unwrap_or_else(|_| "3000".into())
-        .parse()
-        .unwrap();
+    let db_client_data = web::Data::new(db::create_seaorm_connection(&config.db).await);
+    let config_data = web::Data::new(config);
 
-    let server = HttpServer::new(|| {
+    let server = HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(db::create_seaorm_connection()))
-            .service(SwaggerUi::new("/docs/{_:.*}").url("/docs/openapi.json", ApiDoc::openapi()))
-            .configure(routes::auth)
+            .app_data(db_client_data.clone())
+            .app_data(config_data.clone())
             .configure(routes::user)
+            .configure(routes::auth)
     })
-    .bind(("0.0.0.0", port))?;
-
-    println!("Server listening at http://localhost:{}", port);
+    .bind(("0.0.0.0", server_port))?;
 
     Ok(server.run())
 }
