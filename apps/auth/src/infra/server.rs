@@ -14,6 +14,7 @@ pub async fn create_server(config: Config) -> std::io::Result<Server> {
 
     let server = HttpServer::new(move || {
         App::new()
+            .wrap(actix_web::middleware::Logger::default())
             .app_data(db_client_data.clone())
             .app_data(config_data.clone())
             .configure(routes::user)
