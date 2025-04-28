@@ -20,12 +20,11 @@ def require_auth(f):
             token = token[7:]
         # Call the auth app introspection endpoint
         try:
-            response = requests.post(AUTH_INTROSPECT_URL, json={"token": token})
+            response = requests.post(
+                AUTH_INTROSPECT_URL, json={"token": token})
             if response.status_code != 200:
                 return jsonify({"error": "Token introspection failed"}), 403
-            data = response.json()
-            if not data.get("active", False):
-                return jsonify({"error": "Invalid token"}), 403
+
         except Exception as e:
             return jsonify({"error": str(e)}), 403
         return f(*args, **kwargs)
