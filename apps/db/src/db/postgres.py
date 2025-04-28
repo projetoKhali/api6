@@ -7,12 +7,13 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 def get_engine():
     load_dotenv()
 
-    postgres_user = os.getenv("POSTGRES_USER", "postgres")
-    postgres_password = os.getenv("POSTGRES_PASSWORD", "secret")
-    postgres_host = os.getenv("POSTGRES_HOST", "localhost")
-    postgres_port = os.getenv("POSTGRES_PORT", "5432")
-    postgres_db = os.getenv("POSTGRES_DB", "api6_postgres")
-    postgres_debug = os.getenv("POSTGRES_DEBUG", 'False').lower() in ('true', '1', 't')
+    postgres_user = os.getenv("DB_POSTGRES_USER", "postgres")
+    postgres_password = os.getenv("DB_POSTGRES_PASS", "secret")
+    postgres_host = os.getenv("DB_POSTGRES_HOST", "localhost")
+    postgres_port = os.getenv("DB_POSTGRES_PORT", "5432")
+    postgres_db = os.getenv("DB_POSTGRES_NAME", "api6_postgres")
+    postgres_debug = os.getenv(
+        "DB_POSTGRES_DEBUG", 'False').lower() in ('true', '1', 't')
 
     database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
     return create_engine(

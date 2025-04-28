@@ -14,11 +14,11 @@ class MongoDB:
 
         load_dotenv()
 
-        mongo_user = os.getenv("MONGO_USER", "mongo")
-        mongo_password = os.getenv("MONGO_PASSWORD", "secret")
-        mongo_host = os.getenv("MONGO_HOST", "localhost")
-        mongo_port = os.getenv("MONGO_PORT", "27017")
-        mongo_db = os.getenv("MONGO_DB", "api6_mongo")
+        mongo_user = os.getenv("DB_MONGO_USER", "mongo")
+        mongo_password = os.getenv("DB_MONGO_PASS", "secret")
+        mongo_host = os.getenv("DB_MONGO_HOST", "localhost")
+        mongo_port = os.getenv("DB_MONGO_PORT", "27017")
+        mongo_db = os.getenv("DB_MONGO_NAME", "api6_mongo")
 
         mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
