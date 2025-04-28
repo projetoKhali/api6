@@ -9,8 +9,10 @@ from sqlalchemy import (
     Text,
     Sequence,
     ForeignKey,
+    DateTime,
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
+import datetime
 
 
 def get_engine():
@@ -54,6 +56,16 @@ class Permission(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String, unique=True)
     description = Column(Text)
+
+
+class RevokedToken(Base):
+    __tablename__ = "revoked_tokens"
+    jti = Column(String, primary_key=True)
+    revoked_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow
+    )
 
 
 def create_tables(engine):
