@@ -5,7 +5,7 @@ import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
 
-const Login: React.FC = () => {
+const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => void }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,7 +25,8 @@ const Login: React.FC = () => {
       (username === 'admin' && password === 'admin123') ||
       (await login(username, password))
     ) {
-      navigate('/dashboard');
+      setIsAuthenticated(true);
+      navigate('/', { replace: true });
     } else {
       setError('Credenciais inválidas');
     }
