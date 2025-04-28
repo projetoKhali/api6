@@ -1,4 +1,5 @@
 use crate::routes;
+use actix_cors::Cors;
 use actix_web::{dev::Server, web, App, HttpServer};
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -15,6 +16,7 @@ pub async fn create_server(config: Config) -> std::io::Result<Server> {
     let server = HttpServer::new(move || {
         App::new()
             .wrap(actix_web::middleware::Logger::default())
+            .wrap(Cors::permissive())
             .app_data(db_client_data.clone())
             .app_data(config_data.clone())
             .service(
