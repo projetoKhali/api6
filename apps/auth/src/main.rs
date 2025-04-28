@@ -1,38 +1,12 @@
-mod entities;
 mod infra;
 mod jwt;
+
+mod entities;
 mod models;
 mod routes;
 
-use infra::server;
-use utoipa::OpenApi;
+mod swagger;
 
-#[derive(OpenApi)]
-#[openapi(
-    paths(
-        routes::auth::register,
-        routes::auth::login,
-        routes::auth::validate_token,
-        routes::auth::logout,
-        routes::user::create_user,
-        routes::user::get_user,
-        routes::user::update_user,
-        routes::user::delete_user,
-    ),
-    components(schemas(
-        models::auth::RegisterRequest,
-        models::auth::LoginRequest,
-        models::auth::TokenResponse,
-        models::auth::ValidateRequest,
-        models::User
-    )),
-    tags(
-        (name = "Auth", description = "Authentication endpoints"),
-        (name = "User", description = "User management endpoints")
-    )
-)]
-
-pub struct ApiDoc;
 use infra::{config, server};
 
 #[actix_web::main]

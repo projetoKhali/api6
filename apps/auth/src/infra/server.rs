@@ -1,4 +1,4 @@
-use crate::{routes, ApiDoc};
+use crate::routes;
 use actix_web::{dev::Server, web, App, HttpServer};
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -17,6 +17,10 @@ pub async fn create_server(config: Config) -> std::io::Result<Server> {
             .wrap(actix_web::middleware::Logger::default())
             .app_data(db_client_data.clone())
             .app_data(config_data.clone())
+            .service(
+                SwaggerUi::new("/docs/{_:.*}")
+                    .url("/docs/openapi.json", crate::swagger::ApiDoc::openapi()),
+            )
             .configure(routes::user)
             .configure(routes::auth)
     })
