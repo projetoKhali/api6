@@ -16,7 +16,7 @@ type LoginResponse = {
 export const login = async (
   username: string,
   password: string
-): Promise<void> => {
+): Promise<boolean> => {
   const result = await processPOST<LoginRequest, LoginResponse>(
     '/login',
     { username, password },
@@ -24,10 +24,11 @@ export const login = async (
   );
 
   if (!result.token) {
-    throw new Error('Login failed');
+    return false;
   }
 
   setUserToLocalStorage(result.token);
+  return true;
 };
 
 export const logout = async (): Promise<void> => {

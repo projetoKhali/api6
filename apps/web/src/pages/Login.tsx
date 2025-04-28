@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
+import { login } from '../service/AuthService';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!username.trim() || !password.trim()) {
@@ -20,7 +21,10 @@ const Login: React.FC = () => {
 
     console.log('Login attempt:', { username, password });
 
-    if (username === 'admin' && password === 'admin123') {
+    if (
+      (username === 'admin' && password === 'admin123') ||
+      (await login(username, password))
+    ) {
       navigate('/dashboard');
     } else {
       setError('Credenciais inválidas');
