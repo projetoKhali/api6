@@ -19,6 +19,8 @@ dotenv = "*"
 pymongo = "*"
 psycopg2 = "*"
 sqlalchemy = "*"
+cryptography = "*"
+faker = "*"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
