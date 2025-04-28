@@ -56,7 +56,7 @@ def test_connection(engine):
             sql_query = "SELECT 1"
             connection.execute(text(sql_query))
     except Exception as e:
-        print("Erro ao conectar ao banco de dados:", e)
+        raise Exception("Erro ao conectar ao banco de dados:", e) from e
 
 
 def initialize_postgres_database():

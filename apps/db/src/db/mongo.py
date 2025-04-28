@@ -60,7 +60,8 @@ def create_species_collection(db):
         db.create_collection("species_collection", validator=species_validator)
         print("Coleção 'species' criada com validador.")
     except Exception as e:
-        print(f"Erro ao criar ou atualizar a coleção 'species': {e}")
+        raise Exception(
+            f"Erro ao criar ou atualizar a coleção 'species': {e}") from e
 
 
 def create_plots_collection(db):
@@ -82,7 +83,8 @@ def create_plots_collection(db):
         db.create_collection("plots_collection", validator=plots_validator)
         print("Coleção 'plots' criada com validador.")
     except Exception as e:
-        print(f"Erro ao criar ou atualizar a coleção 'plots': {e}")
+        raise Exception(
+            f"Erro ao criar ou atualizar a coleção 'plots': {e}") from e
 
 
 def create_yield_collection(db):
@@ -147,7 +149,8 @@ def create_yield_collection(db):
         db.create_collection("yield_collection", validator=yield_validator)
         print("Coleção 'yield' criada com validador.")
     except Exception as e:
-        print(f"Erro ao criar ou atualizar a coleção 'yield': {e}")
+        raise Exception(
+            f"Erro ao criar ou atualizar a coleção 'yield': {e}") from e
 
 
 def create_indexes(db):
@@ -159,7 +162,7 @@ def create_indexes(db):
         db.yield_collection.create_index([("production", ASCENDING)])
         print("📌 Índices criados com sucesso!")
     except Exception as e:
-        print(f"Erro ao criar índices: {e}")
+        raise Exception(f"Erro ao criar índices: {e}") from e
 
 
 def restart_collections(db):

@@ -12,7 +12,7 @@ def insert_seeds(session):
         insert_users(session)
         insert_permissions(session)
     except Exception as e:
-        raise Exception("Erro ao inserir seeds:", e)
+        raise Exception("Erro ao inserir seeds:", e) from e
 
 
 def insert_users(session):

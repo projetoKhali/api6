@@ -95,8 +95,7 @@ def seed_populate(df):
             )
         return "Dados inseridos com sucesso!"
     except Exception as e:
-        print(f"Erro ao ao popular banco de dados: {e}")
-        return
+        raise Exception("Erro ao popular banco de dados:", e) from e
 
 
 if __name__ == "__main__":
