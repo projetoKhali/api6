@@ -41,37 +41,33 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(BigInteger, primary_key=True,
-                autoincrement=True, name="usr_id")
-    name = Column(String, name="usr_name")
-    email = Column(String, name="usr_email", index=True, unique=True)
-    login = Column(String, name="usr_login", index=True, unique=True)
-    password = Column(Text, name="usr_password")
-    version_terms_agreement = Column(
-        String, name="usr_version_terms_agreement")
-    disabled_since = Column(Date, name="usr_disabled_since")
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    name = Column(String)
+    email = Column(String, index=True, unique=True)
+    login = Column(String, index=True, unique=True)
+    password = Column(Text)
+    version_terms_agreement = Column(String)
+    disabled_since = Column(Date)
 
-    permission_id = Column(BigInteger, ForeignKey(
-        "permissions.pm_id"), name="pm_id")
+    permission_id = Column(BigInteger, ForeignKey("permissions.id"))
 
 
 class Permission(Base):
     __tablename__ = "permissions"
-    id = Column(BigInteger, Sequence("permission_id_seq"),
-                primary_key=True, name="pm_id")
-    name = Column(String, unique=True, name="pm_name")
-    description = Column(Text, name="pm_description")
+    id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
+    name = Column(String, unique=True)
+    description = Column(Text)
 
 
 class DeletedUser(Base):
     __tablename__ = "deleted_users"
-    usr_id = Column(BigInteger, primary_key=True, name="usr_id")
-    delete_date = Column(Date, name="delete_date", default=text("now()"))
+    id = Column(BigInteger, primary_key=True)
+    delete_date = Column(Date, default=text("now()"))
 
 
 class UserKey(Base):
     __tablename__ = "user_key"
-    usr_id = Column(
+    id = Column(
         BigInteger,
         primary_key=True
     )

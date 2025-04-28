@@ -86,13 +86,13 @@ def remove_deleted_users():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT usr_id FROM deleted_users")
+        cursor.execute("SELECT id FROM deleted_users")
         ids = cursor.fetchall()
 
-        for (usr_id,) in ids:
-            cursor.execute("DELETE FROM users WHERE usr_id = %s;", (usr_id,))
+        for (id,) in ids:
+            cursor.execute("DELETE FROM users usr WHERE usr.id = %s;", (id,))
             cursor.execute(
-                "DELETE FROM permissions WHERE pm_id = %s;", (usr_id,))
+                "DELETE FROM permissions pm WHERE pm.id = %s;", (id,))
 
         conn.commit()
     except Exception as e:

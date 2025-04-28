@@ -83,7 +83,7 @@ def insert_users(session, permissoes):
 
     # Gera chaves para cada usuário
     keys = [UserKey(
-        usr_id=user.id,
+        id=user.id,
         key=Fernet.generate_key().decode()
     ) for user in users]
 
@@ -97,7 +97,7 @@ def insert_deleted_users(session, users):
     excluidos = random.sample(users, NUM_HARD_DELETED)
 
     ids_excluidos = [user.id for user in excluidos]
-    deleted = [DeletedUser(usr_id=id_) for id_ in ids_excluidos]
+    deleted = [DeletedUser(id=id_) for id_ in ids_excluidos]
 
     # Remove os usuários selecionados
     for id_ in ids_excluidos:
