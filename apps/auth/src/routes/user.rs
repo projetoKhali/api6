@@ -18,36 +18,6 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(
-    post,
-    path = "/user/",
-    request_body = User,
-    responses(
-        (status = 201, description = "User created successfully", body = User),
-        (status = 500, description = "Server error")
-    ),
-    tags = ["User"]
-)]
-async fn create_user(
-    db: web::Data<DatabaseConnection>,
-    new_user: web::Json<User>,
-) -> impl Responder {
-    let user = user_entity::ActiveModel {
-        id: Set(new_user.id),
-        email: Set(new_user.email.clone()),
-        hashed_password: Set(new_user.hashed_password.clone()),
-        ..Default::default()
-    };
-
-    match user.insert(db.get_ref()).await {
-        Ok(saved_user) => HttpResponse::Created().json(User {
-            id: saved_user.id,
-            email: saved_user.email,
-            hashed_password: saved_user.hashed_password,
-        }),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
-}
-#[utoipa::path(
     get,
     path = "/user/{id}",
     params(
