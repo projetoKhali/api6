@@ -1,9 +1,7 @@
 use actix_web::{web, HttpResponse, Responder};
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{
-    ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel
-};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel};
 
 use crate::entities::user as user_entity;
 use crate::models::{UserPublic, UserUpdate};
@@ -70,9 +68,9 @@ async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) ->
 )]
 
 async fn update_user(
-  db: web::Data<DatabaseConnection>,
-  user_id: web::Path<i64>,
-  user_update: web::Json<UserUpdate>,
+    db: web::Data<DatabaseConnection>,
+    user_id: web::Path<i64>,
+    user_update: web::Json<UserUpdate>,
 ) -> impl Responder {
     let existing = user_entity::Entity::find_by_id(*user_id)
         .one(db.get_ref())
@@ -82,12 +80,13 @@ async fn update_user(
         Ok(Some(model)) => {
             let mut update_model = model.into_active_model();
 
-            let new_disabled_since = match &user_update.disabled_since {
-                Some(dt) => match Date::parse_from_str(&dt, "%Y-%m-%d") {
-                    Ok(valid_update_date) => {
-                        Set(Some(valid_update_date.into()))
+            update_model.disabled_since = match &user_update.disabled_since {
+                Some(dt) => match dt {
+                    Some(dt) => match Date::parse_from_str(&dt, "%Y-%m-%d") {
+                        Ok(valid_update_date) => Set(Some(valid_update_date.into())),
+                        Err(_) => return HttpResponse::BadRequest().body("Invalid disabled_since"),
                     },
-                    Err(_) => return HttpResponse::BadRequest().body("Invalid disabled_since"),
+                    None => Set(None),
                 },
                 None => NotSet,
             };
@@ -112,7 +111,6 @@ async fn update_user(
                 Some(permission_id) => Set(permission_id),
                 None => NotSet,
             };
-            update_model.disabled_since = new_disabled_since;
 
             match update_model.update(db.get_ref()).await {
                 Ok(_) => HttpResponse::Ok().finish(),
@@ -137,10 +135,7 @@ async fn update_user(
     tags = ["User"]
 )]
 
-async fn delete_user(
-    db: web::Data<DatabaseConnection>,
-    user_id: web::Path<i64>,
-) -> impl Responder {
+async fn delete_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) -> impl Responder {
     let result = user_entity::Entity::delete_by_id(user_id.into_inner())
         .exec(db.get_ref())
         .await;

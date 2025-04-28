@@ -9,7 +9,7 @@ pub struct UserPublic {
     pub login: String,
     pub email: String,
     pub version_terms: String,
-    pub permission_id: i64,
+    pub permission_id: Option<i64>,
     pub disabled_since: Option<String>,
 }
 
@@ -19,6 +19,6 @@ pub struct UserUpdate {
     pub login: Option<String>,
     pub email: Option<String>,
     pub version_terms: Option<String>,
-    pub permission_id: Option<i64>,
-    pub disabled_since: Option<String>,
+    pub permission_id: Option<Option<i64>>,
+    pub disabled_since: Option<Option<String>>,
 }
