@@ -21,10 +21,10 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     get,
     path = "/user/{id}",
     params(
-        ("id" = Uuid, Path, description = "User UUID")
+        ("id" = i64, Path, description = "User ID")
     ),
     responses(
-        (status = 200, description = "User found", body = User),
+        (status = 200, description = "User found", body = UserPublic),
         (status = 404, description = "User not found"),
         (status = 500, description = "Server error")
     ),
@@ -57,9 +57,9 @@ async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) ->
 #[utoipa::path(
     put,
     path = "/user/{id}",
-    request_body = User,
+    request_body = UserUpdate,
     params(
-        ("id" = Uuid, Path, description = "User UUID")
+        ("id" = i64, Path, description = "User ID")
     ),
     responses(
         (status = 200, description = "User updated"),
@@ -128,7 +128,7 @@ async fn update_user(
     delete,
     path = "/user/{id}",
     params(
-        ("id" = Uuid, Path, description = "User UUID")
+        ("id" = i64, Path, description = "User ID")
     ),
     responses(
         (status = 200, description = "User deleted"),

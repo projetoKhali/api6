@@ -33,7 +33,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(
     post,
-    path = "/auth/register",
+    path = "/register",
     request_body = RegisterRequest,
     responses(
         (status = 200, description = "User registered"),
@@ -73,7 +73,7 @@ pub async fn register(
 
 #[utoipa::path(
     post,
-    path = "/auth/login",
+    path = "/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = TokenResponse),
@@ -109,7 +109,7 @@ pub async fn login(
 
 #[utoipa::path(
     post,
-    path = "/auth/validate",
+    path = "/validate",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token is valid", body = Claims),
@@ -130,10 +130,10 @@ pub async fn validate_token(
 
 #[utoipa::path(
     post,
-    path = "/auth/logout",
+    path = "/logout",
     request_body = ValidateRequest,
     responses(
-        (status = 200, description = "Token invalidated (simulated)")
+        (status = 200, description = "Token invalidated")
     ),
     tags = ["Auth"]
 )]
