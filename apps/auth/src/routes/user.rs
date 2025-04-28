@@ -1,16 +1,16 @@
 use actix_web::{web, HttpResponse, Responder};
+use sea_orm::prelude::Date;
+use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{
-    ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, Set
+    ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel
 };
-use uuid::Uuid;
 
 use crate::entities::user as user_entity;
-use crate::models::User;
+use crate::models::{UserPublic, UserUpdate};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/user")
-            .route("/", web::post().to(create_user))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
@@ -30,16 +30,24 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     ),
     tags = ["User"]
 )]
-async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<Uuid>) -> impl Responder {
+
+async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) -> impl Responder {
     let result = user_entity::Entity::find_by_id(user_id.into_inner())
         .one(db.get_ref())
         .await;
 
     match result {
-        Ok(Some(user)) => HttpResponse::Ok().json(User {
+        Ok(Some(user)) => HttpResponse::Ok().json(UserPublic {
             id: user.id,
+            name: user.name,
+            login: user.login,
             email: user.email,
-            hashed_password: user.hashed_password,
+            version_terms: user.version_terms_agreement,
+            permission_id: user.permission_id,
+            disabled_since: match user.disabled_since {
+                Some(dt) => Some(dt.format("%Y-%m-%d)").to_string()),
+                None => None,
+            },
         }),
         Ok(None) => HttpResponse::NotFound().finish(),
         Err(_) => HttpResponse::InternalServerError().finish(),
@@ -60,23 +68,58 @@ async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<Uuid>) -
     ),
     tags = ["User"]
 )]
-async fn update_user(db: web::Data<DatabaseConnection>, user: web::Json<User>) -> impl Responder {
-    let existing = user_entity::Entity::find_by_id(user.id)
+
+async fn update_user(
+  db: web::Data<DatabaseConnection>,
+  user_id: web::Path<i64>,
+  user_update: web::Json<UserUpdate>,
+) -> impl Responder {
+    let existing = user_entity::Entity::find_by_id(*user_id)
         .one(db.get_ref())
         .await;
 
     match existing {
-        Ok(Some(mut model)) => {
-            model.email = user.email.clone();
-            model.hashed_password = user.hashed_password.clone();
+        Ok(Some(model)) => {
+            let mut update_model = model.into_active_model();
 
-            // match user_entity::ActiveModel::update(db.get_ref()).await {
-            match model.into_active_model().update(db.get_ref()).await {
+            let new_disabled_since = match &user_update.disabled_since {
+                Some(dt) => match Date::parse_from_str(&dt, "%Y-%m-%d") {
+                    Ok(valid_update_date) => {
+                        Set(Some(valid_update_date.into()))
+                    },
+                    Err(_) => return HttpResponse::BadRequest().body("Invalid disabled_since"),
+                },
+                None => NotSet,
+            };
+
+            update_model.name = match user_update.name {
+                Some(ref name) => Set(name.clone()),
+                None => NotSet,
+            };
+            update_model.login = match user_update.login {
+                Some(ref login) => Set(login.clone()),
+                None => NotSet,
+            };
+            update_model.email = match user_update.email {
+                Some(ref email) => Set(email.clone()),
+                None => NotSet,
+            };
+            update_model.version_terms_agreement = match user_update.version_terms {
+                Some(ref version_terms) => Set(version_terms.clone()),
+                None => NotSet,
+            };
+            update_model.permission_id = match user_update.permission_id {
+                Some(permission_id) => Set(permission_id),
+                None => NotSet,
+            };
+            update_model.disabled_since = new_disabled_since;
+
+            match update_model.update(db.get_ref()).await {
                 Ok(_) => HttpResponse::Ok().finish(),
                 Err(_) => HttpResponse::InternalServerError().finish(),
             }
         }
-        Ok(None) => HttpResponse::NotFound().finish(),
+        Ok(None) => HttpResponse::NotFound().body("User not found"),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
@@ -93,9 +136,10 @@ async fn update_user(db: web::Data<DatabaseConnection>, user: web::Json<User>) -
     ),
     tags = ["User"]
 )]
+
 async fn delete_user(
     db: web::Data<DatabaseConnection>,
-    user_id: web::Path<Uuid>,
+    user_id: web::Path<i64>,
 ) -> impl Responder {
     let result = user_entity::Entity::delete_by_id(user_id.into_inner())
         .exec(db.get_ref())
