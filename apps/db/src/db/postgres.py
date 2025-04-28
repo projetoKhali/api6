@@ -1,6 +1,15 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text, Column, Integer, String, Text, Sequence
+from sqlalchemy import (
+    create_engine,
+    text,
+    Column,
+    BigInteger,
+    String,
+    Text,
+    Sequence,
+    ForeignKey,
+)
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 
@@ -29,7 +38,7 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, Sequence("user_id_seq"), primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String)
     login = Column(String, index=True, unique=True)
     email = Column(String, index=True)
@@ -42,7 +51,7 @@ class User(Base):
 
 class Permission(Base):
     __tablename__ = "permissions"
-    id = Column(Integer, Sequence("permission_id_seq"), primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String, unique=True)
     description = Column(Text)
 
