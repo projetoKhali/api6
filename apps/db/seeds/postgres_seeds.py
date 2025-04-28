@@ -1,4 +1,3 @@
-from apps.db.src.db.postgres import Base, User, Permission, Deleted_User, User_Key, get_engine
 from cryptography.fernet import Fernet
 from faker import Faker
 from sqlalchemy import create_engine
@@ -35,7 +34,7 @@ def insert_permissions(session):
     return permissoes
 
 
-def insert_users(permissoes):
+def insert_users(session, permissoes):
     users = [
         # default user for easy login
         User(
@@ -88,7 +87,7 @@ def insert_users(permissoes):
     return users
 
 
-def insert_deleted_users(users):
+def insert_deleted_users(session, users):
     excluidos = random.sample(users, NUM_HARD_DELETED)
 
     ids_excluidos = [user.id for user in excluidos]
@@ -103,23 +102,24 @@ def insert_deleted_users(users):
         f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
 
 
-def insert_seeds(session):
-    print("🌱 Iniciando seeds...")
-    insert_permissions(session)
-
-    users = insert_users(session)
-
-    insert_deleted_users(users)
-    print("✅ Seed finalizada com sucesso.")
-
-
-if __name__ == "__main__":
+def insert_seeds():
     engine = get_engine()
 
     test_connection(engine)
 
     session = sessionmaker(bind=engine)()
 
-    insert_seeds(session)
+    print("🌱 Iniciando seeds...")
+    permissions = insert_permissions(session)
+
+    users = insert_users(session, permissions)
+
+    insert_deleted_users(session, users)
 
     session.commit()
+
+    print("✅ Seed finalizada com sucesso.")
+
+
+if __name__ == "__main__":
+    insert_seeds()
