@@ -15,11 +15,11 @@ use sea_orm::{
     Set,
 };
 
-use crate::jwt::{extract_bearer, revoke_token};
-
-use crate::entities::user;
-use crate::jwt::{create_jwt, verify_jwt, Claims};
-use crate::models::auth::*;
+use crate::{
+    entities::user,
+    jwt::*,
+    models::{auth::*, jwt::Claims},
+};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(

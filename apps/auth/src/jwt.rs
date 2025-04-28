@@ -1,30 +1,25 @@
 use actix_web::{http::header, HttpRequest};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, DatabaseConnection};
-use serde::{Deserialize, Serialize};
+use jsonwebtoken::{
+  decode,
+  encode,
+  DecodingKey,
+  EncodingKey,
+  Header,
+  TokenData,
+  Validation,
+};
+use sea_orm::EntityTrait;
+use sea_orm::{
+  ActiveModelTrait,
+  ActiveValue::Set,
+  DatabaseConnection,
+};
 use sqlx::types::chrono::Utc;
 use time::{Duration, OffsetDateTime};
-use utoipa::ToSchema;
 use uuid::Uuid;
+use crate::models::jwt::*;
 
 use crate::entities::revoked_token;
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct Claims {
-    /// Subject (user ID or similar)
-    pub sub: String,
-
-    /// Expiration time as UNIX timestamp
-    pub exp: usize,
-
-    /// Issued-at time as UNIX timestamp (optional, but recommended)
-    #[schema(example = 1711670000)]
-    pub iat: usize,
-
-    /// JWT ID – unique token identifier for revocation
-    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
-    pub jti: String,
-}
 
 pub fn create_jwt(user_id: &str, jwt_secret: &str) -> String {
     let now = OffsetDateTime::now_utc();
