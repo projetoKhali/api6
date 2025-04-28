@@ -1,0 +1,38 @@
+[package]
+name = "auth"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+dotenv = "0.15"
+tokio-postgres = "0.7.13"
+sqlx = { version = "0.8.5", features = [
+  "postgres",
+  "runtime-tokio-native-tls",
+  "macros",
+] }
+uuid = { version = "1.16.0", features = ["v4"] }
+argon2 = "0.5.3"
+jsonwebtoken = "9.3.1"
+time = "0.3.41"
+actix-rt = "2.10.0"
+actix-cors = "0.7.1"
+bcrypt = "0.17.0"
+sea-orm = { version = "1.1.10", features = [
+  "sqlx-postgres",
+  "runtime-tokio-native-tls",
+] }
+sea-orm-migration = "1.1.10"
+sea-orm-codegen = "1.1.10"
+sea-query = "0.32.4"
+sea-schema = "0.16.1"
+utoipa = { version = "5.3.1", features = ["uuid", "chrono", "actix_extras"] }
+utoipa-swagger-ui = { version = "9.0.1", features = ["actix-web"] }
+env_logger = "0.11.8"
+thiserror = "2.0.12"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

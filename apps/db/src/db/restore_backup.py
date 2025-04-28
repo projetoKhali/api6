@@ -13,9 +13,10 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DOCKER_CONTAINER = os.getenv("DB_CONTAINER", "api6_postgres")
 
-BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")  
-if not os.path.exists(BACKUP_DIR):  
-    os.makedirs(BACKUP_DIR)  
+BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
+if not os.path.exists(BACKUP_DIR):
+    os.makedirs(BACKUP_DIR)
+
 
 def find_backup_file(backup_file_name=None):
     """
@@ -27,15 +28,18 @@ def find_backup_file(backup_file_name=None):
         if not files:
             print("No backup files found.")
             return None
-        latest_file = max([os.path.join(BACKUP_DIR, f) for f in files], key=os.path.getctime)
+        latest_file = max([os.path.join(BACKUP_DIR, f)
+                          for f in files], key=os.path.getctime)
         return latest_file
-    
+
     files = [f for f in os.listdir(BACKUP_DIR) if f == backup_file_name]
     if not files:
         print("No backup files found.")
         return None
-    latest_file = max([os.path.join(BACKUP_DIR, f) for f in files], key=os.path.getctime)
+    latest_file = max([os.path.join(BACKUP_DIR, f)
+                      for f in files], key=os.path.getctime)
     return latest_file
+
 
 def backup_restore(backup_path):
     create_backup("backup_before_restore_")
@@ -44,7 +48,8 @@ def backup_restore(backup_path):
     container_path = f"/var/lib/postgresql/data/{file_name}"
 
     try:
-        subprocess.run(["docker", "cp", backup_path, f"{DOCKER_CONTAINER}:{container_path}"], check=True)
+        subprocess.run(["docker", "cp", backup_path,
+                       f"{DOCKER_CONTAINER}:{container_path}"], check=True)
 
         command = [
             "docker", "exec",
@@ -64,9 +69,11 @@ def backup_restore(backup_path):
         ]
 
         subprocess.run(command, check=True)
-        subprocess.run(["docker", "exec", DOCKER_CONTAINER, "rm", container_path], check=True)
+        subprocess.run(["docker", "exec", DOCKER_CONTAINER,
+                       "rm", container_path], check=True)
     except subprocess.CalledProcessError as e:
-        raise
+        raise Exception(f"❌ Erro durante restauração: {e}") from e
+
 
 def remove_deleted_users():
     conn = psycopg2.connect(
@@ -79,24 +86,27 @@ def remove_deleted_users():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT usr_id FROM deleted_users")
+        cursor.execute("SELECT id FROM deleted_users")
         ids = cursor.fetchall()
 
-        for (usr_id,) in ids:
-            cursor.execute("DELETE FROM users WHERE usr_id = %s;", (usr_id,))
-            cursor.execute("DELETE FROM permissions WHERE pm_id = %s;", (usr_id,))
-        
+        for (id,) in ids:
+            cursor.execute("DELETE FROM users usr WHERE usr.id = %s;", (id,))
+            cursor.execute(
+                "DELETE FROM permissions pm WHERE pm.id = %s;", (id,))
+
         conn.commit()
     except Exception as e:
-        print(f"❌ Erro ao limpar usuários: {e}")
+        raise Exception(f"❌ Erro ao limpar usuários: {e}") from e
     finally:
         cursor.close()
         conn.close()
 
+
 if __name__ == "__main__":
     try:
-        backup_path = find_backup_file("backup_users_permissions_2025-04-09.dump")
+        backup_path = find_backup_file(
+            "backup_users_permissions_2025-04-09.dump")
         backup_restore(backup_path)
         remove_deleted_users()
     except Exception as e:
-        print(f"❌ Falha durante a restauração: {e}")
+        raise Exception(f"❌ Falha durante a restauração: {e}") from e

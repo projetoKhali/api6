@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from api.middleware.auth import require_auth
 from api.service.yield_predict_service import get_filtered_yield_predict_data
 
 
@@ -7,8 +8,9 @@ def create_blueprint(db):
     yield_predict_blueprint = Blueprint(
         'yield_predict_dashboard', __name__, url_prefix="/api"
     )
-    
+
     @yield_predict_blueprint.route("/get_yield_predict_data", methods=["POST", "OPTIONS"])
+    @require_auth
     def get_yield_predict_data():
         if request.method == "OPTIONS":
             return _build_cors_preflight_response()
@@ -53,9 +55,8 @@ def create_blueprint(db):
             return jsonify({"error": "Erro ao consultar dados"}), 500
 
     @yield_predict_blueprint.route("/get_filters", methods=["GET", "OPTIONS"])
+    @require_auth
     def get_filters():
-        # Aqui você pode implementar a lógica para retornar os filtros disponíveis
-        # Exemplo: return jsonify({"crop_years": [2021, 2022], "seasons": ["Spring", "Summer"], ...})
         return jsonify({
             "crop_years": [2021, 2022, 2023],
             "seasons": ["Spring", "Summer", "Autumn", "Winter"],

@@ -9,33 +9,30 @@ import { Page } from '../schemas/pagination';
 
 export const getUsers = async (
   page: number,
-  size = 50,
-  token?: string
+  size = 50
 ): Promise<Page<User>> => {
-  return await processPaginatedGET(`/user/`, page, size, token);
+  return await processPaginatedGET(`/user/`, page, size);
 };
 
-export const getUser = async (id: string, token: string): Promise<User> => {
-  return await processGET<User>(`/user/${id}`, token);
+export const getUser = async (id: string): Promise<User> => {
+  return await processGET<User>(`/user/${id}`);
 };
 
-export const createUser = async (data: NewUser, token: string): Promise<User> => {
-  return await processPOST<NewUser, User>(`/user/create`, data, token);
+export const createUser = async (data: NewUser): Promise<User> => {
+  return await processPOST<NewUser, User>(`/user/create`, data);
 };
 
 export const updateUser = async (
   id: string,
-  updatedFields: Partial<User>,
-  token: string
+  updatedFields: Partial<User>
 ): Promise<User> => {
   return await processRequest<Partial<User>, User>(
     'PUT',
     `/user/${id}`,
-    updatedFields,
-    token
+    updatedFields
   );
 };
 
-export const deleteUser = async (id: string, token: string): Promise<void> => {
-  return await processRequest<void, void>('DELETE', `/user/${id}`, undefined, token);
-}
+export const deleteUser = async (id: string): Promise<void> => {
+  return await processRequest<void, void>('DELETE', `/user/${id}`);
+};

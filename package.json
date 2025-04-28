@@ -6,6 +6,7 @@
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@monodon/rust": "^2.2.0",
     "@nx/eslint": "20.4.6",
     "@nx/eslint-plugin": "20.4.6",
     "@nx/jest": "20.4.6",

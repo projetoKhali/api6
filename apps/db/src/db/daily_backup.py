@@ -14,9 +14,11 @@ DOCKER_CONTAINER = os.getenv("container_name", "api6_postgres")
 
 TABELAS = ["users", "permissions"]
 
+
 def generate_file_name(bkp_file_name):
     data = datetime.now().strftime("%Y-%m-%d")
     return f"{bkp_file_name}{data}.dump"
+
 
 def create_backup(bkp_file_name="backup_users_permissions_"):
     # Garante que a pasta local existe
@@ -42,11 +44,14 @@ def create_backup(bkp_file_name="backup_users_permissions_"):
     try:
         subprocess.run(comando, check=True)
 
-        subprocess.run(["docker", "cp", f"{DOCKER_CONTAINER}:{container_path}", host_path], check=True)
-        subprocess.run(["docker", "exec", DOCKER_CONTAINER, "rm", container_path], check=True)
+        subprocess.run(
+            ["docker", "cp", f"{DOCKER_CONTAINER}:{container_path}", host_path], check=True)
+        subprocess.run(["docker", "exec", DOCKER_CONTAINER,
+                       "rm", container_path], check=True)
 
     except subprocess.CalledProcessError as e:
-        print(f"❌ Erro durante processo de backup: {e}")
+        raise Exception(f"❌ Erro durante processo de backup: {e}") from e
+
 
 if __name__ == "__main__":
     create_backup()

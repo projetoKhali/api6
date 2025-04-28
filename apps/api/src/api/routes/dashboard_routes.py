@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from api.middleware.auth import require_auth
 from api.service.dashboard_service import (
     get_filtered_yield_data,
     get_filter,
@@ -10,6 +11,7 @@ def create_blueprint(db):
         'yield_dashboard', __name__, url_prefix="/api")
 
     @dashboard_blueprint.route("/get_yield_data", methods=["POST", "OPTIONS"])
+    @require_auth
     def get_yield_data():
         if request.method == "OPTIONS":
             return _build_cors_preflight_response()
@@ -65,6 +67,7 @@ def create_blueprint(db):
             }), 500
 
     @dashboard_blueprint.route("/get_filters", methods=["GET", "OPTIONS"])
+    @require_auth
     def get_filters():
         crop_years, seasons, crops, states = get_filter()
         return jsonify({

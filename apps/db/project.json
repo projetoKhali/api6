@@ -15,9 +15,9 @@
         "command": "poetry run python {projectRoot}/main.py"
       }
     },
-    "init-pg": {
+    "init-postgres": {
       "executor": "nx:run-commands",
-      "dependsOn": ["install"],
+      "dependsOn": ["install", "postgres-up"],
       "options": {
         "command": "poetry run python {projectRoot}/src/db/postgres.py"
       }
@@ -29,16 +29,16 @@
         "command": "poetry run python {projectRoot}/src/db/mongo.py"
       }
     },
-    "pg-seeds": {
+    "postgres-seeds": {
       "executor": "nx:run-commands",
-      "dependsOn": ["install"],
+      "dependsOn": ["init-postgres"],
       "options": {
         "command": "poetry run python {projectRoot}/seeds/postgres_seeds.py"
       }
     },
     "mongo-seeds": {
       "executor": "nx:run-commands",
-      "dependsOn": ["install"],
+      "dependsOn": ["install", "mongo-up"],
       "options": {
         "command": "poetry run python {projectRoot}/seeds/mongo_seeds.py"
       }
@@ -72,7 +72,7 @@
     "postgres-up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres"
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres --build"
       }
     },
     "mongo-up": {
@@ -103,6 +103,18 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-down"
+      }
+    },
+    "init-pg": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run $NX_TASK_TARGET_PROJECT:init-postgres"
+      }
+    },
+    "pg-seeds": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-seeds"
       }
     },
     "lint": {
