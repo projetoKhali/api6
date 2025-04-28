@@ -40,15 +40,27 @@ pub fn create_jwt(user_id: &str, jwt_secret: &str) -> String {
     .expect("Failed to create token")
 }
 
-pub fn verify_jwt(
+pub async fn verify_jwt(
     token: &str,
-    jwt_secret: &String,
-) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
-    decode::<Claims>(
+    jwt_secret: &str,
+    db: &DatabaseConnection,
+) -> Result<TokenData<Claims>, VerificationError> {
+    let token_data = decode::<Claims>(
         token,
-        &DecodingKey::from_secret(jwt_secret.as_ref()),
+        &DecodingKey::from_secret(jwt_secret.as_bytes()),
         &Validation::default(),
-    )
+    )?;
+
+    let jti = &token_data.claims.jti;
+    if revoked_token::Entity::find_by_id(jti.clone())
+        .one(db)
+        .await?
+        .is_some()
+    {
+        return Err(VerificationError::Revoked);
+    }
+
+    Ok(token_data)
 }
 
 pub fn extract_bearer(req: &HttpRequest) -> Result<&str, &'static str> {

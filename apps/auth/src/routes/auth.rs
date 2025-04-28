@@ -126,9 +126,10 @@ pub async fn login(
 
 pub async fn validate_token(
     data: web::Json<ValidateRequest>,
+    db: web::Data<DatabaseConnection>,
     config: web::Data<crate::infra::config::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret) {
+    match verify_jwt(&data.token, &config.jwt_secret, db.get_ref()).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
         Err(_) => HttpResponse::Unauthorized().body("Invalid token"),
     }

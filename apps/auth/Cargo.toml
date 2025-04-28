@@ -33,5 +33,6 @@ sea-schema = "0.16.1"
 utoipa = { version = "5.3.1", features = ["uuid", "chrono", "actix_extras"] }
 utoipa-swagger-ui = { version = "9.0.1", features = ["actix-web"] }
 env_logger = "0.11.8"
+thiserror = "2.0.12"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
