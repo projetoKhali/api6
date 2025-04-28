@@ -4,6 +4,18 @@
   "projectType": "application",
   "sourceRoot": "apps/auth/src",
   "targets": {
+    "serve-docker": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "foreground",
+      "configurations": {
+        "detached": {
+          "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d --build"
+        },
+        "foreground": {
+          "command": "docker-compose -f {projectRoot}/docker-compose.yml up --build"
+        }
+      }
+    },
     "serve": {
       "executor": "@monodon/rust:run",
       "outputs": ["{options.target-dir}"],
