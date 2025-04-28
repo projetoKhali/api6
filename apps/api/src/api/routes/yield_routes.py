@@ -23,6 +23,7 @@ def create_blueprint(db):
         return '', 200
 
     @yield_blueprint.route('/new', methods=['POST'])
+    @require_auth
     def create():
         data = request.json
         result = create_yield_event(yield_collection, data)
@@ -47,12 +48,14 @@ def create_blueprint(db):
         })
 
     @yield_blueprint.route('/all', methods=['GET'])
+    @require_auth
     def read_all():
         filters = request.args.to_dict()
         result = get_yield_events_filter(yield_collection, filters)
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['PUT'])
+    @require_auth
     def update():
         data = request.json
         crop = data.get('crop')
