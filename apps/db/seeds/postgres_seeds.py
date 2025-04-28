@@ -1,3 +1,4 @@
+import bcrypt
 from cryptography.fernet import Fernet
 from faker import Faker
 from sqlalchemy import create_engine
@@ -19,6 +20,8 @@ fake = Faker()
 Faker.seed(42)
 random.seed(42)
 
+DEFAULT_HASH_COST = 12
+
 NUM_USERS = 10
 NUM_PERMISSIONS = 2
 NUM_SOFT_DELETED = 0
@@ -26,14 +29,14 @@ NUM_HARD_DELETED = 0
 
 
 def insert_permissions(session):
-    permissoes = [
+    permissions = [
         Permission(name=f"perm_{i}", description=fake.sentence())
         for i in range(NUM_PERMISSIONS)
     ]
 
-    session.add_all(permissoes)
+    session.add_all(permissions)
     print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
-    return permissoes
+    return permissions
 
 
 def insert_users(session, permissoes):
@@ -46,14 +49,17 @@ def insert_users(session, permissoes):
             password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
             version_terms_agreement="v1",
         )]
-    keys = []
 
     for i in range(NUM_USERS):
-        nome = fake.name()
+        name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        senha = fake.password()
-        perm = random.choice(permissoes)
+        permission = random.choice(permissoes)
+
+        hashed_password = bcrypt.hashpw(
+            fake.password().encode("utf-8"),
+            bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
+        )
 
         # Decide se o usuário será soft-deletado
         if i < NUM_SOFT_DELETED:
@@ -62,12 +68,12 @@ def insert_users(session, permissoes):
             disabled_date = None
 
         user = User(
-            name=nome,
+            name=name,
             email=email,
             login=login,
-            password=senha,
+            password=hashed_password.decode("utf-8"),
             version_terms_agreement="v1.0",
-            permission_id=perm.id,
+            permission_id=permission.id,
             disabled_since=disabled_date
         )
         users.append(user)
@@ -76,12 +82,10 @@ def insert_users(session, permissoes):
     print(f"✅ {NUM_USERS} usuários inseridos.")
 
     # Gera chaves para cada usuário
-    for user in users:
-        chave = Fernet.generate_key().decode()
-        keys.append(UserKey(
-            usr_id=user.id,
-            key=chave
-        ))
+    keys = [UserKey(
+        usr_id=user.id,
+        key=Fernet.generate_key().decode()
+    ) for user in users]
 
     session.add_all(keys)
     print(f"\ueb11 {NUM_USERS} chaves de usuário inseridas.")

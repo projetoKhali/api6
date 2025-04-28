@@ -21,6 +21,7 @@ psycopg2 = "*"
 sqlalchemy = "*"
 cryptography = "*"
 faker = "*"
+bcrypt = "*"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "*"
