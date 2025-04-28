@@ -11,6 +11,7 @@ import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
+import Login from '../pages/Login';
 
 function App() {
   return (
@@ -26,18 +27,35 @@ function App() {
         </div>
         <div style={{ height: '100%', width: '100%' }}>
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/projection" element={<ProjectionPage />} />
+            <Route path="/login" element={<Login />} />
+
             <Route
-              path="/register"
-              element={<Navigate to="/register/yield" replace />}
+              path="*"
+              element={
+                <>
+                  <div style={{ width: '100%', backgroundColor: '#026734' }}>
+                    <Navbar />
+                  </div>
+                  <div style={{ height: '100%', width: '100%' }}>
+                    <Routes>
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/projection" element={<ProjectionPage />} />
+                      <Route path="/user" element={<UserManagementPage />} />
+                      <Route
+                        path="/register"
+                        element={<Navigate to="/register/yield" replace />}
+                      />
+                      <Route path="/register">
+                        <Route path="yield" element={<YieldRegister />} />
+                        <Route path="event" element={<EventsRegister />} />
+                      </Route>
+                    </Routes>
+                  </div>
+                </>
+              }
             />
-            <Route path="/user" element={<UserManagementPage />} />
-            <Route path="/register">
-              <Route path="yield" element={<YieldRegister />} />
-              <Route path="event" element={<EventsRegister />} />
-            </Route>
           </Routes>
+          <Routes></Routes>
         </div>
       </div>
     </Router>
