@@ -3,7 +3,6 @@ name = "auth"
 version = "0.1.0"
 edition = "2021"
 
-
 [dependencies]
 actix-web = "4"
 serde = { version = "1.0", features = ["derive"] }
@@ -33,5 +32,6 @@ sea-query = "0.32.4"
 sea-schema = "0.16.1"
 utoipa = { version = "5.3.1", features = ["uuid", "chrono", "actix_extras"] }
 utoipa-swagger-ui = { version = "9.0.1", features = ["actix-web"] }
+env_logger = "0.11.8"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
