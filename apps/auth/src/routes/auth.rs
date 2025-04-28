@@ -103,7 +103,13 @@ pub async fn login(
             }
         }
         Ok(None) => HttpResponse::Unauthorized().body("User not found"),
-        Err(_) => HttpResponse::InternalServerError().body("Database error"),
+        Err(err) => HttpResponse::InternalServerError().body(format!(
+            "Database error: {}",
+            match &config.dev_mode {
+                true => format!(": {:?}", err),
+                false => "".to_string(),
+            }
+        )),
     }
 }
 
