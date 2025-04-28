@@ -3,13 +3,17 @@ use utoipa::ToSchema;
 
 #[derive(Deserialize, ToSchema)]
 pub struct RegisterRequest {
+    pub name: String,
+    pub login: String,
     pub email: String,
     pub password: String,
+    pub version_terms: String,
+    pub permission_id: i64,
 }
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
-    pub email: String,
+    pub login: String,
     pub password: String,
 }
 

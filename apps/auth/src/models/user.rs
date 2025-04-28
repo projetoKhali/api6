@@ -1,11 +1,24 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use utoipa::ToSchema;
-use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
-pub struct User {
-    pub id: Uuid,
+pub struct UserPublic {
+    pub id: i64,
+    pub name: String,
+    pub login: String,
     pub email: String,
-    pub hashed_password: String,
+    pub version_terms: String,
+    pub permission_id: i64,
+    pub disabled_since: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct UserUpdate {
+    pub name: Option<String>,
+    pub login: Option<String>,
+    pub email: Option<String>,
+    pub version_terms: Option<String>,
+    pub permission_id: Option<i64>,
+    pub disabled_since: Option<String>,
 }
