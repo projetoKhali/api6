@@ -49,7 +49,7 @@ def insert_users(session, permissoes):
     keys = []
 
     for i in range(NUM_USERS):
-        nome = fake.name().encode()
+        nome = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
         senha = fake.password()
