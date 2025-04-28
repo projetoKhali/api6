@@ -38,7 +38,7 @@ const Navbar = () => {
           }}
         ></div>
         <a
-          href="/predictions"
+          href="/projection"
           style={{ textDecoration: 'none', color: '#fff' }}
         >
           Previsões
@@ -52,6 +52,19 @@ const Navbar = () => {
         ></div>
         <a href="/register" style={{ textDecoration: 'none', color: '#fff' }}>
           Cadastro
+        </a>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/user"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Usuários
         </a>
       </div>
     </main>

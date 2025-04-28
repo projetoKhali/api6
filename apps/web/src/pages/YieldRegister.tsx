@@ -2,22 +2,31 @@ import { useEffect, useState } from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { schema, tableSchema, initialValues } from '../schemas/FormsSchema';
-import { getAllYields, createYield } from '../service/YieldService';
+import { getYields, createYield } from '../service/YieldService';
 import { Yield, Season } from '../schemas/yield';
 import './styles/EventsRegister.css';
+import { Pagination } from '../components/Pagination';
+
+const PAGE_SIZE = 20;
 
 function YieldRegister() {
   const [data, setData] = useState<Yield[]>([]);
 
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const fetchPage = async (newPage: number) => {
+    setPage(newPage);
+
+    const yieldsPage = await getYields(page, PAGE_SIZE);
+
+    setTotalPages(yieldsPage.totalPages);
+    setData(yieldsPage.items);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const allYields = await getAllYields();
-
-      setData(allYields);
-    };
-
-    fetchData();
-  }, []);
+    fetchPage(page);
+  }, [page]);
 
   async function handleFormSubmit(formData: Record<string, string>) {
     const transformedData: Omit<Yield, 'id'> = {
@@ -38,8 +47,9 @@ function YieldRegister() {
   }
 
   return (
-    <div className="container">
+    <div className="container" style={{ width: '100%' }}>
       <div className="form-container">
+        <h2>Cadastro de Rendimento</h2>
         <DynamicForm
           schema={schema}
           initialValues={initialValues}
@@ -47,8 +57,19 @@ function YieldRegister() {
         />
       </div>
       <div className="separator"></div>
-      <div className="table-container">
-        <TableComponent schema={tableSchema} data={data} />
+      <div className="table-container" style={{ width: '100%'}}>
+        <TableComponent
+          style={{ width: '100%' }}
+          schema={tableSchema}
+          data={data}
+        />
+        <Pagination
+          getPage={() => page}
+          setPage={(newPage) => setPage(newPage)}
+          getTotalPages={() => totalPages}
+          onPageChange={async (newPage) => fetchPage(newPage)}
+          style={{ marginTop: '30px', gap: '10px' }}
+        />
       </div>
     </div>
   );
