@@ -5,7 +5,7 @@ import {
 import { AUTH_BASE_URL, processPOST } from './service';
 
 type LoginRequest = {
-  username: string;
+  login: string;
   password: string;
 };
 
@@ -14,12 +14,12 @@ type LoginResponse = {
 };
 
 export const login = async (
-  username: string,
+  login: string,
   password: string
 ): Promise<boolean> => {
   const result = await processPOST<LoginRequest, LoginResponse>(
-    '/login',
-    { username, password },
+    '/',
+    { login: login, password },
     AUTH_BASE_URL
   );
 
