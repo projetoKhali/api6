@@ -9,34 +9,37 @@ from db.postgres import (
 
 def insert_seeds(session):
     try:
-        insert_users(session)
         insert_permissions(session)
+        insert_users(session)
     except Exception as e:
         raise Exception("Erro ao inserir seeds:", e) from e
 
 
-def insert_users(session):
-    new_user = User(
-        name="Alice",
-        login="alice01",
-        password="secret",
-        version_terms_agreement="v1"
-    )
-
-    session.add(new_user)
-    session.commit()
-    print("Usuário inserido com sucesso!")
-
-
 def insert_permissions(session):
-    new_permission = Permission(
+    permissions = [Permission(
         name="read",
         description="Permissão de leitura"
-    )
+    ),]
 
-    session.add(new_permission)
-    session.commit()
-    print("Permissão inserida com sucesso!")
+    session.add_all(permissions)
+
+    print("Permissões inseridas com sucesso!")
+
+
+def insert_users(session):
+    users = [User(
+        name="Alice",
+        login="alice01",
+        email="alice@mail.com",
+        password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i", # "secret"
+        version_terms_agreement="v1",
+    ),]
+
+    for i, user in enumerate(users):
+        user.permission_id = i + 1
+
+    session.add_all(users)
+    print("Usuários inseridos com sucesso!")
 
 
 if __name__ == "__main__":
@@ -44,4 +47,8 @@ if __name__ == "__main__":
 
     test_connection(engine)
 
-    insert_seeds(sessionmaker(bind=engine)())
+    session = sessionmaker(bind=engine)()
+
+    insert_seeds(session)
+
+    session.commit()
