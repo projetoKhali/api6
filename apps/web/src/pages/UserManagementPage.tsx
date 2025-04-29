@@ -12,7 +12,7 @@ const mockUsers: User[] = [
     name: 'João Silva',
     login: 'joao.silva',
     email: 'joao@example.com',
-    version_terms_agreement: '1.0',
+    version_terms: '1.0',
     permission_id: 1
   },
   {
@@ -20,7 +20,7 @@ const mockUsers: User[] = [
     name: 'Maria Souza',
     login: 'maria.souza',
     email: 'maria@example.com',
-    version_terms_agreement: '1.0',
+    version_terms: '1.0',
     permission_id: 2,
     disabled_since: '2023-01-01'
   },
@@ -29,7 +29,7 @@ const mockUsers: User[] = [
     name: 'Carlos Oliveira',
     login: 'carlos.oliveira',
     email: 'carlos@example.com',
-    version_terms_agreement: '1.1',
+    version_terms: '1.1',
     permission_id: 1
   },
 ];
@@ -57,9 +57,9 @@ const editFormSchema: FieldSchema[] = [
   { name: 'name', label: 'Nome Completo', type: 'text',},
   { name: 'login', label: 'Nome de Usuário', type: 'text',},
   { name: 'email', label: 'E-mail', type: 'text',},
-  { 
-    name: 'permission_id', 
-    label: 'Permissão', 
+  {
+    name: 'permission_id',
+    label: 'Permissão',
     type: 'text'
   },
 
@@ -112,7 +112,7 @@ const UserManagementPage = () => {
         login: formData.login,
         email: formData.email,
         password: formData.password,
-        version_terms_agreement: '1.0',
+        version_terms: '1.0',
         permission_id: 1,
       };
       await createUser(newUser);
@@ -146,14 +146,14 @@ const UserManagementPage = () => {
       name: row.name,
       login: row.login,
       email: row.email,
-      version_terms_agreement: row.version_terms_agreement || '1.0',
+      version_terms: row.version_terms || '1.0',
       permission_id: Number(row.permission_id),
       disabled_since: row.disabled_since,
     };
-  
+
     console.log('Editando usuário:', user);
     setIsEditing(true);
-  
+
     // Atualize o estado corretamente
     setCurrentUser({
       id: user.id ? user.id.toString() : '',
@@ -164,7 +164,7 @@ const UserManagementPage = () => {
 
     });
   };
-  
+
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
