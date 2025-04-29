@@ -1,4 +1,5 @@
 import {
+  AUTH_BASE_URL,
   processGET,
   processPaginatedGET,
   processPOST,
@@ -19,7 +20,7 @@ export const getUser = async (id: string): Promise<User> => {
 };
 
 export const createUser = async (data: NewUser): Promise<User> => {
-  return await processPOST<NewUser, User>(`/user/create`, data);
+  return await processPOST<NewUser, User>(`/register`, data, AUTH_BASE_URL);
 };
 
 export const updateUser = async (
