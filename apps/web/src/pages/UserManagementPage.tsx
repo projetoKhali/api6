@@ -79,7 +79,7 @@ const UserManagementPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [useMockData, setUseMockData] = useState(true);
+  const [useMockData, setUseMockData] = useState(false);
 
   // Carrega os usuários
   const loadUsers = async () => {
