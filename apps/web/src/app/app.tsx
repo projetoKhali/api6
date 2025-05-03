@@ -12,6 +12,7 @@ import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
 import Login from '../pages/Login';
+import ProjectionCostumPage from '../pages/ProjectionCostumPage';
 import { getUserFromLocalStorage } from '../store/UserStorage';
 import { useState } from 'react';
 
@@ -44,6 +45,10 @@ function App() {
                         <Route
                           path="/projection"
                           element={<ProjectionPage />}
+                        />
+                        <Route
+                          path="/prevision"
+                          element={<ProjectionCostumPage />}
                         />
                         <Route path="/user" element={<UserManagementPage />} />
                         <Route
