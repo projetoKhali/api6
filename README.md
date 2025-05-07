@@ -1,16 +1,15 @@
 <br id="topo">
 
-![API6](https://github.com/user-attachments/assets/a9f5c228-61f2-4c7e-834c-c37635a21f42)
+![7](https://github.com/user-attachments/assets/d0217c10-db11-470b-a029-f8b664cf4cd2)
+
 
 
 <p align="center">
     <a href="#sobre">Sobre</a> |
-    <a href="#backlogproduto">Backlog do produto</a>  |
     <a href="#backlogsprint">Backlog da sprint </a> |
     <a href="#entrega">Entrega das Sprints</a>  |
     <a href="#burndown">Burndown</a>  |
     <a href="#gerenciamento">Gerenciamento do projeto</a>  |
-    <a href="#documentacoes">Documentações</a>  |
     <a href="#prototipo">Protótipo</a>     |
     <a href="#tecnologias">Tecnologias</a>  |
     <a href="#equipe">Equipe</a>        
@@ -46,6 +45,19 @@ A plataforma visa integrar **dados de diferentes fontes**, aplicar **inteligênc
 | Cadastro e gestão dos dados de plantio | Eu como Administrador quero cadastrar os principais eventos no meu plantio para o armazenamento e tomada de decisão | Média      |
 </details>
 
+<details open>
+<summary>Sprint 2 </summary>
+
+
+| **Épico** | **Funcionalidade** | **Prioridade** |
+| :-------- | :-------- | :-----------: |
+| Sistema de Previsões  | Eu como Administrador quero um painel para acompanhar as projeções de produtividade do plantio | Média  |
+| Sistema de Previsões  | Eu como consultor quero um painel para acompanhar as projeções de produtividade do plantio | Média  |
+| Sistema de Previsões  | Eu como consultor quero poder realizar simulações de produtividade para obter insight e tomar decisões | Média  |
+| Sistema de Previsões  | Eu como Administrador quero poder realizar simulações de produtividade para obter insight e tomar decisões | Média  |
+</details>
+
+
 <span id="entrega">
 
 ## Entregavéis das sprints
@@ -80,6 +92,31 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 
 <br>
 
+<details>
+
+<summary>Sprint 2 - De 07/04 a 27/04 </summary>
+</br>
+Nesta sprint, serão entregues as seguintes funcionalidades:
+
+## 📊 Dashboard de Projeções
+
+- Atualização do dashboard atual com foco em previsões futuras de produtividade.
+- Inclusão de visualizações baseadas em dados históricos e tendências para o próximo ano.
+
+## 📅 Simulador de Cenários de Produtividade  
+
+- Entrega de um novo recurso de simulação para análise de produtividade.
+- Inteligência artificial aplicada à geração de insights com base em diferentes cenários inseridos pelo usuário.
+
+## 📈 Rotina de Backup e Persistência Segura
+
+- Implementação de uma rotina de backup controlado.
+- Garantia de que registros excluídos não serão restaurados indevidamente.
+
+</details>
+
+<br>
+
 >Confira nossa documentações completa: https://github.com/projetoKhali/api6-docs
 <br>
 
@@ -95,7 +132,12 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 
 </details>
 
+<details>
+<summary> Sprint 2 </summary>
+  
+![image](https://github.com/user-attachments/assets/9498770a-c0d5-4b19-9e11-ce403e710f97)
 
+</details>
 
 <span id="gerenciamento">
 
@@ -137,7 +179,8 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 <span id="equipe">
 
 
-![API6 equipe](https://github.com/user-attachments/assets/5bb59915-c8c6-4d2f-96f4-ff4d2a9e15d6)
+![9](https://github.com/user-attachments/assets/4fd8cb6f-2049-42fc-8104-284531c9bcf0)
+
 
 
 <table style="width:100%; border-collapse: collapse;">
@@ -176,14 +219,6 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
         <td style="text-align: center; padding: 10px;">
             <a href="https://www.linkedin.com/in/nicolem-souza/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
             <a href="https://github.com/NicSouza"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
-        </td>
-    </tr>
-    <tr>
-        <td style="text-align: center; padding: 10px;">Developer</td>
-        <td style="text-align: center; padding: 10px;">Tânia Cruz</td>
-        <td style="text-align: center; padding: 10px;">
-            <a href="https://www.linkedin.com/in/tânia-cruz-30ab5812a/"><img src="https://img.shields.io/badge/-Linkedin-blue?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"></a>
-            <a href="https://github.com/taniacruzz"><img src="https://img.shields.io/badge/-GitHub-111217?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
         </td>
     </tr>
 </table>

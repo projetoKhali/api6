@@ -1,52 +1,65 @@
-import os
-import sys
-import random
-from datetime import datetime, timedelta
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from faker import Faker
+import bcrypt
 from cryptography.fernet import Fernet
-
-from apps.db.src.db.postgres import Base, User, Permission, Deleted_User, User_Key, get_engine
-
-engine = get_engine()
-Session = sessionmaker(bind=engine)
-session = Session()
+from faker import Faker
+from sqlalchemy import create_engine
+from datetime import datetime, timedelta
+import random
+import sys
+import os
+from db.postgres import (
+    get_engine,
+    test_connection,
+    User,
+    UserKey,
+    DeletedUser,
+    Permission
+)
+from sqlalchemy.orm import sessionmaker
 
 fake = Faker()
 Faker.seed(42)
 random.seed(42)
 
-# Quantidades
+DEFAULT_HASH_COST = 12
+
 NUM_USERS = 10
 NUM_PERMISSIONS = 2
 NUM_SOFT_DELETED = 0
 NUM_HARD_DELETED = 0
 
-def permissions_generate():
-    permissoes = []
-    for i in range(NUM_PERMISSIONS):
-        p = Permission(
-            name=f"perm_{i}",
-            description=fake.sentence()
-        )
-        permissoes.append(p)
-    session.add_all(permissoes)
-    session.commit()
-    print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
-    return permissoes
 
-def users_generate(permissoes):
-    usuarios = []
-    chaves = []
+def insert_permissions(session):
+    permissions = [
+        Permission(name=f"perm_{i}", description=fake.sentence())
+        for i in range(NUM_PERMISSIONS)
+    ]
+
+    session.add_all(permissions)
+    print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
+    return permissions
+
+
+def insert_users(session, permissoes):
+    users = [
+        # default user for easy login
+        User(
+            name="Alice",
+            login="a",
+            email="alice@mail.com",
+            password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
+            version_terms_agreement="v1",
+        )]
 
     for i in range(NUM_USERS):
-        nome = fake.name().encode()
+        name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        senha = fake.password()
-        perm = random.choice(permissoes)
+        permission = random.choice(permissoes)
+
+        hashed_password = bcrypt.hashpw(
+            fake.password().encode("utf-8"),
+            bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
+        )
 
         # Decide se o usuário será soft-deletado
         if i < NUM_SOFT_DELETED:
@@ -55,57 +68,64 @@ def users_generate(permissoes):
             disabled_date = None
 
         user = User(
-            name=nome,
+            name=name,
             email=email,
             login=login,
-            password=senha,
+            password=hashed_password.decode("utf-8"),
             version_terms_agreement="v1.0",
-            permission_id=perm.id,
+            permission_id=permission.id,
             disabled_since=disabled_date
         )
-        usuarios.append(user)
+        users.append(user)
 
-    session.add_all(usuarios)
-    session.commit()
+    session.add_all(users)
     print(f"✅ {NUM_USERS} usuários inseridos.")
 
     # Gera chaves para cada usuário
-    for user in usuarios:
-        chave = Fernet.generate_key().decode()
-        chaves.append(User_Key(
-            usr_id=user.id,
-            key=chave
-        ))
+    keys = [UserKey(
+        id=user.id,
+        key=Fernet.generate_key().decode()
+    ) for user in users]
 
-    session.add_all(chaves)
-    session.commit()
+    session.add_all(keys)
     print(f"\ueb11 {NUM_USERS} chaves de usuário inseridas.")
 
-    return usuarios
+    return users
 
-def deleted_users_generate(usuarios):
-    excluidos = random.sample(usuarios, NUM_HARD_DELETED)
+
+def insert_deleted_users(session, users):
+    excluidos = random.sample(users, NUM_HARD_DELETED)
 
     ids_excluidos = [user.id for user in excluidos]
-    deleted = [Deleted_User(usr_id=id_) for id_ in ids_excluidos]
+    deleted = [DeletedUser(id=id_) for id_ in ids_excluidos]
 
     # Remove os usuários selecionados
     for id_ in ids_excluidos:
         session.query(User).filter(User.id == id_).delete()
 
-    session.commit()
     session.add_all(deleted)
+    print(
+        f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
+
+
+def insert_seeds():
+    engine = get_engine()
+
+    test_connection(engine)
+
+    session = sessionmaker(bind=engine)()
+
+    print("🌱 Iniciando seeds...")
+    permissions = insert_permissions(session)
+
+    users = insert_users(session, permissions)
+
+    insert_deleted_users(session, users)
+
     session.commit()
-    print(f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
 
-def seeds_generate():
-    print("🌱 Iniciando seed...")
-    Base.metadata.create_all(engine)
-
-    permissoes = permissions_generate()
-    usuarios = users_generate(permissoes)
-    deleted_users_generate(usuarios)
     print("✅ Seed finalizada com sucesso.")
 
+
 if __name__ == "__main__":
-    seeds_generate()
+    insert_seeds()

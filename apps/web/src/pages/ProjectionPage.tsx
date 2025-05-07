@@ -64,19 +64,29 @@ function ProjectionPage() {
         }));
       };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const prediction = await fetchYielPredictiondData(selectedFilters);
-                const formattedData = formatPredictionData(prediction);
-                setPredictionData(formattedData);
-            } catch (error) {
-                console.error('Erro ao buscar dados:', error);
-            }
-        };
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            // Remove chaves com valores vazios ou indefinidos
+            const cleanedFilters = Object.fromEntries(
+                Object.entries(selectedFilters).filter(
+                    ([_, value]) =>
+                        value !== undefined &&
+                        value !== '' &&
+                        !(Array.isArray(value) && value.length === 0)
+                )
+            );
 
-        fetchData();
-    }, [selectedFilters]);
+            const prediction = await fetchYielPredictiondData(cleanedFilters);
+            const formattedData = formatPredictionData(prediction);
+            setPredictionData(formattedData);
+        } catch (error) {
+            console.error('Erro ao buscar dados:', error);
+        }
+    };
+
+    fetchData();
+}, [selectedFilters]);
 
     useEffect(() => {
         getFilterData()

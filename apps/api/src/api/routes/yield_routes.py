@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from api.middleware.auth import require_auth
 from api.models.yield_model import (
     create_yield_event,
     get_yield_events_filter,
@@ -22,12 +23,14 @@ def create_blueprint(db):
         return '', 200
 
     @yield_blueprint.route('/new', methods=['POST'])
+    @require_auth
     def create():
         data = request.json
         result = create_yield_event(yield_collection, data)
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['POST'])
+    @require_auth
     def read():
         page, size, error_response, status_code = Pagination.parse()
         if error_response:
@@ -45,12 +48,14 @@ def create_blueprint(db):
         })
 
     @yield_blueprint.route('/all', methods=['GET'])
+    @require_auth
     def read_all():
         filters = request.args.to_dict()
         result = get_yield_events_filter(yield_collection, filters)
         return jsonify(result)
 
     @yield_blueprint.route('/', methods=['PUT'])
+    @require_auth
     def update():
         data = request.json
         crop = data.get('crop')
