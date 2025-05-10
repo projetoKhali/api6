@@ -53,6 +53,10 @@ export const processPaginatedRequest = async <Body, Response>(
 export const processPaginatedGET = async <Response>(
   path: string,
   page: number,
-  size: number
+  size: number,
+  crop_year?: number | number[],
+  season?: string | string[],
+  crop?: string | string[],
+  state?: string | string[]
 ): Promise<Page<Response>> =>
-  await processPaginatedRequest(path, { page, size });
+  await processPaginatedRequest(path, { page, size, crop_year, season, crop, state });

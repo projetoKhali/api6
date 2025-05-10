@@ -15,6 +15,7 @@ import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
 import { getUserFromLocalStorage } from '../store/UserStorage';
 import { useState } from 'react';
+import ReportPage from '../pages/ReportPage';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
@@ -54,6 +55,10 @@ function App() {
                         <Route
                           path="/register"
                           element={<Navigate to="/register/yield" replace />}
+                        />
+                         <Route
+                          path="/report"
+                          element={<ReportPage />}
                         />
                         <Route path="/register">
                           <Route path="yield" element={<YieldRegister />} />
