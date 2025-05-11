@@ -67,6 +67,7 @@ A plataforma visa integrar **dados de diferentes fontes**, aplicar **inteligênc
 | Sistema de Previsões  | Eu como Administrador quero poder realizar simulações de produtividade para obter insight e tomar decisões | Média  |
 </details>
 
+>Confira o backlog completa: https://github.com/projetoKhali/api6-docs/blob/main/product-backlog.md
 
 <span id="entrega">
 
@@ -130,15 +131,16 @@ Nesta sprint, serão entregues as seguintes funcionalidades:
 Nesta sprint, serão entregues as seguintes funcionalidades:
 
 ## Sistema de Relatórios
-- Possibilitar a extração de relatórios
-- Implementar filtros na extração de relatório
+- Desenvolver funcionalidade para geração e exportação de relatórios personalizados com base nos dados do sistema.
+- Implementar filtros dinâmicos para que o usuário possa refinar os dados antes de extrair os relatórios.
 
-## Cadastro e gestão de Usuários  
-- Sistema de cadastro de usuário
-- Possibilitar atualização dos dados de usuário
+## Cadastro e Gestão de Usuários
+- Criar um sistema completo de cadastro de usuários, incluindo autenticação e controle de acesso.
+- Permitir que os usuários atualizem suas informações pessoais e credenciais de forma segura.
 
 ## Sistema de Previsões
-- Impelemntação de IA para previsão de produtividade
+- Integrar um modelo de inteligência artificial capaz de prever a produtividade agrícola com base em dados históricos e variáveis relevantes.
+
 
 </details>
 
