@@ -3,6 +3,8 @@ import { Page, PageRequest, emptyPage } from '../schemas/pagination';
 
 export const API_BASE_URL = 'http://127.0.0.1:5000';
 export const AUTH_BASE_URL = 'http://127.0.0.1:3000';
+export const API_PREDICTION = 'http://127.0.0.1:9000';
+
 
 const headers = {
   headers: {
@@ -21,7 +23,7 @@ export const processRequest = async <R, T>(
   const token = localStorage.getItem('token');
 
   const response = await axios.request<T>({
-    url: `${overrideURL || API_BASE_URL}${path}`,
+    url: `${overrideURL || API_BASE_URL || API_PREDICTION}${path}`,
     method,
     headers: {
       ...headers.headers,

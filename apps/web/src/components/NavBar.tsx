@@ -38,10 +38,23 @@ const Navbar = () => {
           }}
         ></div>
         <a
-          href="/projection"
+          href="/prevision"
           style={{ textDecoration: 'none', color: '#fff' }}
         >
           Previsões
+        </a>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/projection"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Projeção
         </a>
         <div
           style={{
