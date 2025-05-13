@@ -1,11 +1,8 @@
 import bcrypt
 from cryptography.fernet import Fernet
 from faker import Faker
-from sqlalchemy import create_engine
 from datetime import datetime, timedelta
 import random
-import sys
-import os
 from db.postgres import (
     get_engine,
     test_connection,
