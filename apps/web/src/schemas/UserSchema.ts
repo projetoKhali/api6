@@ -8,6 +8,6 @@ export interface User {
   disabled_since?: string;
 }
 
-export type NewUser = Omit<User, 'id'> & {
+export interface NewUser extends User {
   password: string;
 };
