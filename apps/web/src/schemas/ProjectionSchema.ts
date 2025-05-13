@@ -47,10 +47,13 @@ interface AgriculturalSummary {
   totalArea: number;
   totalProduction: number;
   cropCount: number;
-  bySeason: Record<Season, {
-    count: number;
-    averageYield: number;
-  }>;
+  bySeason: Record<
+    Season,
+    {
+      count: number;
+      averageYield: number;
+    }
+  >;
 }
 
 function isAgriculturalData(data: any): data is AgriculturalData {
@@ -68,7 +71,6 @@ function isAgriculturalData(data: any): data is AgriculturalData {
     typeof data.yield === 'number'
   );
 }
-
 
 export interface PredictCustomRequest {
   state?: string;

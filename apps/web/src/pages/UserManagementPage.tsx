@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { FieldSchema } from '../schemas/FormsSchema';
-import { getUsers, createUser, updateUser, deleteUser } from '../service/UserService';
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../service/UserService';
 import { User, NewUser } from '../schemas/UserSchema';
 
 // Dados mockados para teste
@@ -13,7 +18,7 @@ const mockUsers: User[] = [
     login: 'joao.silva',
     email: 'joao@example.com',
     version_terms: '1.0',
-    permission_id: 1
+    permission_id: 1,
   },
   {
     id: 2,
@@ -22,7 +27,7 @@ const mockUsers: User[] = [
     email: 'maria@example.com',
     version_terms: '1.0',
     permission_id: 2,
-    disabled_since: '2023-01-01'
+    disabled_since: '2023-01-01',
   },
   {
     id: 3,
@@ -30,7 +35,7 @@ const mockUsers: User[] = [
     login: 'carlos.oliveira',
     email: 'carlos@example.com',
     version_terms: '1.1',
-    permission_id: 1
+    permission_id: 1,
   },
 ];
 
@@ -40,29 +45,28 @@ const mockGetUsers = async (page: number, size: number) => {
     items: mockUsers,
     totalItems: mockUsers.length,
     totalPages: 1,
-    size: size
+    size: size,
   };
 };
 
 // Schema para cadastro de usuários
 const registerFormSchema: FieldSchema[] = [
-  { name: 'name', label: 'Nome Completo', type: 'text',},
-  { name: 'login', label: 'Nome de Usuário', type: 'text',},
-  { name: 'email', label: 'E-mail', type: 'text',},
-  { name: 'password', label: 'Senha', type: 'text',}
+  { name: 'name', label: 'Nome Completo', type: 'text' },
+  { name: 'login', label: 'Nome de Usuário', type: 'text' },
+  { name: 'email', label: 'E-mail', type: 'text' },
+  { name: 'password', label: 'Senha', type: 'text' },
 ];
 
 // Schema para edição de usuários
 const editFormSchema: FieldSchema[] = [
-  { name: 'name', label: 'Nome Completo', type: 'text',},
-  { name: 'login', label: 'Nome de Usuário', type: 'text',},
-  { name: 'email', label: 'E-mail', type: 'text',},
+  { name: 'name', label: 'Nome Completo', type: 'text' },
+  { name: 'login', label: 'Nome de Usuário', type: 'text' },
+  { name: 'email', label: 'E-mail', type: 'text' },
   {
     name: 'permission_id',
     label: 'Permissão',
-    type: 'text'
+    type: 'text',
   },
-
 ];
 
 const tableSchema = [
@@ -146,7 +150,7 @@ const UserManagementPage = () => {
       name: row.name,
       login: row.login,
       email: row.email,
-      version_terms: row.version_terms || '1.0',
+      version_terms: row.version_terms_agreement || '1.0',
       permission_id: Number(row.permission_id),
       disabled_since: row.disabled_since,
     };
@@ -161,10 +165,8 @@ const UserManagementPage = () => {
       login: user.login,
       email: user.email,
       permission_id: user.permission_id.toString(),
-
     });
   };
-
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
@@ -183,33 +185,37 @@ const UserManagementPage = () => {
   };
 
   // Transforma os dados para a tabela
-  const tableData = users.map(user => ({
+  const tableData = users.map((user) => ({
     ...user,
     disabled_since: user.disabled_since ? 'Desativado' : 'Ativo',
     actions: user.id,
   }));
 
   return (
-    <div className="user-management-container"
-        style={{
-            maxWidth: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: '100vh',
-            padding: '20px',
-            gap: '20px',
-        }}>
-      <div className="form-section"
+    <div
+      className="user-management-container"
       style={{
+        maxWidth: '100%',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '20%',
-        height: '100%',
-      }}>
+        justifyContent: 'space-between',
+        height: '100vh',
+        padding: '20px',
+        gap: '20px',
+      }}
+    >
+      <div
+        className="form-section"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '20%',
+          height: '100%',
+        }}
+      >
         {!isEditing ? (
           <>
             <h2>Cadastrar Usuário</h2>
@@ -223,57 +229,64 @@ const UserManagementPage = () => {
           <>
             <h2>Editar Usuário</h2>
             <DynamicForm
-                schema={editFormSchema}
-                initialValues={currentUser}
-                onSubmit={handleEditSubmit}
+              schema={editFormSchema}
+              initialValues={currentUser}
+              onSubmit={handleEditSubmit}
             />
             <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-                <button
+              <button
                 onClick={resetForm}
                 style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#6c757d', // cinza para "cancelar"
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d', // cinza para "cancelar"
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
                 }}
-                >
+              >
                 Cancelar Edição
-                </button>
+              </button>
 
-                <button
+              <button
                 onClick={async () => {
-                    if (currentUser.id && window.confirm('Tem certeza que deseja excluir este usuário?')) {
+                  if (
+                    currentUser.id &&
+                    window.confirm(
+                      'Tem certeza que deseja excluir este usuário?'
+                    )
+                  ) {
                     await handleDelete(Number(currentUser.id));
                     resetForm();
-                    }
+                  }
                 }}
                 style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#dc3545', // vermelho para "excluir"
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                  padding: '8px 16px',
+                  backgroundColor: '#dc3545', // vermelho para "excluir"
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
                 }}
-                >
+              >
                 Excluir Usuário
-                </button>
+              </button>
             </div>
-            </>
+          </>
         )}
       </div>
 
-      <div className="table-section"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '78%',
-        height: '100%',
-      }}>
+      <div
+        className="table-section"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '78%',
+          height: '100%',
+        }}
+      >
         <h2>Lista de Usuários</h2>
         {isLoading ? (
           <p>Carregando usuários...</p>
