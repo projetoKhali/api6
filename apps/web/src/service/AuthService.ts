@@ -1,17 +1,15 @@
 import {
-  getUserFromLocalStorage,
-  setUserToLocalStorage,
-} from '../store/UserStorage';
+  LoginRequest,
+  LoginResponse,
+  ValidateRequest,
+  ValidateResponse,
+} from '../schemas/auth';
+
+import {
+  getTokenFromLocalStorage,
+  setTokenToLocalStorage,
+} from '../store/storage';
 import { AUTH_BASE_URL, processPOST } from './service';
-
-type LoginRequest = {
-  login: string;
-  password: string;
-};
-
-type LoginResponse = {
-  token?: string;
-};
 
 export const login = async (
   login: string,
@@ -19,7 +17,7 @@ export const login = async (
 ): Promise<boolean> => {
   const result = await processPOST<LoginRequest, LoginResponse>(
     '/',
-    { login: login, password },
+    { login, password },
     AUTH_BASE_URL
   );
 
@@ -27,15 +25,23 @@ export const login = async (
     return false;
   }
 
-  setUserToLocalStorage(result.token);
+  setTokenToLocalStorage(result.token);
   return true;
+};
+
+export const validate = async (token: string) => {
+  return await processPOST<ValidateRequest, boolean>(
+    '/validate',
+    { token },
+    AUTH_BASE_URL
+  ).catch(() => false);
 };
 
 export const logout = async (): Promise<void> => {
   const result = await processPOST(
     '/logout',
     {
-      token: getUserFromLocalStorage(),
+      token: getTokenFromLocalStorage(),
     },
     AUTH_BASE_URL
   );

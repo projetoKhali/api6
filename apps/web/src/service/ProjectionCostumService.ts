@@ -1,5 +1,3 @@
-// services/CustomPredictionService.ts
-
 import {
   CustomPredictionRequest,
   CustomPredictionResponse,
