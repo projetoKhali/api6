@@ -22,11 +22,11 @@ export async function fetchYieldData(
   };
 
   return await processPOST<FilterParams, YieldDataResponse>(
-    '/api/get_yield_data',
+    '/dashboard/',
     requestBody
   );
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  return await processGET<filterListSchema>('/api/get_filters');
+  return await processGET<filterListSchema>('/dashboard/filters');
 }

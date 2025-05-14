@@ -1,6 +1,4 @@
-import {
-  filterListSchema,
-} from '../schemas/DashboardSchema';
+import { filterListSchema } from '../schemas/DashboardSchema';
 import { PredictCustomResponseItem } from '../schemas/ProjectionSchema';
 import { FilterParams } from './DashboardService';
 import { processGET, processPOST } from './service';
@@ -16,11 +14,11 @@ export async function fetchYielPredictiondData(
   };
 
   return await processPOST<FilterParams, PredictCustomResponseItem[]>(
-    '/api/get_yield_predict_data',
+    '/projection/',
     requestBody
   );
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  return await processGET<filterListSchema>('/api/get_filters');
+  return await processGET<filterListSchema>('/projection/filters');
 }
