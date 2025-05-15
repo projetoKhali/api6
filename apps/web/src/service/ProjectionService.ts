@@ -20,5 +20,7 @@ export async function fetchYielPredictiondData(
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  return await processGET<filterListSchema>('/projection/filters');
+  return await processGET<filterListSchema>({
+    path: '/projection/filters',
+  });
 }
