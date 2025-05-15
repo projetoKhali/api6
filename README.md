@@ -53,10 +53,21 @@ A plataforma visa integrar **dados de diferentes fontes**, aplicar **inteligênc
 | :-------- | :-------- | :-----------: |
 | Sistema de Previsões  | Eu como Administrador quero um painel para acompanhar as projeções de produtividade do plantio | Média  |
 | Sistema de Previsões  | Eu como consultor quero um painel para acompanhar as projeções de produtividade do plantio | Média  |
+</details>
+
+<details open>
+<summary>Sprint 3 </summary>
+
+
+| **Épico** | **Funcionalidade** | **Prioridade** |
+| :-------- | :-------- | :-----------: |
+| Sistema de Relatórios  | Eu como consultor quero extrair relatórios para análises independentes | Média  |
+| Cadastro e gestão de Usuários  | Eu como Administrador quero cadastrar e gerir usuários para o controle de acesso e utilização | Baixa  |
 | Sistema de Previsões  | Eu como consultor quero poder realizar simulações de produtividade para obter insight e tomar decisões | Média  |
 | Sistema de Previsões  | Eu como Administrador quero poder realizar simulações de produtividade para obter insight e tomar decisões | Média  |
 </details>
 
+>Confira o backlog completa: https://github.com/projetoKhali/api6-docs/blob/main/product-backlog.md
 
 <span id="entrega">
 
@@ -90,8 +101,6 @@ Esses entregáveis garantirão que os usuários tenham uma visão detalhada dos 
 
 </details>
 
-<br>
-
 <details>
 
 <summary>Sprint 2 - De 07/04 a 27/04 </summary>
@@ -112,6 +121,26 @@ Nesta sprint, serão entregues as seguintes funcionalidades:
 
 - Implementação de uma rotina de backup controlado.
 - Garantia de que registros excluídos não serão restaurados indevidamente.
+
+</details>
+
+<details>
+
+<summary>Sprint 3 - De 05/05 a 25/05 </summary>
+</br>
+Nesta sprint, serão entregues as seguintes funcionalidades:
+
+## Sistema de Relatórios
+- Desenvolver funcionalidade para geração e exportação de relatórios personalizados com base nos dados do sistema.
+- Implementar filtros dinâmicos para que o usuário possa refinar os dados antes de extrair os relatórios.
+
+## Cadastro e Gestão de Usuários
+- Criar um sistema completo de cadastro de usuários, incluindo autenticação e controle de acesso.
+- Permitir que os usuários atualizem suas informações pessoais e credenciais de forma segura.
+
+## Sistema de Previsões
+- Integrar um modelo de inteligência artificial capaz de prever a produtividade agrícola com base em dados históricos e variáveis relevantes.
+
 
 </details>
 

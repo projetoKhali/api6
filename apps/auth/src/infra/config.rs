@@ -23,7 +23,7 @@ pub fn setup() -> Config {
         db: DatabaseConfig {
             db_user: env::var("DB_POSTGRES_USER").unwrap_or_else(|_| "postgres".to_string()),
             db_pass: env::var("DB_POSTGRES_PASS").unwrap_or_else(|_| "secret".to_string()),
-            db_host: env::var("DB_POSTGRES_HOST").unwrap_or_else(|_| "localhost".to_string()),
+            db_host: env::var("AUTH_DB_HOST").unwrap_or_else(|_| "localhost".to_string()),
             db_name: env::var("DB_POSTGRES_NAME").unwrap_or_else(|_| "api6_postgres".to_string()),
             db_port: env::var("DB_POSTGRES_PORT")
                 .unwrap_or_else(|_| "5432".into())
@@ -38,7 +38,7 @@ pub fn setup() -> Config {
             .parse()
             .unwrap(),
 
-        server_port: env::var("AUTH_PORT")
+        server_port: env::var("AUTH_APP_PORT")
             .unwrap_or_else(|_| "3000".into())
             .parse()
             .unwrap(),

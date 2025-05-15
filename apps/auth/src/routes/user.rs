@@ -1,14 +1,15 @@
 use actix_web::{web, HttpResponse, Responder};
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QuerySelect};
 
 use crate::entities::user as user_entity;
-use crate::models::{UserPublic, UserUpdate};
+use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/user")
+            .route("/", web::post().to(get_users))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
@@ -48,6 +49,62 @@ async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) ->
             },
         }),
         Ok(None) => HttpResponse::NotFound().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+}
+
+#[utoipa::path(
+    post,
+    path = "/user",
+    request_body = PaginatedRequest,
+    responses(
+        (status = 200, description = "Users found", body = PaginatedResponse<UserPublic>),
+        (status = 500, description = "Server error")
+    ),
+    tags = ["User"]
+)]
+
+async fn get_users(
+  db: web::Data<DatabaseConnection>,
+  pagination: web::Json<PaginatedRequest>,
+) -> impl Responder {
+    let page = pagination.page.unwrap_or(1);
+    let limit = pagination.limit.unwrap_or(10);
+
+    let offset = (page - 1) * limit;
+    let result = user_entity::Entity::find()
+        .limit(limit)
+        .offset(Some(offset))
+        .all(db.get_ref())
+        .await;
+
+    match result {
+        Ok(users) => {
+            let users: Vec<UserPublic> = users
+                .into_iter()
+                .map(|user| UserPublic {
+                    id: user.id,
+                    name: user.name,
+                    login: user.login,
+                    email: user.email,
+                    version_terms: user.version_terms_agreement,
+                    permission_id: user.permission_id,
+                    disabled_since: match user.disabled_since {
+                        Some(dt) => Some(dt.format("%Y-%m-%d").to_string()),
+                        None => None,
+                    },
+                })
+                .collect();
+
+            let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
+                total: users.len() as u64,
+                page,
+                limit,
+                items: users,
+            };
+
+            HttpResponse::Ok().json(users_page)
+        }
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
