@@ -28,7 +28,7 @@ class Pagination:
         return page, size, None, None
 
     @staticmethod
-    def get_metadata(collection, size):
+    def get_metadata(collection, size: int):
         """Return pagination metadata for a collection."""
         total = collection.count_documents({})
         pages = ceil(total / size)

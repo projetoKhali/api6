@@ -1,17 +1,17 @@
-// services/CustomPredictionService.ts
-
 import {
   CustomPredictionRequest,
   CustomPredictionResponse,
 } from '../schemas/ProjectionCostumSchema';
-import { processPOST } from './service';
+import { API_PREDICTION_URL, processPOST } from './service';
 
 export async function fetchCustomPrediction(
-  data: CustomPredictionRequest
+  body: CustomPredictionRequest
 ): Promise<CustomPredictionResponse[]> {
   return await processPOST<CustomPredictionRequest, CustomPredictionResponse[]>(
-    '/api/predict/custom',
-    data,
-    'http://127.0.0.1:9000'
+    {
+      path: '/predict/custom',
+      body,
+      overrideURL: API_PREDICTION_URL,
+    }
   );
 }

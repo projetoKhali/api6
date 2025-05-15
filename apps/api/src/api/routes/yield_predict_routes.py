@@ -4,17 +4,17 @@ from api.service.yield_predict_service import get_filtered_yield_predict_data
 
 
 def create_blueprint(db):
-    print("Criando blueprint para 'yield_predict_dashboard'")  # Teste simples
     yield_predict_blueprint = Blueprint(
-        'yield_predict_dashboard', __name__, url_prefix="/api"
+        'projection', __name__, url_prefix="/projection"
     )
 
-    @yield_predict_blueprint.route("/get_yield_predict_data", methods=["POST", "OPTIONS"])
+    @yield_predict_blueprint.route('/', methods=['OPTIONS'])
+    def options():
+        return '', 200
+
+    @yield_predict_blueprint.route("/", methods=["POST"])
     @require_auth
     def get_yield_predict_data():
-        if request.method == "OPTIONS":
-            return _build_cors_preflight_response()
-
         if not request.is_json:
             return jsonify({"error": "O corpo da requisição deve ser JSON"}), 400
 
@@ -46,15 +46,13 @@ def create_blueprint(db):
                 state=state
             )
 
-            # Criando a resposta com os dados filtrados
-            response = jsonify(filtered_data)
-            return _corsify_actual_response(response), 200
+            return jsonify(filtered_data), 200
 
         except Exception as e:
             print(f"Erro ao consultar os dados: {str(e)}")
             return jsonify({"error": "Erro ao consultar dados"}), 500
 
-    @yield_predict_blueprint.route("/get_filters", methods=["GET", "OPTIONS"])
+    @yield_predict_blueprint.route("/filters", methods=["GET"])
     @require_auth
     def get_filters():
         return jsonify({
@@ -63,18 +61,5 @@ def create_blueprint(db):
             "crops": ["Corn", "Soybean", "Wheat"],
             "states": ["California", "Texas", "Iowa"]
         })
-
-    def _build_cors_preflight_response():
-        response = jsonify()
-        response.status_code = 204
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "*")
-        response.headers.add(
-            "Access-Control-Allow-Methods", "POST, OPTIONS, GET")
-        return response
-
-    def _corsify_actual_response(response):
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
 
     return yield_predict_blueprint

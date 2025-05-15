@@ -13,13 +13,15 @@ import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
 import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
-import { getUserFromLocalStorage } from '../store/UserStorage';
-import { useState } from 'react';
+import { isUserLoggedIn } from '../store/storage';
+import { useEffect, useState } from 'react';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(
-    getUserFromLocalStorage() !== null
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  useEffect(() => {
+    isUserLoggedIn().then((result) => setIsAuthenticated(result));
+  }, []);
 
   return (
     <Router>
@@ -67,9 +69,10 @@ function App() {
             </Routes>
           ) : (
             <Routes>
-              <Route path="/login" element={<Login
-                setIsAuthenticated={setIsAuthenticated}
-              />} />
+              <Route
+                path="/login"
+                element={<Login setIsAuthenticated={setIsAuthenticated} />}
+              />
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           )}

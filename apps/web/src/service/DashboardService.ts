@@ -21,12 +21,12 @@ export async function fetchYieldData(
     ...(filters.state && { state: filters.state }),
   };
 
-  return await processPOST<FilterParams, YieldDataResponse>(
-    '/api/get_yield_data',
-    requestBody
-  );
+  return await processPOST<FilterParams, YieldDataResponse>({
+    path: '/dashboard/',
+    body: requestBody,
+  });
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  return await processGET<filterListSchema>('/api/get_filters');
+  return await processGET<filterListSchema>('/dashboard/filters');
 }
