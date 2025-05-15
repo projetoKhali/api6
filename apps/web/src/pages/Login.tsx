@@ -30,7 +30,7 @@ const Login = ({
       setTokenToLocalStorage('token');
       setIsAuthenticated(true);
       navigate('/', { replace: true });
-    } else if (await login(username, password)) {
+    } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
       navigate('/', { replace: true });
     } else {

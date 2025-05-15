@@ -5,11 +5,13 @@ import {
 import { API_PREDICTION_URL, processPOST } from './service';
 
 export async function fetchCustomPrediction(
-  data: CustomPredictionRequest
+  body: CustomPredictionRequest
 ): Promise<CustomPredictionResponse[]> {
   return await processPOST<CustomPredictionRequest, CustomPredictionResponse[]>(
-    '/predict/custom',
-    data,
-    API_PREDICTION_URL
+    {
+      path: '/predict/custom',
+      body,
+      overrideURL: API_PREDICTION_URL,
+    }
   );
 }

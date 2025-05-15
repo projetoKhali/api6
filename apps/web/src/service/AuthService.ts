@@ -11,15 +11,12 @@ import {
 } from '../store/storage';
 import { AUTH_BASE_URL, processPOST } from './service';
 
-export const login = async (
-  login: string,
-  password: string
-): Promise<boolean> => {
-  const result = await processPOST<LoginRequest, LoginResponse>(
-    '/',
-    { login, password },
-    AUTH_BASE_URL
-  );
+export const login = async (params: LoginRequest): Promise<boolean> => {
+  const result = await processPOST<LoginRequest, LoginResponse>({
+    path: '/',
+    body: params,
+    overrideURL: AUTH_BASE_URL,
+  });
 
   if (!result.token) {
     return false;
@@ -30,21 +27,21 @@ export const login = async (
 };
 
 export const validate = async (token: string) => {
-  return await processPOST<ValidateRequest, boolean>(
-    '/validate',
-    { token },
-    AUTH_BASE_URL
-  ).catch(() => false);
+  return await processPOST<ValidateRequest, ValidateResponse>({
+    path: '/validate',
+    body: { token },
+    overrideURL: AUTH_BASE_URL,
+  }).catch(() => false);
 };
 
 export const logout = async (): Promise<void> => {
-  const result = await processPOST(
-    '/logout',
-    {
+  const result = await processPOST({
+    path: '/logout',
+    body: {
       token: getTokenFromLocalStorage(),
     },
-    AUTH_BASE_URL
-  );
+    overrideURL: AUTH_BASE_URL,
+  });
 
   if (result) {
     localStorage.removeItem('utoken');

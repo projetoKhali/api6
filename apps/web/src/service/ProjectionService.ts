@@ -6,17 +6,17 @@ import { processGET, processPOST } from './service';
 export async function fetchYielPredictiondData(
   filters: FilterParams = {}
 ): Promise<PredictCustomResponseItem[]> {
-  const requestBody = {
+  const body = {
     ...(filters.crop_year && { crop_year: filters.crop_year }),
     ...(filters.season && { season: filters.season }),
     ...(filters.crop && { crop: filters.crop }),
     ...(filters.state && { state: filters.state }),
   };
 
-  return await processPOST<FilterParams, PredictCustomResponseItem[]>(
-    '/projection/',
-    requestBody
-  );
+  return await processPOST<FilterParams, PredictCustomResponseItem[]>({
+    path: '/projection/',
+    body,
+  });
 }
 
 export async function getFilterData(): Promise<filterListSchema> {

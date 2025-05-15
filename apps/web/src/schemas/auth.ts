@@ -11,6 +11,4 @@ export type ValidateRequest = {
   token: string;
 };
 
-export type ValidateResponse = {
-  token: string;
-};
+export type ValidateResponse = boolean;
