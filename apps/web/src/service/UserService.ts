@@ -16,7 +16,10 @@ export const getUsers = async (
 };
 
 export const getUser = async (id: string): Promise<User> => {
-  return await processGET<User>(`/user/${id}`);
+  return await processGET<User>({
+    path: `/user/${id}`,
+    overrideURL: AUTH_BASE_URL,
+  });
 };
 
 export const createUser = async (newUser: NewUser): Promise<User> => {
@@ -34,11 +37,13 @@ export const updateUser = async (
   return await processRequest<Partial<User>, User>('PUT', {
     path: `/user/${id}`,
     body: updatedFields,
+    overrideURL: AUTH_BASE_URL,
   });
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
   return await processRequest<never, void>('DELETE', {
     path: `/user/${id}`,
+    overrideURL: AUTH_BASE_URL,
   });
 };

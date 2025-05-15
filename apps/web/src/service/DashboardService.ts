@@ -28,5 +28,7 @@ export async function fetchYieldData(
 }
 
 export async function getFilterData(): Promise<filterListSchema> {
-  return await processGET<filterListSchema>('/dashboard/filters');
+  return await processGET<filterListSchema>({
+    path: '/dashboard/filters',
+  });
 }

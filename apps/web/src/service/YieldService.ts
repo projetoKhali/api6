@@ -8,7 +8,9 @@ import { Yield } from '../schemas/yield';
 import { Page } from '../schemas/pagination';
 
 export const getAllYields = async (): Promise<Yield[]> => {
-  return await processGET<Yield[]>(`/yield/all`);
+  return await processGET<Yield[]>({
+    path: `/yield/all`,
+  });
 };
 
 export const getYields = async (

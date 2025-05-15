@@ -28,6 +28,7 @@ type WithPaginationBody<T> = {
 };
 
 type RequestParams<T> = RequestParamsBase & Partial<WithBody<T>>;
+type GetParams = RequestParamsBase;
 type PostParams<T> = RequestParamsBase & WithBody<T>;
 
 type PaginatedGetParams = RequestParamsBase & PageRequest;
@@ -53,8 +54,9 @@ export const processRequest = async <R, T>(
   return response.data;
 };
 
-export const processGET = async <Response>(path: string): Promise<Response> =>
-  await processRequest('GET', { path });
+export const processGET = async <Response>(
+  params: GetParams
+): Promise<Response> => await processRequest('GET', params);
 
 export const processPOST = async <R, T>(params: PostParams<R>): Promise<T> =>
   await processRequest('POST', params);
