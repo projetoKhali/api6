@@ -4,7 +4,7 @@ import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
-import { setUserToLocalStorage } from '../store/UserStorage';
+import { setTokenToLocalStorage } from '../store/storage';
 
 const Login = ({
   setIsAuthenticated,
@@ -27,10 +27,10 @@ const Login = ({
     console.log('Login attempt:', { username, password });
 
     if (username === 'admin' && password === 'admin123') {
-      setUserToLocalStorage('token');
+      setTokenToLocalStorage('token');
       setIsAuthenticated(true);
       navigate('/', { replace: true });
-    } else if (await login(username, password)) {
+    } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
       navigate('/', { replace: true });
     } else {

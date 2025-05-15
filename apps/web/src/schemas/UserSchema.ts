@@ -10,4 +10,4 @@ export interface User {
 
 export interface NewUser extends User {
   password: string;
-};
+}

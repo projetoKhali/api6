@@ -88,19 +88,14 @@ const UserManagementPage = () => {
   // Carrega os usuários
   const loadUsers = async () => {
     setIsLoading(true);
-    try {
-      let response;
-      if (useMockData) {
-        response = await mockGetUsers(0, 50);
-      } else {
-        response = await getUsers(0, 50);
-      }
-      setUsers(response.items);
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
-    } finally {
-      setIsLoading(false);
+    let response;
+    if (useMockData) {
+      response = await mockGetUsers(0, 50);
+    } else {
+      response = await getUsers(0, 50);
     }
+    setUsers(response.items);
+    setIsLoading(false);
   };
 
   // Efeito para carregar os dados iniciais
@@ -110,37 +105,29 @@ const UserManagementPage = () => {
 
   // Manipuladores de eventos
   const handleRegisterSubmit = async (formData: Record<string, string>) => {
-    try {
-      const newUser: NewUser = {
-        name: formData.name,
-        login: formData.login,
-        email: formData.email,
-        password: formData.password,
-        version_terms: '1.0',
-        permission_id: 1,
-      };
-      await createUser(newUser);
-      await loadUsers();
-    } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error);
-    }
+    const newUser: NewUser = {
+      name: formData.name,
+      login: formData.login,
+      email: formData.email,
+      password: formData.password,
+      version_terms: '1.0',
+      permission_id: 1,
+    };
+    await createUser(newUser);
+    await loadUsers();
   };
 
   const handleEditSubmit = async (formData: Record<string, string>) => {
-    try {
-      if (currentUser.id) {
-        const userData: Partial<User> = {
-          name: formData.name,
-          login: formData.login,
-          email: formData.email,
-          permission_id: Number(formData.permission_id),
-        };
-        await updateUser(currentUser.id, userData);
-        await loadUsers();
-        resetForm();
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
+    if (currentUser.id) {
+      const userData: Partial<User> = {
+        name: formData.name,
+        login: formData.login,
+        email: formData.email,
+        permission_id: Number(formData.permission_id),
+      };
+      await updateUser(currentUser.id, userData);
+      await loadUsers();
+      resetForm();
     }
   };
 
@@ -170,12 +157,8 @@ const UserManagementPage = () => {
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-      try {
-        await deleteUser(id.toString());
-        await loadUsers();
-      } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
-      }
+      await deleteUser(id.toString());
+      await loadUsers();
     }
   };
 

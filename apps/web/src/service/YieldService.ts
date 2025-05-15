@@ -15,20 +15,26 @@ export const getYields = async (
   page: number,
   size = 50
 ): Promise<Page<Yield>> => {
-  return await processPaginatedGET(`/yield/`, page, size);
+  return await processPaginatedGET({
+    path: `/yield/`,
+    page,
+    size,
+  });
 };
 
-export const createYield = async (data: Yield): Promise<Yield> => {
-  return await processPOST<Yield, Yield>(`/yield/create`, data);
+export const createYield = async (body: Yield): Promise<Yield> => {
+  return await processPOST<Yield, Yield>({
+    path: `/yield/create`,
+    body,
+  });
 };
 
 export const updateYield = async (
   id: string,
   updatedFields: Partial<Yield>
 ): Promise<Yield> => {
-  return await processRequest<Partial<Yield>, Yield>(
-    'PUT',
-    `/yield/${id}`,
-    updatedFields
-  );
+  return await processRequest<Partial<Yield>, Yield>('PUT', {
+    path: `/yield/${id}`,
+    body: updatedFields,
+  });
 };

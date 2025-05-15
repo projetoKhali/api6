@@ -38,17 +38,13 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const data = await fetchYieldData(selectedFilters);
-        const dataMetrics = data.metrics;
-        setYieldData(data);
-        setStateData(data.states_totals); // Adicione esta linha
-        setMetrics(dataMetrics);
-        setCropData(data.crops_totals);
-        setData(data.data);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-      }
+      const data = await fetchYieldData(selectedFilters);
+      const dataMetrics = data.metrics;
+      setYieldData(data);
+      setStateData(data.states_totals);
+      setMetrics(dataMetrics);
+      setCropData(data.crops_totals);
+      setData(data.data);
     };
 
     fetchData();
@@ -62,14 +58,10 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const data = await fetchYieldData(selectedFilters);
-        const dataMetrics = data.metrics;
-        setYieldData(data);
-        setMetrics(dataMetrics);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-      }
+      const data = await fetchYieldData(selectedFilters);
+      const dataMetrics = data.metrics;
+      setYieldData(data);
+      setMetrics(dataMetrics);
     };
 
     fetchData();
