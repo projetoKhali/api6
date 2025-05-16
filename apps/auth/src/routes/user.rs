@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse, Responder};
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QuerySelect};
+use bcrypt::{hash, DEFAULT_COST};
 
 use crate::entities::user as user_entity;
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
@@ -166,6 +167,13 @@ async fn update_user(
             };
             update_model.permission_id = match user_update.permission_id {
                 Some(permission_id) => Set(permission_id),
+                None => NotSet,
+            };
+            update_model.password = match user_update.password {
+                Some(ref password) => match hash(password, DEFAULT_COST) {
+                    Ok(h) => Set(h),
+                    Err(_) => return HttpResponse::InternalServerError().body("Hashing error"),
+                },
                 None => NotSet,
             };
 

@@ -18,6 +18,7 @@ pub struct UserUpdate {
     pub name: Option<String>,
     pub login: Option<String>,
     pub email: Option<String>,
+    pub password: Option<String>,
     pub version_terms: Option<String>,
     pub permission_id: Option<Option<i64>>,
     pub disabled_since: Option<Option<String>>,
