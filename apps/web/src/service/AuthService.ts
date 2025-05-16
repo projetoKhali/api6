@@ -28,11 +28,9 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
   
   try{
     const decoded: any = jwtDecode(result.token);
-    console.log('Decoded token:', decoded);
     const userId = decoded.sub;
     if (userId) {
       setUserIdToLocalStorage(userId);
-      console.log('User ID set to local storage:', userId);
     }
   } catch (error) {
     console.error('Error decoding token:', error);
