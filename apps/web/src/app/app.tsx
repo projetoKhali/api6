@@ -15,9 +15,10 @@ import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
 import { getUserFromLocalStorage } from '../store/UserStorage';
 import { useState } from 'react';
+import Terms from '../pages/Terms';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(
+  const [isAuthenticated, setIsAuthenticated] = useState(
     getUserFromLocalStorage() !== null
   );
 
@@ -59,6 +60,7 @@ function App() {
                           <Route path="yield" element={<YieldRegister />} />
                           <Route path="event" element={<EventsRegister />} />
                         </Route>
+                        <Route path="/terms" element={<Terms />} />
                       </Routes>
                     </div>
                   </>
