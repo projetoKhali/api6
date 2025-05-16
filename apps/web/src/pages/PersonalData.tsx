@@ -12,7 +12,7 @@ const editFormSchema: FieldSchema[] = [
     { name: 'confirmPassword', label: 'Confirmar Senha', type: 'text' },
 ];
 
-const EditUserPage = ({ userId }: { userId: number }) => {
+const EditUserPage = ({ userId }: { userId: string }) => {
     const [currentUser, setCurrentUser] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
 
