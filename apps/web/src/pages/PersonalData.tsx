@@ -44,12 +44,13 @@ const EditUserPage = ({ userId }: { userId: number }) => {
                 login: formData.login,
                 email: formData.email
             };
-            // if (formData.password && formData.password === formData.confirmPassword) {
-            //     userData.password = formData.password;
-            // } else {
-            //     alert('As senhas não coincidem ou estão vazias.');
-            //     return;
-            // }
+            if (formData.password) {
+                if (formData.password !== formData.confirmPassword) {
+                    alert('As senhas não coincidem.');
+                    return;
+                }
+                userData.password = formData.password;
+            }
             await updateUser(String(userId), userData);
             alert('Usuário atualizado com sucesso!');
         } catch (error) {
