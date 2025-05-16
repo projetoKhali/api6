@@ -44,7 +44,7 @@ const mockGetUsers = async (page: number, size: number) => {
   return {
     items: mockUsers,
     totalItems: mockUsers.length,
-    totalPages: 1,
+    totalPages: page,
     size: size,
   };
 };

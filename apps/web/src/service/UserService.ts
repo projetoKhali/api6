@@ -12,7 +12,12 @@ export const getUsers = async (
   page: number,
   size = 50
 ): Promise<Page<User>> => {
-  return await processPaginatedGET({ path: `/user/`, page, size });
+  return await processPaginatedGET({
+    path: `/users/`,
+    page,
+    size,
+    overrideURL: AUTH_BASE_URL,
+  });
 };
 
 export const getUser = async (id: string): Promise<User> => {

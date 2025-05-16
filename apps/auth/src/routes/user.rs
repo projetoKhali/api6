@@ -8,8 +8,11 @@ use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate}
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
+        //
+        web::scope("/users").route("/", web::post().to(get_users)),
+    )
+    .service(
         web::scope("/user")
-            .route("/", web::post().to(get_users))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
@@ -17,45 +20,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(
-    get,
-    path = "/user/{id}",
-    params(
-        ("id" = i64, Path, description = "User ID")
-    ),
-    responses(
-        (status = 200, description = "User found", body = UserPublic),
-        (status = 404, description = "User not found"),
-        (status = 500, description = "Server error")
-    ),
-    tags = ["User"]
-)]
-
-async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) -> impl Responder {
-    let result = user_entity::Entity::find_by_id(user_id.into_inner())
-        .one(db.get_ref())
-        .await;
-
-    match result {
-        Ok(Some(user)) => HttpResponse::Ok().json(UserPublic {
-            id: user.id,
-            name: user.name,
-            login: user.login,
-            email: user.email,
-            version_terms: user.version_terms_agreement,
-            permission_id: user.permission_id,
-            disabled_since: match user.disabled_since {
-                Some(dt) => Some(dt.format("%Y-%m-%d)").to_string()),
-                None => None,
-            },
-        }),
-        Ok(None) => HttpResponse::NotFound().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
-}
-
-#[utoipa::path(
     post,
-    path = "/user",
+    path = "/users/",
     request_body = PaginatedRequest,
     responses(
         (status = 200, description = "Users found", body = PaginatedResponse<UserPublic>),
@@ -106,6 +72,45 @@ async fn get_users(
             HttpResponse::Ok().json(users_page)
         }
         Err(_) => HttpResponse::InternalServerError().finish(),
+
+#[utoipa::path(
+    get,
+    path = "/user/{id}",
+    params(
+        ("id" = i64, Path, description = "User ID")
+    ),
+    responses(
+        (status = 200, description = "User found", body = UserPublic),
+        (status = 404, description = "User not found"),
+        (status = 500, description = "Server error")
+    ),
+    tags = ["User"]
+)]
+
+async fn get_user(
+    db: web::Data<DatabaseConnection>,
+    config: web::Data<crate::infra::config::Config>,
+    user_id: web::Path<i64>,
+) -> impl Responder {
+    let result = user_entity::Entity::find_by_id(user_id.into_inner())
+        .one(db.get_ref())
+        .await;
+
+    match result {
+        Ok(Some(user)) => HttpResponse::Ok().json(UserPublic {
+            id: user.id,
+            name: user.name,
+            login: user.login,
+            email: user.email,
+            version_terms: user.version_terms_agreement,
+            permission_id: user.permission_id,
+            disabled_since: match user.disabled_since {
+                Some(dt) => Some(dt.format("%Y-%m-%d)").to_string()),
+                None => None,
+            },
+        }),
+        Ok(None) => HttpResponse::NotFound().finish(),
+        Err(err) => handle_server_error_body("Database Error", err, &config, None),
     }
 }
 
