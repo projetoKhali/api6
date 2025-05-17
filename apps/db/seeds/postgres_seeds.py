@@ -33,6 +33,8 @@ def insert_permissions(session):
 
     session.add_all(permissions)
     print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
+
+    session.commit()
     return permissions
 
 
@@ -87,6 +89,7 @@ def insert_users(session, permissoes):
     session.add_all(keys)
     print(f"\ueb11 {NUM_USERS} chaves de usuário inseridas.")
 
+    session.commit()
     return users
 
 
@@ -104,6 +107,8 @@ def insert_deleted_users(session, users):
     print(
         f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
 
+    session.commit()
+
 
 def insert_seeds():
     engine = get_engine()
@@ -118,8 +123,6 @@ def insert_seeds():
     users = insert_users(session, permissions)
 
     insert_deleted_users(session, users)
-
-    session.commit()
 
     print("✅ Seed finalizada com sucesso.")
 
