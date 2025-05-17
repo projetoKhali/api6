@@ -45,7 +45,10 @@ where
         "{}{}",
         generic_text,
         match &config.dev_mode {
-            true => format!(": {:?}", err),
+            true => {
+                eprintln!("Error: {}: {:?}", generic_text, err);
+                format!(": {:?}", err)
+            }
             false => "".to_string(),
         }
     )
