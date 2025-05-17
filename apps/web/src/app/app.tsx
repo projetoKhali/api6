@@ -34,7 +34,7 @@ function App() {
                 element={
                   <>
                     <div style={{ width: '100%', backgroundColor: '#026734' }}>
-                      <Navbar />
+                      <Navbar setIsAuthenticated={setIsAuthenticated} />
                     </div>
                     <div style={{ height: '100%', width: '100%' }}>
                       <Routes>
