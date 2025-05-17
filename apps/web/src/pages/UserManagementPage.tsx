@@ -156,9 +156,13 @@ const UserManagementPage = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+    if (
+      currentUser.id &&
+      window.confirm('Tem certeza que deseja excluir este usuário?')
+    ) {
       await deleteUser(id.toString());
       await loadUsers();
+      resetForm();
     }
   };
 
@@ -232,17 +236,7 @@ const UserManagementPage = () => {
               </button>
 
               <button
-                onClick={async () => {
-                  if (
-                    currentUser.id &&
-                    window.confirm(
-                      'Tem certeza que deseja excluir este usuário?'
-                    )
-                  ) {
-                    await handleDelete(Number(currentUser.id));
-                    resetForm();
-                  }
-                }}
+                onClick={async () => await handleDelete(Number(currentUser.id))}
                 style={{
                   padding: '8px 16px',
                   backgroundColor: '#dc3545', // vermelho para "excluir"
