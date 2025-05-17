@@ -32,7 +32,7 @@ def insert_permissions(session):
     ]
 
     session.add_all(permissions)
-    print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
+    print(f"{NUM_PERMISSIONS} permissões criadas.")
     return permissions
 
 
@@ -76,7 +76,7 @@ def insert_users(session, permissoes):
         users.append(user)
 
     session.add_all(users)
-    print(f"✅ {NUM_USERS} usuários inseridos.")
+    print(f"{NUM_USERS} usuários inseridos.")
 
     # Gera chaves para cada usuário
     keys = [UserKey(
@@ -85,7 +85,7 @@ def insert_users(session, permissoes):
     ) for user in users]
 
     session.add_all(keys)
-    print(f"\ueb11 {NUM_USERS} chaves de usuário inseridas.")
+    print(f"{NUM_USERS} chaves de usuário inseridas.")
 
     return users
 
@@ -102,7 +102,7 @@ def insert_deleted_users(session, users):
 
     session.add_all(deleted)
     print(
-        f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
+        f"{NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
 
 
 def insert_seeds():
@@ -112,7 +112,7 @@ def insert_seeds():
 
     session = sessionmaker(bind=engine)()
 
-    print("🌱 Iniciando seeds...")
+    print("Iniciando seeds...")
     permissions = insert_permissions(session)
 
     users = insert_users(session, permissions)
@@ -121,7 +121,7 @@ def insert_seeds():
 
     session.commit()
 
-    print("✅ Seed finalizada com sucesso.")
+    print("Seed finalizada com sucesso.")
 
 
 if __name__ == "__main__":
