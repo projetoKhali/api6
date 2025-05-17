@@ -85,6 +85,23 @@ const UserManagementPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [useMockData, setUseMockData] = useState(false);
 
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const handleNextPage = () => {
+    if (page < totalPages) {
+      setPage((prev) => prev + 1);
+      loadUsers();
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+      loadUsers();
+    }
+  };
+
   // Carrega os usuários
   const loadUsers = async () => {
     setIsLoading(true);
@@ -268,13 +285,50 @@ const UserManagementPage = () => {
         {isLoading ? (
           <p>Carregando usuários...</p>
         ) : (
-          <TableComponent
-            schema={tableSchema}
-            data={tableData}
-            onEdit={(row) => handleEdit(row)}
-            onRowSelect={(row) => handleEdit(row)}
-            style={{ width: '100%' }}
-          />
+          <>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignContent: 'center',
+                justifyContent: 'space-between',
+                padding: 10,
+                marginBlock: 10,
+              }}
+            >
+              <button
+                style={{ margin: 4 }}
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+              >
+                Anterior
+              </button>
+              <p
+                style={{
+                  margin: 4,
+                  textAlign: 'center',
+                  alignContent: 'center',
+                }}
+              >
+                Página {page} de {totalPages}
+              </p>
+              <button
+                style={{ margin: 4 }}
+                onClick={handleNextPage}
+                disabled={page === totalPages}
+              >
+                Próxima
+              </button>
+            </div>
+            <TableComponent
+              schema={tableSchema}
+              data={tableData}
+              onEdit={(row) => handleEdit(row)}
+              onRowSelect={(row) => handleEdit(row)}
+              style={{ width: '100%' }}
+            />
+          </>
         )}
       </div>
     </div>
