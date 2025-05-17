@@ -160,7 +160,7 @@ async fn update_user(
                                 &config,
                                 Some(ErrorType::BadRequest),
                             )
-                        } // Err(_) => return HttpResponse::BadRequest().body("Invalid disabled_since"),
+                        }
                     },
                     None => Set(None),
                 },
