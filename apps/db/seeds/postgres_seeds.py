@@ -38,22 +38,23 @@ def insert_permissions(session):
     return permissions
 
 
-def insert_users(session, permissoes):
+def insert_users(session, permissions):
     users = [
         # default user for easy login
         User(
             name="Alice",
-            login="a",
             email="alice@mail.com",
+            login="a",
             password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
             version_terms_agreement="v1",
+            permission_id=2,
         )]
 
     for i in range(NUM_USERS):
         name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        permission = random.choice(permissoes)
+        permission = random.choice(permissions)
 
         hashed_password = bcrypt.hashpw(
             fake.password().encode("utf-8"),
