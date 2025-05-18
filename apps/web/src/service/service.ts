@@ -66,12 +66,13 @@ export const processPaginatedRequest = async <R, T>(
 ): Promise<Page<T>> => (await processRequest('POST', params)) || emptyPage();
 
 export const processPaginatedGET = async <Response>(
-  params: PaginatedGetParams
+  path: string,
+  page: number,
+  size: number,
+  crop_year?: number | number[],
+  season?: string | string[],
+  crop?: string | string[],
+  state?: string | string[]
 ): Promise<Page<Response>> =>
-  await processPaginatedRequest({
-    path: params.path,
-    body: {
-      page: params.page,
-      size: params.size,
-    },
-  });
+  await processPaginatedRequest(path, { page, size, crop_year, season, crop, state });
+

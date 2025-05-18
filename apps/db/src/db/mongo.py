@@ -17,7 +17,7 @@ class MongoDB:
         mongo_password = os.getenv("DB_MONGO_PASS", "secret")
         mongo_host = os.getenv("DB_MONGO_HOST", "localhost")
         mongo_port = os.getenv("DB_MONGO_PORT", "27017")
-        mongo_db = os.getenv("DB_MONGO_NAME", "api6_mongo")
+        mongo_db = os.getenv("DB_MONGO_NAME", "reforestation")
 
         mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
@@ -151,6 +151,103 @@ def create_yield_collection(db):
         raise Exception(
             f"Erro ao criar ou atualizar a coleção 'yield': {e}") from e
 
+def create_terms_of_use_collection(db):
+    terms_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["text", "status", "topics"],
+            "properties": {
+                "text": {
+                    "bsonType": "string",
+                    "description": "Texto completo dos termos de uso",
+                },
+                "status": {
+                    "bsonType": "string",
+                    "enum": ["ativo", "inativo"],
+                    "description": "Status do termo de uso",
+                },
+                "version": {
+                    "bsonType": "string",
+                    "description": "Versão do termo de uso",
+                },
+                    },
+                "topics": {
+                    "bsonType": "array",
+                    "description": "Lista de tópicos incluídos nos termos",
+                    "items": {
+                        "bsonType": "object",
+                        "required": ["description", "status", "required"],
+                        "properties": {
+                            "description": {
+                                "bsonType": "string",
+                                "description": "Descrição do tópico",
+                            },
+                            "status": {
+                                "bsonType": "string",
+                                "enum": ["ativo", "inativo"],
+                                "description": "Status do tópico",
+                            },
+                            "required": {
+                                "bsonType": "bool",
+                                "description": "Se o tópico é obrigatório",
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    try:
+        db.create_collection("terms_of_use_collection", validator=terms_validator)
+        print("Coleção 'terms_of_use_collection' criada com validador.")
+    except Exception as e:
+        raise Exception(
+            f"Erro ao criar a coleção 'terms_of_use_collection': {e}"
+        ) from e
+
+def create_user_acceptance_collection(db):
+    acceptance_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["user_id", "topics"],
+            "properties": {
+                "user_id": {
+                    "bsonType": "string",
+                    "description": "Identificador do usuário",
+                },
+                "topics": {
+                    "bsonType": "array",
+                    "description": "Lista de tópicos aceitos pelo usuário",
+                    "items": {
+                        "bsonType": "object",
+                        "required": ["description", "status", "accepted"],
+                        "properties": {
+                            "description": {
+                                "bsonType": "string",
+                                "description": "Descrição do tópico",
+                            },
+                            "status": {
+                                "bsonType": "string",
+                                "enum": ["ativo", "inativo"],
+                                "description": "Status do tópico",
+                            },
+                            "accepted": {
+                                "bsonType": "bool",
+                                "description": "Se o usuário aceitou o tópico",
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    }
+    try:
+        db.create_collection("user_acceptance_collection", validator=acceptance_validator)
+        print("Coleção 'user_acceptance_collection' criada com validador.")
+    except Exception as e:
+        raise Exception(
+            f"Erro ao criar a coleção 'user_acceptance_collection': {e}"
+        ) from e
+
 
 def create_indexes(db):
     try:
@@ -174,12 +271,16 @@ def restart_collections(db):
     create_indexes(db)
 
 
+
 def initialize_mongo_database():
-    db = MongoDB.get_database("api6_mongo")
+    db = MongoDB.connect()
     if db is None:
         print("Erro ao conectar ao banco de dados.")
         return
     create_species_collection(db)
     create_plots_collection(db)
     create_yield_collection(db)
+    create_terms_of_use_collection(db)
+    create_user_acceptance_collection(db)
     create_indexes(db)
+

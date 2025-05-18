@@ -28,12 +28,16 @@ class Pagination:
         return page, size, None, None
 
     @staticmethod
-    def get_metadata(collection, size: int):
-        """Return pagination metadata for a collection."""
-        total = collection.count_documents({})
+    def get_metadata(collection, size, query_filter=None):
+        """Return pagination metadata for a collection, with optional filtering."""
+        if query_filter is None:
+            query_filter = {}
+
+        total = collection.count_documents(query_filter)
+
         pages = ceil(total / size)
         return {
             'totalItems': total,
             'totalPages': pages,
             'size': size,
-        }
+    }

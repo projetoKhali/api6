@@ -21,7 +21,7 @@ const Navbar = () => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          width: '25%',
+          width: '35%',
           justifyContent: 'space-evenly',
           padding: '20px',
           color: '#fff',
@@ -55,6 +55,19 @@ const Navbar = () => {
           style={{ textDecoration: 'none', color: '#fff' }}
         >
           Projeção
+        </a>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/report"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Relatório
         </a>
         <div
           style={{
