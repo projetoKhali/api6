@@ -34,6 +34,7 @@ class Pagination:
             query_filter = {}
 
         total = collection.count_documents(query_filter)
+
         pages = ceil(total / size)
         return {
             'totalItems': total,

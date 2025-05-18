@@ -17,10 +17,13 @@ import { getUserFromLocalStorage } from '../store/UserStorage';
 import { useState } from 'react';
 import ReportPage from '../pages/ReportPage';
 
+
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(
-    getUserFromLocalStorage() !== null
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  useEffect(() => {
+    isUserLoggedIn().then((result) => setIsAuthenticated(result));
+  }, []);
 
   return (
     <Router>
@@ -72,9 +75,10 @@ function App() {
             </Routes>
           ) : (
             <Routes>
-              <Route path="/login" element={<Login
-                setIsAuthenticated={setIsAuthenticated}
-              />} />
+              <Route
+                path="/login"
+                element={<Login setIsAuthenticated={setIsAuthenticated} />}
+              />
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           )}
