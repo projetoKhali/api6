@@ -81,7 +81,7 @@ def remove_deleted_users():
     cursor = conn.cursor()
 
     keys_conn = psycopg2.connect(
-        dbname="api6_key",
+        dbname=os.getenv("DB_CONTAINER", "api6_keys"),
         user=DB_USER,
         password=DB_PASSWORD,
         host=DB_HOST,
@@ -107,8 +107,7 @@ def remove_deleted_users():
 
 if __name__ == "__main__":
     try:
-        backup_path = find_backup_file(
-            "backup_users_permissions_2025-04-09.dump")
+        backup_path = find_backup_file()
         backup_restore(backup_path)
         remove_deleted_users()
     except Exception as e:
