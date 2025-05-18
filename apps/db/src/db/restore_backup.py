@@ -59,12 +59,7 @@ def backup_restore(backup_path):
             "-U", DB_USER,
             "-p", DB_PORT,
             "-d", DB_NAME,
-            "-c",                # drop + create
-            "--no-owner",
-            "--no-comments",
-            "--no-acl",
-            "-t", "users",
-            "-t", "permissions",
+            "-c",
             container_path
         ]
 
@@ -72,7 +67,7 @@ def backup_restore(backup_path):
         subprocess.run(["docker", "exec", DOCKER_CONTAINER,
                        "rm", container_path], check=True)
     except subprocess.CalledProcessError as e:
-        raise Exception(f"❌ Erro durante restauração: {e}") from e
+        raise Exception(f"Erro durante restauração: {e}") from e
 
 
 def remove_deleted_users():
@@ -85,18 +80,26 @@ def remove_deleted_users():
     )
     cursor = conn.cursor()
 
-    try:
-        cursor.execute("SELECT id FROM deleted_users")
-        ids = cursor.fetchall()
+    keys_conn = psycopg2.connect(
+        dbname="api6_key",
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=os.getenv("DB_KEY_PORT", "5433")
+    )
 
-        for (id,) in ids:
-            cursor.execute("DELETE FROM users usr WHERE usr.id = %s;", (id,))
-            cursor.execute(
-                "DELETE FROM permissions pm WHERE pm.id = %s;", (id,))
+    keys_cursor = keys_conn.cursor()
+
+    try:
+        keys_cursor.execute("SELECT id FROM deleted_users")
+        ids = [row[0] for row in keys_cursor.fetchall()]
+
+        if ids:
+            cursor.execute("DELETE FROM users WHERE id = ANY(%s)", (ids,))
 
         conn.commit()
     except Exception as e:
-        raise Exception(f"❌ Erro ao limpar usuários: {e}") from e
+        raise Exception(f"Erro ao limpar usuários: {e}") from e
     finally:
         cursor.close()
         conn.close()
@@ -109,4 +112,4 @@ if __name__ == "__main__":
         backup_restore(backup_path)
         remove_deleted_users()
     except Exception as e:
-        raise Exception(f"❌ Falha durante a restauração: {e}") from e
+        raise Exception(f"Falha durante a restauração: {e}") from e
