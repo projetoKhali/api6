@@ -22,6 +22,13 @@
         "command": "poetry run python {projectRoot}/src/db/postgres.py"
       }
     },
+    "init-pg-keys": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install", "pg-keys-up"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/db/pg_keys.py"
+      }
+    },
     "init-mongo": {
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
@@ -60,7 +67,7 @@
     "up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-up mongo-up"
+        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-up mongo-up key-up"
       }
     },
     "down": {
@@ -73,6 +80,12 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres --build"
+      }
+    },
+    "pg-keys-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d pg-key --build"
       }
     },
     "mongo-up": {
@@ -97,6 +110,12 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-up"
+      }
+    },
+    "key-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run $NX_TASK_TARGET_PROJECT:pg-keys-up"
       }
     },
     "pg-down": {
