@@ -108,7 +108,7 @@ const UserManagementPage = () => {
     if (useMockData) {
       response = await mockGetUsers(0, 50);
     } else {
-      response = await getUsers(0, 50);
+      response = await getUsers(1, 50);
       setTotalPages(response.totalPages)
     }
     setUsers(response.items);
