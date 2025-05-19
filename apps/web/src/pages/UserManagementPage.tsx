@@ -54,7 +54,7 @@ const registerFormSchema: FieldSchema[] = [
   { name: 'name', label: 'Nome Completo', type: 'text' },
   { name: 'login', label: 'Nome de Usuário', type: 'text' },
   { name: 'email', label: 'E-mail', type: 'text' },
-  { name: 'password', label: 'Senha', type: 'text' },
+  { name: 'password', label: 'Senha', type: 'password' },
 ];
 
 // Schema para edição de usuários
