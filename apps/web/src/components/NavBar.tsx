@@ -41,6 +41,9 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
         style={{
           display: 'flex',
           alignItems: 'center',
+          width: '40%',
+          justifyContent: 'space-evenly',
+          padding: '20px',
           color: '#fff',
           gap: '24px',
         }}
@@ -82,6 +85,19 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
         >
           Sair
         </button>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/user-data"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Informações Pessoais
+        </a>
       </div>
     </main>
   );
