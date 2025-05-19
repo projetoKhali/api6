@@ -39,11 +39,11 @@ async fn get_users(
     pagination: web::Json<PaginatedRequest>,
 ) -> impl Responder {
     let page = pagination.page.unwrap_or(1).max(1);
-    let limit = pagination.limit.unwrap_or(10).max(1);
+    let size = pagination.size.unwrap_or(10).max(1);
 
-    let offset = (page - 1) * limit;
+    let offset = (page - 1) * size;
     let result = user_entity::Entity::find()
-        .limit(limit)
+        .limit(size)
         .offset(Some(offset))
         .all(db.get_ref())
         .await;
@@ -66,7 +66,7 @@ async fn get_users(
                 })
                 .collect();
 
-            let total_pages = (users.len().max(1) as f64 / limit as f64).ceil() as u64;
+            let total_pages = (users.len().max(1) as f64 / size as f64).ceil() as u64;
 
             let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
                 total: users.len() as u64,

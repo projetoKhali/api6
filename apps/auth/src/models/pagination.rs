@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct PaginatedRequest {
     pub page: Option<u64>,
-    pub limit: Option<u64>,
+    pub size: Option<u64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
