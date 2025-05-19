@@ -11,6 +11,6 @@ pub struct PaginatedRequest {
 pub struct PaginatedResponse<T> {
     pub total: u64,
     pub page: u64,
-    pub limit: u64,
+    pub total_pages: u64,
     pub items: Vec<T>,
 }

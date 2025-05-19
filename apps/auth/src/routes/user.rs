@@ -66,10 +66,12 @@ async fn get_users(
                 })
                 .collect();
 
+            let total_pages = (users.len().max(1) as f64 / limit as f64).ceil() as u64;
+
             let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
                 total: users.len() as u64,
                 page,
-                limit,
+                total_pages,
                 items: users,
             };
 
