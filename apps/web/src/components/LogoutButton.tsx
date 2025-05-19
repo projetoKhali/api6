@@ -1,7 +1,5 @@
-// LogoutButton.tsx
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../service/AuthService';
-
 
 interface Props {
     setIsAuthenticated: (auth: boolean) => void;
