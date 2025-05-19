@@ -9,6 +9,7 @@ import {
   deleteUser,
 } from '../service/UserService';
 import { User, NewUser } from '../schemas/UserSchema';
+import { Pagination } from '../components/Pagination';
 
 // Dados mockados para teste
 const mockUsers: User[] = [
@@ -84,24 +85,12 @@ const UserManagementPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const useMockData = false;
 
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const handleNextPage = async () => {
-    if (page < totalPages) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = async () => {
-    if (page > 1) {
-      setPage((prev) => prev - 1);
-    }
-  };
-
   // Carrega os usuários
   const loadUsers = async (pageToLoad: number, size = 5) => {
+    setPage(pageToLoad);
     setIsLoading(true);
     const response = useMockData
       ? await mockGetUsers(1, size)
@@ -114,7 +103,7 @@ const UserManagementPage = () => {
   // Efeito para carregar os dados iniciais
   useEffect(() => {
     loadUsers(page);
-  }, [useMockData, page, refreshFlag]);
+  }, [page]);
 
   // Manipuladores de eventos
   const handleRegisterSubmit = async (formData: Record<string, string>) => {
@@ -127,7 +116,7 @@ const UserManagementPage = () => {
       permissionId: 1,
     };
     await createUser(newUser);
-      setRefreshFlag(f => !f)
+    await loadUsers(1)
   };
 
   const handleEditSubmit = async (formData: Record<string, string>) => {
@@ -139,8 +128,7 @@ const UserManagementPage = () => {
         permissionId: Number(formData.permissionId),
       };
       await updateUser(currentUser.id, userData);
-      setPage(1);
-      setRefreshFlag(f => !f)
+      await loadUsers(1)
     }
   };
 
@@ -169,7 +157,7 @@ const UserManagementPage = () => {
       window.confirm('Tem certeza que deseja excluir este usuário?')
     ) {
       await deleteUser(id);
-      setRefreshFlag(f => !f)
+      await loadUsers(1);
       resetForm();
     }
   };
@@ -288,29 +276,13 @@ const UserManagementPage = () => {
                 marginBlock: 10,
               }}
             >
-              <button
-                style={{ margin: 4 }}
-                onClick={handlePreviousPage}
-                disabled={page === 1}
-              >
-                Anterior
-              </button>
-              <p
-                style={{
-                  margin: 4,
-                  textAlign: 'center',
-                  alignContent: 'center',
-                }}
-              >
-                Página {page} de {totalPages}
-              </p>
-              <button
-                style={{ margin: 4 }}
-                onClick={handleNextPage}
-                disabled={page === totalPages}
-              >
-                Próxima
-              </button>
+              <Pagination
+                getPage={() => page}
+                setPage={async (newPage) => await loadUsers(newPage)}
+                getTotalPages={() => totalPages}
+                onPageChange={async(newPage) => await loadUsers(newPage)}
+                style={{ marginTop: '30px', gap: '10px' }}
+              />
             </div>
             <TableComponent
               schema={tableSchema}
