@@ -148,6 +148,7 @@ const UserManagementPage = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEdit = (row: Record<string, any>) => {
     const user: User = {
       id: Number(row.id),
