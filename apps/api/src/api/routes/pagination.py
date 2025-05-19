@@ -37,7 +37,7 @@ class Pagination:
 
         pages = ceil(total / size)
         return {
-            'totalItems': total,
+            'total': total,
             'totalPages': pages,
             'size': size,
-    }
+        }

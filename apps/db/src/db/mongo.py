@@ -17,7 +17,7 @@ class MongoDB:
         mongo_password = os.getenv("DB_MONGO_PASS", "secret")
         mongo_host = os.getenv("DB_MONGO_HOST", "localhost")
         mongo_port = os.getenv("DB_MONGO_PORT", "27017")
-        mongo_db = os.getenv("DB_MONGO_NAME", "reforestation")
+        mongo_db = os.getenv("DB_MONGO_NAME", "api6_mongo")
 
         mongo_url = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
@@ -273,7 +273,7 @@ def restart_collections(db):
 
 
 def initialize_mongo_database():
-    db = MongoDB.connect()
+    db = MongoDB.get_database("api6_mongo")
     if db is None:
         print("Erro ao conectar ao banco de dados.")
         return

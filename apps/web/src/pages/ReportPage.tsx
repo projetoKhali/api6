@@ -6,10 +6,7 @@ import { Yield } from '../schemas/yield';
 import './styles/EventsRegister.css';
 import { Pagination } from '../components/Pagination';
 import Select from 'react-select';
-import {
-  FilterParams,
-  getFilterData,
-} from '../service/DashboardService';
+import { FilterParams, getFilterData } from '../service/DashboardService';
 import { filterListSchema } from '../schemas/DashboardSchema';
 
 import Loading from '../components/Loading';
@@ -20,9 +17,10 @@ function ReportPage() {
   const [data, setData] = useState<Yield[]>([]);
   const [filtersData, setFiltersData] = useState<filterListSchema | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<FilterParams>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchPage = async (newPage: number) => {
     setPage(newPage);
@@ -76,11 +74,11 @@ function ReportPage() {
           !(Array.isArray(value) && value.length === 0)
       )
     );
-  
+
     let allData: Yield[] = [];
     let currentPage = 1;
     let totalPageCount = 1;
-  
+
     do {
       const pageData = await reportYields(
         currentPage,
@@ -90,29 +88,31 @@ function ReportPage() {
         cleanedFilters.crop,
         cleanedFilters.state
       );
-  
+
       allData = allData.concat(pageData.items);
       totalPageCount = pageData.totalPages;
       currentPage++;
     } while (currentPage <= totalPageCount);
-  
+
     if (allData.length === 0) {
       alert('Nenhum dado para exportar.');
       return;
     }
-  
+
     const headers = Object.keys(allData[0]);
     const csvRows = [
       headers.join(','), // header
       ...allData.map((row) =>
-        headers.map((field) => JSON.stringify((row as any)[field] ?? '')).join(',')
+        headers
+          .map((field) => JSON.stringify((row as any)[field] ?? ''))
+          .join(',')
       ),
     ];
-  
+
     const csvContent = csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-  
+
     const link = document.createElement('a');
     link.setAttribute('href', url);
     link.setAttribute('download', 'relatorio_producao.csv');
@@ -123,7 +123,10 @@ function ReportPage() {
   };
 
   return (
-    <div className="container" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div
+      className="container"
+      style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       <div
         style={{
           display: 'flex',
@@ -205,32 +208,37 @@ function ReportPage() {
           </>
         )}
       </div>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-        {isLoading ? <Loading /> : <button
-                onClick={exportToCSV}
-                style={{
-                    margin: '10px auto',
-                    padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    alignSelf: 'center',
-                }}
-                >
-                Extrair Relatório
-        </button>}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <button
+            onClick={exportToCSV}
+            style={{
+              margin: '10px auto',
+              padding: '10px 20px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              alignSelf: 'center',
+            }}
+          >
+            Extrair Relatório
+          </button>
+        )}
       </div>
       {/* Tabela + Paginação */}
       <div className="table-container" style={{ width: '100%' }}>
-      
         <TableComponent
           style={{ width: '100%' }}
           schema={tableSchema}

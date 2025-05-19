@@ -23,16 +23,14 @@ type WithBody<T> = {
   body: T;
 };
 
-type WithPaginationBody<T> = {
-  body: PageRequest & T;
-};
-
 type RequestParams<T> = RequestParamsBase & Partial<WithBody<T>>;
 type GetParams = RequestParamsBase;
 type PostParams<T> = RequestParamsBase & WithBody<T>;
 
 type PaginatedGetParams = RequestParamsBase & PageRequest;
-type PaginatedRequestParams<T> = RequestParamsBase & WithPaginationBody<T>;
+type PaginatedRequestParams<T> = RequestParamsBase &
+  PageRequest &
+  Partial<WithBody<T>>;
 
 export const processRequest = async <R, T>(
   method: Method,
@@ -61,18 +59,20 @@ export const processGET = async <Response>(
 export const processPOST = async <R, T>(params: PostParams<R>): Promise<T> =>
   await processRequest('POST', params);
 
+// Request paginado que tem body além de page e size
 export const processPaginatedRequest = async <R, T>(
   params: PaginatedRequestParams<R>
-): Promise<Page<T>> => (await processRequest('POST', params)) || emptyPage();
+): Promise<Page<T>> =>
+  (await processRequest('POST', {
+    ...params,
+    body: {
+      ...params.body,
+      page: params.page,
+      size: params.size,
+    },
+  })) || emptyPage();
 
-export const processPaginatedGET = async <Response>(
-  path: string,
-  page: number,
-  size: number,
-  crop_year?: number | number[],
-  season?: string | string[],
-  crop?: string | string[],
-  state?: string | string[]
-): Promise<Page<Response>> =>
-  await processPaginatedRequest(path, { page, size, crop_year, season, crop, state });
-
+// Request paginado que não tem body além de page e size
+export const processPaginatedGET = async <T>(
+  params: PaginatedGetParams
+): Promise<Page<T>> => await processPaginatedRequest<never, T>(params);

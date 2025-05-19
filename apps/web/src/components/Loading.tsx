@@ -1,6 +1,6 @@
-import React from 'react';
+import { CSSProperties } from 'react';
 
-const spinnerStyle: React.CSSProperties = {
+const spinnerStyle: CSSProperties = {
   border: '6px solid #f3f3f3',
   borderTop: '6px solid #3498db',
   borderRadius: '50%',
@@ -9,14 +9,14 @@ const spinnerStyle: React.CSSProperties = {
   animation: 'spin 1s linear infinite',
 };
 
-const containerStyle: React.CSSProperties = {
+const containerStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   padding: '20px',
 };
 
-const Loading: React.FC = () => {
+const Loading = () => {
   return (
     <div style={containerStyle}>
       <div style={spinnerStyle}></div>

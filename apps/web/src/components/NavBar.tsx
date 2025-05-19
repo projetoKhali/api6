@@ -37,10 +37,7 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a
-          href="/prevision"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
+        <a href="/prevision" style={{ textDecoration: 'none', color: '#fff' }}>
           Previsões
         </a>
         <div
@@ -50,10 +47,7 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a
-          href="/projection"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
+        <a href="/projection" style={{ textDecoration: 'none', color: '#fff' }}>
           Projeção
         </a>
         <div
@@ -63,10 +57,7 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a
-          href="/report"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
+        <a href="/report" style={{ textDecoration: 'none', color: '#fff' }}>
           Relatório
         </a>
         <div
@@ -86,10 +77,7 @@ const Navbar = () => {
             backgroundColor: '#fff',
           }}
         ></div>
-        <a
-          href="/user"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
+        <a href="/user" style={{ textDecoration: 'none', color: '#fff' }}>
           Usuários
         </a>
       </div>

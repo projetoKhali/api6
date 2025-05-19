@@ -1,6 +1,7 @@
 import {
   processGET,
   processPaginatedGET,
+  processPaginatedRequest,
   processPOST,
   processRequest,
 } from './service';
@@ -32,11 +33,16 @@ export const reportYields = async (
   crop?: string | string[],
   state?: string | string[]
 ): Promise<Page<Yield>> => {
-  return await processPaginatedGET(`/yield/filter`, page, size, crop_year, season, crop, state);
+  return await processPaginatedRequest({
+    path: `/yield/filter`,
+    page,
+    size,
+    body: { crop_year, season, crop, state },
+  });
 };
 
-export const createYield = async (data: Yield): Promise<Yield> => {
-  return await processPOST<Yield, Yield>(`/yield/create`, data);
+export const createYield = async (body: Yield): Promise<Yield> => {
+  return await processPOST<Yield, Yield>({ path: `/yield/create`, body });
 };
 
 export const updateYield = async (
