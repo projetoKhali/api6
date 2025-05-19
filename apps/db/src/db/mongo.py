@@ -151,6 +151,103 @@ def create_yield_collection(db):
         raise Exception(
             f"Erro ao criar ou atualizar a coleção 'yield': {e}") from e
 
+def create_terms_of_use_collection(db):
+    terms_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["text", "status", "topics"],
+            "properties": {
+                "text": {
+                    "bsonType": "string",
+                    "description": "Texto completo dos termos de uso",
+                },
+                "status": {
+                    "bsonType": "string",
+                    "enum": ["ativo", "inativo"],
+                    "description": "Status do termo de uso",
+                },
+                "version": {
+                    "bsonType": "string",
+                    "description": "Versão do termo de uso",
+                },
+                    },
+                "topics": {
+                    "bsonType": "array",
+                    "description": "Lista de tópicos incluídos nos termos",
+                    "items": {
+                        "bsonType": "object",
+                        "required": ["description", "status", "required"],
+                        "properties": {
+                            "description": {
+                                "bsonType": "string",
+                                "description": "Descrição do tópico",
+                            },
+                            "status": {
+                                "bsonType": "string",
+                                "enum": ["ativo", "inativo"],
+                                "description": "Status do tópico",
+                            },
+                            "required": {
+                                "bsonType": "bool",
+                                "description": "Se o tópico é obrigatório",
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    try:
+        db.create_collection("terms_of_use_collection", validator=terms_validator)
+        print("Coleção 'terms_of_use_collection' criada com validador.")
+    except Exception as e:
+        raise Exception(
+            f"Erro ao criar a coleção 'terms_of_use_collection': {e}"
+        ) from e
+
+def create_user_acceptance_collection(db):
+    acceptance_validator = {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["user_id", "topics"],
+            "properties": {
+                "user_id": {
+                    "bsonType": "string",
+                    "description": "Identificador do usuário",
+                },
+                "topics": {
+                    "bsonType": "array",
+                    "description": "Lista de tópicos aceitos pelo usuário",
+                    "items": {
+                        "bsonType": "object",
+                        "required": ["description", "status", "accepted"],
+                        "properties": {
+                            "description": {
+                                "bsonType": "string",
+                                "description": "Descrição do tópico",
+                            },
+                            "status": {
+                                "bsonType": "string",
+                                "enum": ["ativo", "inativo"],
+                                "description": "Status do tópico",
+                            },
+                            "accepted": {
+                                "bsonType": "bool",
+                                "description": "Se o usuário aceitou o tópico",
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    }
+    try:
+        db.create_collection("user_acceptance_collection", validator=acceptance_validator)
+        print("Coleção 'user_acceptance_collection' criada com validador.")
+    except Exception as e:
+        raise Exception(
+            f"Erro ao criar a coleção 'user_acceptance_collection': {e}"
+        ) from e
+
 
 def create_indexes(db):
     try:
@@ -174,6 +271,7 @@ def restart_collections(db):
     create_indexes(db)
 
 
+
 def initialize_mongo_database():
     db = MongoDB.get_database("api6_mongo")
     if db is None:
@@ -182,4 +280,7 @@ def initialize_mongo_database():
     create_species_collection(db)
     create_plots_collection(db)
     create_yield_collection(db)
+    create_terms_of_use_collection(db)
+    create_user_acceptance_collection(db)
     create_indexes(db)
+

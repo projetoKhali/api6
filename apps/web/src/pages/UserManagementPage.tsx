@@ -82,9 +82,9 @@ const UserManagementPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<Partial<User>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const useMockData = false;
 
+  const [refreshFlag, setRefreshFlag] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
