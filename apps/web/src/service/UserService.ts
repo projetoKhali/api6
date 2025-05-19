@@ -20,7 +20,7 @@ export const getUsers = async (
   });
 };
 
-export const getUser = async (id: string): Promise<User> => {
+export const getUser = async (id: number): Promise<User> => {
   return await processGET<User>({
     path: `/user/${id}`,
     overrideURL: AUTH_BASE_URL,
@@ -36,7 +36,7 @@ export const createUser = async (newUser: NewUser): Promise<User> => {
 };
 
 export const updateUser = async (
-  id: string,
+  id: number,
   updatedFields: Partial<User>
 ): Promise<User> => {
   return await processRequest<Partial<User>, User>('PUT', {
@@ -46,7 +46,7 @@ export const updateUser = async (
   });
 };
 
-export const deleteUser = async (id: string): Promise<void> => {
+export const deleteUser = async (id: number): Promise<void> => {
   return await processRequest<never, void>('DELETE', {
     path: `/user/${id}`,
     overrideURL: AUTH_BASE_URL,

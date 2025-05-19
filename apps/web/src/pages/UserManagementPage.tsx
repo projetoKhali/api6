@@ -78,7 +78,6 @@ const tableSchema = [
 ];
 
 const UserManagementPage = () => {
-  // Estado inicial
   const [users, setUsers] = useState<User[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<Record<string, string>>({});
@@ -178,7 +177,7 @@ const UserManagementPage = () => {
       currentUser.id &&
       window.confirm('Tem certeza que deseja excluir este usuário?')
     ) {
-      await deleteUser(id.toString());
+      await deleteUser(id);
       await loadUsers();
       resetForm();
     }
