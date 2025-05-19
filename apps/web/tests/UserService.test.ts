@@ -22,8 +22,8 @@ describe('UserService', () => {
 
     it('should fetch paginated users', async () => {
         const mockPage: Page<User> = {
-            items: [{ 
-                id: 1, 
+            items: [{
+                id: 1,
                 name: 'John Doe',
                 login: 'johndoe',
                 email: 'johndoe@email.com',
@@ -43,8 +43,8 @@ describe('UserService', () => {
     });
 
     it('should fetch a user by ID', async () => {
-        const mockUser: User = { 
-            id: 1, 
+        const mockUser: User = {
+            id: 1,
             name: 'John Doe',
             login: 'johndoe',
             email: 'johndoe@email.com',
@@ -60,8 +60,8 @@ describe('UserService', () => {
     });
 
     it('should create a new user', async () => {
-        const newUser: NewUser = { 
-            id: 1, 
+        const newUser: NewUser = {
+            id: 1,
             name: 'John Doe',
             login: 'johndoe',
             password: 'password123',
@@ -69,8 +69,8 @@ describe('UserService', () => {
             version_terms_agreement: '1.0',
             permission_id: 1
         };
-        const createdUser: User = { 
-            id: 1, 
+        const createdUser: User = {
+            id: 1,
             name: 'John Doe',
             login: 'johndoe',
             email: 'johndoe@email.com',
@@ -87,8 +87,8 @@ describe('UserService', () => {
 
     it('should update a user', async () => {
         const updatedFields: Partial<User> = { name: 'John Smith' };
-        const updatedUser: User = { 
-            id: 1, 
+        const updatedUser: User = {
+            id: 1,
             name: 'John Doe',
             login: 'johndoe',
             email: 'johndoe@email.com',
