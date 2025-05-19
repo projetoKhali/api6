@@ -22,7 +22,6 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
     <main
       style={{
         display: 'flex',
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 40px',
@@ -36,69 +35,39 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
         </a>
       </div>
 
-      {/* Links + Logout */}
+      {/* Links */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          width: '40%',
-          justifyContent: 'space-evenly',
-          padding: '20px',
-          color: '#fff',
           gap: '24px',
+          color: '#fff',
+          flex: 1,
+          marginLeft: '40px',
         }}
       >
-        <a href="/dashboard" style={{ textDecoration: 'none', color: '#fff' }}>
-          Dashboard
-        </a>
-        <div style={{ height: '35px', width: '2px', backgroundColor: '#fff' }} />
-        <a href="/prevision" style={{ textDecoration: 'none', color: '#fff' }}>
-          Previsões
-        </a>
-        <div style={{ height: '35px', width: '2px', backgroundColor: '#fff' }} />
-        <a href="/projection" style={{ textDecoration: 'none', color: '#fff' }}>
-          Projeção
-        </a>
-        <div style={{ height: '35px', width: '2px', backgroundColor: '#fff' }} />
-        <a href="/register" style={{ textDecoration: 'none', color: '#fff' }}>
-          Cadastro
-        </a>
-        <div style={{ height: '35px', width: '2px', backgroundColor: '#fff' }} />
-        <a href="/user" style={{ textDecoration: 'none', color: '#fff' }}>
-          Usuários
-        </a>
-        <div style={{ height: '35px', width: '2px', backgroundColor: '#fff' }} />
-
-        {/* Botão de logout */}
-        <button
-          onClick={handleLogout}
-          style={{
-            backgroundColor: 'transparent',
-            color: '#fff',
-            border: '1px solid #fff',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            marginLeft: '24px',
-            marginTop: '-2px',
-          }}
-        >
-          Sair
-        </button>
-        <div
-          style={{
-            height: '35px',
-            width: '3px',
-            backgroundColor: '#fff',
-          }}
-        ></div>
-        <a
-          href="/user-data"
-          style={{ textDecoration: 'none', color: '#fff' }}
-        >
-          Informações Pessoais
-        </a>
+        <a href="/dashboard" style={{ textDecoration: 'none', color: '#fff' }}>Dashboard</a>
+        <a href="/prevision" style={{ textDecoration: 'none', color: '#fff' }}>Previsões</a>
+        <a href="/projection" style={{ textDecoration: 'none', color: '#fff' }}>Projeção</a>
+        <a href="/register" style={{ textDecoration: 'none', color: '#fff' }}>Cadastro</a>
+        <a href="/user" style={{ textDecoration: 'none', color: '#fff' }}>Usuários</a>
+        <a href="/user-data" style={{ textDecoration: 'none', color: '#fff' }}>Informações Pessoais</a>
       </div>
+
+      {/* Botão sair */}
+      <button
+        onClick={handleLogout}
+        style={{
+          backgroundColor: 'transparent',
+          color: '#fff',
+          border: '1px solid #fff',
+          padding: '4px 10px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+      >
+        Sair
+      </button>
     </main>
   );
 };
