@@ -43,7 +43,7 @@ const mockUsers: User[] = [
 const mockGetUsers = async (page: number, size: number) => {
   return {
     items: mockUsers,
-    totalItems: mockUsers.length,
+    total: mockUsers.length,
     totalPages: page,
     size: size,
   };
@@ -110,6 +110,7 @@ const UserManagementPage = () => {
       response = await mockGetUsers(0, 50);
     } else {
       response = await getUsers(0, 50);
+      setTotalPages(response.totalPages)
     }
     setUsers(response.items);
     setIsLoading(false);

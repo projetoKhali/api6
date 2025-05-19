@@ -33,7 +33,7 @@ class Pagination:
         total = collection.count_documents({})
         pages = ceil(total / size)
         return {
-            'totalItems': total,
+            'total': total,
             'totalPages': pages,
             'size': size,
         }

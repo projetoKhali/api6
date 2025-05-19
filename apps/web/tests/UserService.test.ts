@@ -31,7 +31,7 @@ describe('UserService', () => {
                 permission_id: 1
             }],
             totalPages: 1,
-            totalItems: 1,
+            total: 1,
             size: 50
         };
         (processPaginatedGET as jest.Mock).mockResolvedValue(mockPage);
