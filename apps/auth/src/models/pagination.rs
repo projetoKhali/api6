@@ -9,7 +9,7 @@ pub struct PaginatedRequest {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct PaginatedResponse<T> {
+pub struct PaginatedResponse<T> where T: Serialize {
     pub total: u64,
     pub page: u64,
     pub total_pages: u64,

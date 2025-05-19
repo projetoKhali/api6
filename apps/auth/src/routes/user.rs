@@ -1,7 +1,9 @@
 use actix_web::{web, HttpResponse, Responder};
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QuerySelect};
+use sea_orm::{
+    ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect,
+};
 
 use crate::entities::user as user_entity;
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
@@ -66,7 +68,12 @@ async fn get_users(
                 })
                 .collect();
 
-            let total_pages = (users.len().max(1) as f64 / size as f64).ceil() as u64;
+            let total_users = user_entity::Entity::find()
+                .count(db.get_ref())
+                .await
+                .unwrap_or(0);
+
+            let total_pages = (total_users as f64 / size as f64).ceil() as u64;
 
             let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
                 total: users.len() as u64,
