@@ -8,8 +8,8 @@ const editFormSchema: FieldSchema[] = [
     { name: 'name', label: 'Nome Completo', type: 'text' },
     { name: 'login', label: 'Login', type: 'text' },
     { name: 'email', label: 'E-mail', type: 'text' },
-    { name: 'password', label: 'Nova Senha', type: 'text' },
-    { name: 'confirmPassword', label: 'Confirmar Senha', type: 'text' },
+    { name: 'password', label: 'Nova Senha', type: 'password' },
+    { name: 'confirmPassword', label: 'Confirmar Senha', type: 'password' },
 ];
 
 const EditUserPage = ({ userId }: { userId: string }) => {
