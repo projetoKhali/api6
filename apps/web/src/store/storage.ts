@@ -21,9 +21,9 @@ export const isUserLoggedIn = async (): Promise<boolean> => {
   return await validate(token);
 };
 
-export const getUserIdFromLocalStorage = (): string => {
+export const getUserIdFromLocalStorage = (): number => {
   const userId = localStorage.getItem('khali_api6:uid');
-  return userId ? userId : '';
+  return userId ? parseInt(userId) : 0;
 };
 
 export const setUserIdToLocalStorage = (userId: string): void => {
