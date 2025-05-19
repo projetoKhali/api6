@@ -3,6 +3,7 @@ use sqlx::FromRow;
 use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserPublic {
     pub id: i64,
     pub name: String,
@@ -14,6 +15,7 @@ pub struct UserPublic {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserUpdate {
     pub name: Option<String>,
     pub login: Option<String>,

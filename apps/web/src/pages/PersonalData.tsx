@@ -8,18 +8,18 @@ const editFormSchema: FieldSchema[] = [
     { name: 'name', label: 'Nome Completo', type: 'text' },
     { name: 'login', label: 'Login', type: 'text' },
     { name: 'email', label: 'E-mail', type: 'text' },
-    { name: 'password', label: 'Nova Senha', type: 'text' },
-    { name: 'confirmPassword', label: 'Confirmar Senha', type: 'text' },
+    { name: 'password', label: 'Nova Senha', type: 'password' },
+    { name: 'confirmPassword', label: 'Confirmar Senha', type: 'password' },
 ];
 
-const EditUserPage = ({ userId }: { userId: string }) => {
+const EditUserPage = ({ userId }: { userId: number }) => {
     const [currentUser, setCurrentUser] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
 
     const loadUser = async () => {
         setIsLoading(true);
         try {
-            const user = await getUser(String(userId));
+            const user = await getUser(userId);
             setCurrentUser({
                 id: user.id,
                 name: user.name,
@@ -51,7 +51,7 @@ const EditUserPage = ({ userId }: { userId: string }) => {
                 }
                 userData.password = formData.password;
             }
-            await updateUser(String(userId), userData);
+            await updateUser(userId, userData);
             alert('Usuário atualizado com sucesso!');
         } catch (error) {
             console.error('Erro ao atualizar usuário:', error);

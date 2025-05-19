@@ -15,8 +15,9 @@ import UserInformation from '../pages/PersonalData';
 import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
-import { isUserLoggedIn } from '../store/storage';
 import { useEffect, useState } from 'react';
+import ReportPage from '../pages/ReportPage';
+import { isUserLoggedIn } from '../store/storage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -59,6 +60,7 @@ function App() {
                           path="/register"
                           element={<Navigate to="/register/yield" replace />}
                         />
+                        <Route path="/report" element={<ReportPage />} />
                         <Route path="/register">
                           <Route path="yield" element={<YieldRegister />} />
                           <Route path="event" element={<EventsRegister />} />

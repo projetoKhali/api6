@@ -39,7 +39,7 @@ describe('getUser', () => {
     const mockUser = { id: '1', name: 'Test User' };
     (processGET as jest.Mock).mockResolvedValueOnce(mockUser);
 
-    const result = await getUser('1');
+    const result = await getUser(1);
 
     expect(processGET).toHaveBeenCalledWith({
       path: `/user/1`,
@@ -72,7 +72,7 @@ describe('updateUser', () => {
     const updatedUser = { id: '1', name: 'Updated Name' };
     (processRequest as jest.Mock).mockResolvedValueOnce(updatedUser);
 
-    const result = await updateUser('1', updatedFields);
+    const result = await updateUser(1, updatedFields);
 
     expect(processRequest).toHaveBeenCalledWith('PUT', {
       path: `/user/1`,
@@ -87,7 +87,7 @@ describe('deleteUser', () => {
   it('should call processRequest with DELETE and correct params', async () => {
     (processRequest as jest.Mock).mockResolvedValueOnce(undefined);
 
-    await deleteUser('1');
+    await deleteUser(1);
 
     expect(processRequest).toHaveBeenCalledWith('DELETE', {
       path: `/user/1`,
