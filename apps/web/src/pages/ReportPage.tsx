@@ -19,7 +19,6 @@ function ReportPage() {
   const [selectedFilters, setSelectedFilters] = useState<FilterParams>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
