@@ -80,7 +80,7 @@ const tableSchema = [
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUser, setCurrentUser] = useState<Record<string, string>>({});
+  const [currentUser, setCurrentUser] = useState<Partial<User>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [useMockData, setUseMockData] = useState(false);
 
@@ -163,13 +163,7 @@ const UserManagementPage = () => {
     setIsEditing(true);
 
     // Atualize o estado corretamente
-    setCurrentUser({
-      id: user.id ? user.id.toString() : '',
-      name: user.name,
-      login: user.login,
-      email: user.email,
-      permission_id: user.permission_id.toString(),
-    });
+    setCurrentUser(user);
   };
 
   const handleDelete = async (id: number) => {
@@ -234,7 +228,7 @@ const UserManagementPage = () => {
             <h2>Editar Usuário</h2>
             <DynamicForm
               schema={editFormSchema}
-              initialValues={currentUser}
+              initialValues={currentUser as Record<string, string>}
               onSubmit={handleEditSubmit}
             />
             <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
