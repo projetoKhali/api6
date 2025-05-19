@@ -4,7 +4,7 @@ import './styles/TableComponent.css';
 export interface Column {
   key: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'select' | 'actions';
+  type: 'text' | 'number' | 'date' | 'select' | 'actions' | 'password';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

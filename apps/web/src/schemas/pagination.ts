@@ -5,14 +5,14 @@ export type PageRequest = {
 
 export type Page<T> = {
   items: T[];
-  totalItems: number;
+  total: number;
   totalPages: number;
   size: number;
 };
 
 export const emptyPage = <T>(): Page<T> => ({
   items: [],
-  totalItems: 0,
+  total: 0,
   totalPages: 1,
   size: 0,
 });

@@ -33,25 +33,28 @@ def insert_permissions(session):
 
     session.add_all(permissions)
     print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
+
+    session.commit()
     return permissions
 
 
-def insert_users(session, permissoes):
+def insert_users(session, permissions):
     users = [
         # default user for easy login
         User(
             name="Alice",
-            login="a",
             email="alice@mail.com",
+            login="a",
             password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
             version_terms_agreement="v1",
+            permission_id=2,
         )]
 
     for i in range(NUM_USERS):
         name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        permission = random.choice(permissoes)
+        permission = random.choice(permissions)
 
         hashed_password = bcrypt.hashpw(
             fake.password().encode("utf-8"),
@@ -87,6 +90,7 @@ def insert_users(session, permissoes):
     session.add_all(keys)
     print(f"\ueb11 {NUM_USERS} chaves de usuário inseridas.")
 
+    session.commit()
     return users
 
 
@@ -104,6 +108,8 @@ def insert_deleted_users(session, users):
     print(
         f"🗑️ {NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
 
+    session.commit()
+
 
 def insert_seeds():
     engine = get_engine()
@@ -118,8 +124,6 @@ def insert_seeds():
     users = insert_users(session, permissions)
 
     insert_deleted_users(session, users)
-
-    session.commit()
 
     print("✅ Seed finalizada com sucesso.")
 
