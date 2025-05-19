@@ -82,43 +82,39 @@ const UserManagementPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState<Partial<User>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshFlag, setRefreshFlag] = useState(false);
   const useMockData = false;
 
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
     if (page < totalPages) {
       setPage((prev) => prev + 1);
-      loadUsers();
     }
   };
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = async () => {
     if (page > 1) {
       setPage((prev) => prev - 1);
-      loadUsers();
     }
   };
 
   // Carrega os usuários
-  const loadUsers = async () => {
+  const loadUsers = async (pageToLoad: number, size = 5) => {
     setIsLoading(true);
-    let response;
-    if (useMockData) {
-      response = await mockGetUsers(0, 50);
-    } else {
-      response = await getUsers(1, 50);
-      setTotalPages(response.totalPages)
-    }
+    const response = useMockData
+      ? await mockGetUsers(1, size)
+      : await getUsers(pageToLoad, size);
+    setTotalPages(response.totalPages);
     setUsers(response.items);
     setIsLoading(false);
   };
 
   // Efeito para carregar os dados iniciais
   useEffect(() => {
-    loadUsers();
-  }, [useMockData]);
+    loadUsers(page);
+  }, [useMockData, page, refreshFlag]);
 
   // Manipuladores de eventos
   const handleRegisterSubmit = async (formData: Record<string, string>) => {
@@ -131,7 +127,7 @@ const UserManagementPage = () => {
       permissionId: 1,
     };
     await createUser(newUser);
-    await loadUsers();
+      setRefreshFlag(f => !f)
   };
 
   const handleEditSubmit = async (formData: Record<string, string>) => {
@@ -143,8 +139,8 @@ const UserManagementPage = () => {
         permissionId: Number(formData.permissionId),
       };
       await updateUser(currentUser.id, userData);
-      await loadUsers();
-      resetForm();
+      setPage(1);
+      setRefreshFlag(f => !f)
     }
   };
 
@@ -173,7 +169,7 @@ const UserManagementPage = () => {
       window.confirm('Tem certeza que deseja excluir este usuário?')
     ) {
       await deleteUser(id);
-      await loadUsers();
+      setRefreshFlag(f => !f)
       resetForm();
     }
   };
