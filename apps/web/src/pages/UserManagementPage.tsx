@@ -17,25 +17,25 @@ const mockUsers: User[] = [
     name: 'João Silva',
     login: 'joao.silva',
     email: 'joao@example.com',
-    version_terms: '1.0',
-    permission_id: 1,
+    versionTerms: '1.0',
+    permissionId: 1,
   },
   {
     id: 2,
     name: 'Maria Souza',
     login: 'maria.souza',
     email: 'maria@example.com',
-    version_terms: '1.0',
-    permission_id: 2,
-    disabled_since: '2023-01-01',
+    versionTerms: '1.0',
+    permissionId: 2,
+    disabledSince: '2023-01-01',
   },
   {
     id: 3,
     name: 'Carlos Oliveira',
     login: 'carlos.oliveira',
     email: 'carlos@example.com',
-    version_terms: '1.1',
-    permission_id: 1,
+    versionTerms: '1.1',
+    permissionId: 1,
   },
 ];
 
@@ -63,7 +63,7 @@ const editFormSchema: FieldSchema[] = [
   { name: 'login', label: 'Nome de Usuário', type: 'text' },
   { name: 'email', label: 'E-mail', type: 'text' },
   {
-    name: 'permission_id',
+    name: 'permissionId',
     label: 'Permissão',
     type: 'text',
   },
@@ -73,7 +73,7 @@ const tableSchema = [
   { key: 'name', label: 'Nome', type: 'text' as const },
   { key: 'email', label: 'E-mail', type: 'text' as const },
   { key: 'login', label: 'Usuário', type: 'text' as const },
-  { key: 'disabled_since', label: 'Status', type: 'text' as const },
+  { key: 'disabledSince', label: 'Status', type: 'text' as const },
   { key: 'actions', label: 'Ações', type: 'actions' as const },
 ];
 
@@ -127,8 +127,8 @@ const UserManagementPage = () => {
       login: formData.login,
       email: formData.email,
       password: formData.password,
-      version_terms: '1.0',
-      permission_id: 1,
+      versionTerms: '1.0',
+      permissionId: 1,
     };
     await createUser(newUser);
     await loadUsers();
@@ -140,7 +140,7 @@ const UserManagementPage = () => {
         name: formData.name,
         login: formData.login,
         email: formData.email,
-        permission_id: Number(formData.permission_id),
+        permissionId: Number(formData.permissionId),
       };
       await updateUser(currentUser.id, userData);
       await loadUsers();
@@ -154,9 +154,9 @@ const UserManagementPage = () => {
       name: row.name,
       login: row.login,
       email: row.email,
-      version_terms: row.version_terms_agreement || '1.0',
-      permission_id: Number(row.permission_id),
-      disabled_since: row.disabled_since,
+      versionTerms: row.versionTerms || '1.0',
+      permissionId: Number(row.permissionId),
+      disabledSince: row.disabledSince,
     };
 
     console.log('Editando usuário:', user);
@@ -191,7 +191,7 @@ const UserManagementPage = () => {
   // Transforma os dados para a tabela
   const tableData = users.map((user) => ({
     ...user,
-    disabled_since: user.disabled_since ? 'Desativado' : 'Ativo',
+    disabledSince: user.disabledSince ? 'Desativado' : 'Ativo',
     actions: user.id,
   }));
 

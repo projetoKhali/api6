@@ -3,9 +3,9 @@ export interface User {
   name: string;
   login: string;
   email: string;
-  version_terms: string;
-  permission_id: number;
-  disabled_since?: string;
+  versionTerms: string;
+  permissionId: number;
+  disabledSince?: string;
 }
 
 export interface NewUser extends User {
