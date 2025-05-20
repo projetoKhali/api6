@@ -11,6 +11,8 @@ import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
+import UserInformation from '../pages/PersonalData';
+import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
 import { useEffect, useState } from 'react';
@@ -63,6 +65,7 @@ function App() {
                           <Route path="yield" element={<YieldRegister />} />
                           <Route path="event" element={<EventsRegister />} />
                         </Route>
+                        <Route path='/user-data' element={<UserInformation userId={getUserIdFromLocalStorage()} />} />
                       </Routes>
                     </div>
                   </>

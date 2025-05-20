@@ -21,7 +21,7 @@ const Navbar = () => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          width: '35%',
+          width: '40%',
           justifyContent: 'space-evenly',
           padding: '20px',
           color: '#fff',
@@ -79,6 +79,32 @@ const Navbar = () => {
         ></div>
         <a href="/user" style={{ textDecoration: 'none', color: '#fff' }}>
           Usuários
+        </a>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/user"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Usuários
+        </a>
+        <div
+          style={{
+            height: '35px',
+            width: '3px',
+            backgroundColor: '#fff',
+          }}
+        ></div>
+        <a
+          href="/user-data"
+          style={{ textDecoration: 'none', color: '#fff' }}
+        >
+          Informações Pessoais
         </a>
       </div>
     </main>
