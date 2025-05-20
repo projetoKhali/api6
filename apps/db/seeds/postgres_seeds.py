@@ -3,7 +3,7 @@ from cryptography.fernet import Fernet
 from faker import Faker
 from datetime import datetime, timedelta
 import random
-from db.pg_keys import (
+from db.keys import (
     get_keys_engine,
     UserKey,
     DeletedUser
