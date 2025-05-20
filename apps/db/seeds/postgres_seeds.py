@@ -51,7 +51,7 @@ def insert_users(session, permissoes):
     fernet = Fernet(default_key)
     user = User(
         name=fernet.encrypt("Alice".encode()).decode(),
-        login=fernet.encrypt("a".encode()).decode(),
+        login="a",
         email=fernet.encrypt("alice@mail.com".encode()).decode(),
         password=fernet.encrypt(default_password.encode()).decode(),
         version_terms_agreement=fernet.encrypt("v1".encode()).decode(),
@@ -86,7 +86,7 @@ def insert_users(session, permissoes):
         user = User(
             name=fernet.encrypt(name.encode()).decode(),
             email=fernet.encrypt(email.encode()).decode(),
-            login=fernet.encrypt(login.encode()).decode(),
+            login=login,
             password=fernet.encrypt(hashed_password.encode()).decode(),
             version_terms_agreement=fernet.encrypt("v1.0".encode()).decode(),
             permission_id=permission.id,
