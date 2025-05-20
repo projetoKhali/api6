@@ -65,9 +65,9 @@ def test_connection(engine):
     except Exception as e:
         raise Exception("Erro ao conectar ao banco de dados:", e) from e
 
-def initialize_key_database():
+def initialize_keys_database():
     engine = get_keys_engine()
     create_tables(engine)
 
 if __name__ == "__main__":
-    initialize_key_database()
+    initialize_keys_database()

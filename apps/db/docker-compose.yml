@@ -11,7 +11,7 @@ services:
     networks:
       - api6
 
-  pg-key:
+  keys:
     image: postgres:16
     container_name: api6_keys
     environment:

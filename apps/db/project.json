@@ -22,9 +22,9 @@
         "command": "poetry run python {projectRoot}/src/db/postgres.py"
       }
     },
-    "init-pg-keys": {
+    "init-keys": {
       "executor": "nx:run-commands",
-      "dependsOn": ["install", "pg-keys-up"],
+      "dependsOn": ["install", "keys-up"],
       "options": {
         "command": "poetry run python {projectRoot}/src/db/pg_keys.py"
       }
@@ -38,7 +38,7 @@
     },
     "seeds": {
       "executor": "nx:run-commands",
-      "dependsOn": ["install", "init-mongo", "init-postgres"],
+      "dependsOn": ["install", "init"],
       "options": {
         "command": "nx run-many -p db -t pg-seeds mongo-seeds"
       }
@@ -74,7 +74,7 @@
     "up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many -p db -t pg-up mongo-up key-up"
+        "command": "nx run-many -p db -t pg-up mongo-up keys-up"
       }
     },
     "down": {
@@ -89,10 +89,10 @@
         "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres --build"
       }
     },
-    "pg-keys-up": {
+    "keys-up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d pg-key --build"
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d keys --build"
       }
     },
     "mongo-up": {
@@ -117,12 +117,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "nx run db:postgres-up"
-      }
-    },
-    "key-up": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run db:pg-keys-up"
       }
     },
     "pg-down": {
