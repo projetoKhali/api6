@@ -12,7 +12,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/main.py"
+        "command": "nx run-many -p db -t init-pg init-mongo init-keys"
       }
     },
     "init-postgres": {
