@@ -15,7 +15,7 @@ pub enum ErrorType {
 pub fn handle_server_error_body<E>(
     generic_text: &str,
     err: E,
-    config: &web::Data<crate::infra::config::Config>,
+    config: &web::Data<crate::infra::types::Config>,
     error_type_option: Option<ErrorType>,
 ) -> HttpResponse
 where
@@ -36,7 +36,7 @@ where
 pub fn handle_server_error_string<E>(
     generic_text: &str,
     err: E,
-    config: &web::Data<crate::infra::config::Config>,
+    config: &web::Data<crate::infra::types::Config>,
 ) -> String
 where
     E: std::error::Error,

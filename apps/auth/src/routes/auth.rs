@@ -155,7 +155,7 @@ pub async fn logout(
         Err(msg) => return HttpResponse::BadRequest().body(msg),
     };
 
-    match revoke_token(token, &cfg.jwt_secret, &keys_client.client).await {
+    match revoke_token(token, &config.jwt_secret, &keys_client.client).await {
         Ok(_) => HttpResponse::Ok().body("Token invalidated"),
         Err(err) => handle_server_error_body("Token Invalidation error", err, &config, None),
     }
