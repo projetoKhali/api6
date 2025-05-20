@@ -67,6 +67,7 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
           padding: '4px 10px',
           borderRadius: '4px',
           cursor: 'pointer',
+          marginTop: '4px',
         }}
       >
         Sair
