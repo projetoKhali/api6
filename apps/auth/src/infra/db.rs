@@ -1,6 +1,6 @@
 use sea_orm::{Database, DatabaseConnection};
 
-use super::config::DatabaseConfig;
+use super::types::DatabaseConfig;
 
 pub async fn create_seaorm_connection(config: &DatabaseConfig) -> DatabaseConnection {
     let db_url = format!(

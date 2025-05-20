@@ -1,9 +1,10 @@
 use actix_web::{web, HttpResponse, Responder};
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QuerySelect};
+use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel, QuerySelect};
 
 use crate::entities::user as user_entity;
+use crate::infra::server::DatabaseClientPostgres;
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -30,9 +31,12 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     tags = ["User"]
 )]
 
-async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) -> impl Responder {
+async fn get_user(
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    user_id: web::Path<i64>,
+) -> impl Responder {
     let result = user_entity::Entity::find_by_id(user_id.into_inner())
-        .one(db.get_ref())
+        .one(&postgres_client.client)
         .await;
 
     match result {
@@ -65,8 +69,8 @@ async fn get_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) ->
 )]
 
 async fn get_users(
-  db: web::Data<DatabaseConnection>,
-  pagination: web::Json<PaginatedRequest>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    pagination: web::Json<PaginatedRequest>,
 ) -> impl Responder {
     let page = pagination.page.unwrap_or(1);
     let limit = pagination.limit.unwrap_or(10);
@@ -75,7 +79,7 @@ async fn get_users(
     let result = user_entity::Entity::find()
         .limit(limit)
         .offset(Some(offset))
-        .all(db.get_ref())
+        .all(&postgres_client.client)
         .await;
 
     match result {
@@ -125,12 +129,12 @@ async fn get_users(
 )]
 
 async fn update_user(
-    db: web::Data<DatabaseConnection>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
     user_id: web::Path<i64>,
     user_update: web::Json<UserUpdate>,
 ) -> impl Responder {
     let existing = user_entity::Entity::find_by_id(*user_id)
-        .one(db.get_ref())
+        .one(&postgres_client.client)
         .await;
 
     match existing {
@@ -169,7 +173,7 @@ async fn update_user(
                 None => NotSet,
             };
 
-            match update_model.update(db.get_ref()).await {
+            match update_model.update(&postgres_client.client).await {
                 Ok(_) => HttpResponse::Ok().finish(),
                 Err(_) => HttpResponse::InternalServerError().finish(),
             }
@@ -192,9 +196,12 @@ async fn update_user(
     tags = ["User"]
 )]
 
-async fn delete_user(db: web::Data<DatabaseConnection>, user_id: web::Path<i64>) -> impl Responder {
+async fn delete_user(
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    user_id: web::Path<i64>,
+) -> impl Responder {
     let result = user_entity::Entity::delete_by_id(user_id.into_inner())
-        .exec(db.get_ref())
+        .exec(&postgres_client.client)
         .await;
 
     match result {
