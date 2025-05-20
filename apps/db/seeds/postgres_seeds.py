@@ -41,37 +41,59 @@ def insert_permissions(session):
 
 def insert_users(session, permissions):
     users = []
-    keys_engine = get_keys_engine()
-    KeysSession = sessionmaker(bind=keys_engine)
-    keys_session = KeysSession()
+    keys_session = sessionmaker(bind=get_keys_engine())()
 
-    # default user for easy login
-    default_password = "$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i"  # "secret"
-    default_key = Fernet.generate_key()
-    fernet = Fernet(default_key)
-    user = User(
-        name=fernet.encrypt("Alice".encode()).decode(),
+    def encrypt_user(
+        fernet: Fernet,
+        user: User,
+    ):
+        return User (
+            name=fernet.encrypt(user.name.encode()).decode(),
+            login=user.login,
+            email=fernet.encrypt(user.email.encode()).decode(),
+            password=fernet.encrypt(user.password.encode()).decode(),
+            version_terms_agreement=fernet.encrypt(user.version_terms_agreement.encode()).decode(),
+            permission_id=user.permission_id
+        )
+
+    def add_user(
+        name: str,
+        login: str,
+        email: str,
+        password: str,
+        version_terms_agreement: str,
+        permission_id: int,
+        disabled_since: datetime | None = None
+    ):
+        key = Fernet.generate_key()
+        fernet = Fernet(key)
+        user = encrypt_user(fernet, User(
+            name=name,
+            login=login,
+            email=email,
+            password=password,
+            version_terms_agreement=version_terms_agreement,
+            permission_id=permission_id,
+            disabled_since=disabled_since,
+        ))
+        users.append(user)
+        session.add(user)
+        session.flush()  # get user.id
+
+        keys_session.add(UserKey(id=user.id, key=key.decode()))
+
+    add_user( # default user for easy login
+        name="Alice",
         login="a",
-        email=fernet.encrypt("alice@mail.com".encode()).decode(),
-        password=fernet.encrypt(default_password.encode()).decode(),
-        version_terms_agreement=fernet.encrypt("v1.0".encode()).decode(),
+        email="alice@mail.com",
+        password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i", # "secret"
+        version_terms_agreement="v1.0",
         permission_id=2
     )
-    users.append(user)
-    session.add(user)
-    session.flush()  # get user.id
-
-    keys_session.add(UserKey(id=user.id, key=default_key.decode()))
 
     for i in range(NUM_USERS):
-        name = fake.name()
-        email = fake.unique.email()
-        login = fake.unique.user_name()
-        permission = random.choice(permissions)
-
-        raw_password = fake.password()
         hashed_password = bcrypt.hashpw(
-            raw_password.encode("utf-8"),
+            fake.password().encode("utf-8"),
             bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
         ).decode("utf-8")
 
@@ -81,23 +103,15 @@ def insert_users(session, permissions):
         else:
             disabled_date = None
 
-        key = Fernet.generate_key()
-        fernet = Fernet(key)
-
-        user = User(
-            name=fernet.encrypt(name.encode()).decode(),
-            email=fernet.encrypt(email.encode()).decode(),
-            login=login,
-            password=fernet.encrypt(hashed_password.encode()).decode(),
-            version_terms_agreement=fernet.encrypt("v1.0".encode()).decode(),
-            permission_id=permission.id,
+        add_user(
+            name = fake.name(),
+            email = fake.unique.email(),
+            login = fake.unique.user_name(),
+            password=hashed_password,
+            version_terms_agreement="v1.0",
+            permission_id = random.choice(permissions).id,
             disabled_since=disabled_date
         )
-        users.append(user)
-        session.add(user)
-        session.flush()  # get user.id
-
-        keys_session.add(UserKey(id=user.id, key=key.decode()))
 
     session.commit()
     keys_session.commit()
