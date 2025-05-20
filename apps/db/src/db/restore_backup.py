@@ -85,7 +85,7 @@ def remove_deleted_users():
         user=DB_USER,
         password=DB_PASSWORD,
         host=DB_HOST,
-        port=os.getenv("DB_KEY_PORT", "5433")
+        port=os.getenv("DB_KEYS_PORT", "5433")
     )
 
     keys_cursor = keys_conn.cursor()

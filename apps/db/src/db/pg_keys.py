@@ -15,11 +15,11 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 def get_keys_engine():
     load_dotenv()
 
-    postgres_user = os.getenv("DB_KEY_USER", "postgres")
-    postgres_password = os.getenv("DB_KEY_PASS", "secret")
-    postgres_host = os.getenv("DB_KEY_HOST", "localhost")
-    postgres_port = os.getenv("DB_KEY_PORT", "5433")
-    postgres_db = os.getenv("DB_KEY_NAME", "api6_keys")
+    postgres_user = os.getenv("DB_KEYS_USER", "postgres")
+    postgres_password = os.getenv("DB_KEYS_PASS", "secret")
+    postgres_host = os.getenv("DB_KEYS_HOST", "localhost")
+    postgres_port = os.getenv("DB_KEYS_PORT", "5433")
+    postgres_db = os.getenv("DB_KEYS_NAME", "api6_keys")
 
     database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
     return create_engine(
