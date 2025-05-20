@@ -39,6 +39,7 @@ impl PresetField {
 }
 
 pub struct DatabasePreset {
+    pub name: String,
     pub db_user: PresetField,
     pub db_pass: PresetField,
     pub db_host: PresetField,
