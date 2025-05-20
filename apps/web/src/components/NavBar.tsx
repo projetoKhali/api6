@@ -1,5 +1,6 @@
 import { logout } from '../service/AuthService';
 import { useNavigate } from 'react-router-dom';
+import { clearLocalStorageData, clearUserIdFromLocalStorage } from '../store/storage';
 
 interface NavbarProps {
   setIsAuthenticated: (auth: boolean) => void;
@@ -12,6 +13,8 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
     try {
       await logout();
       setIsAuthenticated(false);
+      clearUserIdFromLocalStorage();
+      clearLocalStorageData();
       navigate('/login');
     } catch (err) {
       console.error('Erro ao fazer logout:', err);
