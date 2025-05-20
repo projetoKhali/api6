@@ -41,7 +41,7 @@ class UserKey(Base):
         BigInteger,
         primary_key=True
     )
-    key = Column(String, unique=True)
+    key = Column(String, unique=True, nullable=False)
 
 class RevokedToken(Base):
     __tablename__ = "revoked_tokens"
