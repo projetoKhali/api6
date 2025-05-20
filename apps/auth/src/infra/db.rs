@@ -16,7 +16,7 @@ pub async fn create_seaorm_connection(config: &DatabaseConfig) -> DatabaseConnec
 
     match Database::connect(&db_url).await {
         Ok(connection) => {
-            println!("Connected to database at {}", db_url);
+            println!("Successfully connected");
             connection
         },
         Err(err) => {
