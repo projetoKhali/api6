@@ -40,7 +40,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install", "init"],
       "options": {
-        "command": "nx run-many -p db -t pg-seeds mongo-seeds"
+        "command": "nx run-many -p db -t pg-seeds mongo-seeds keys-seeds"
       }
     },
     "postgres-seeds": {
@@ -80,7 +80,7 @@
     "down": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many -p db -t pg-down mongo-down"
+        "command": "nx run-many -p db -t pg-down mongo-down keys-down"
       }
     },
     "postgres-up": {
