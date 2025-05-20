@@ -1,4 +1,10 @@
-export type FieldType = 'text' | 'number' | 'date' | 'select' | 'actions';
+export type FieldType =
+  | 'text'
+  | 'number'
+  | 'date'
+  | 'select'
+  | 'actions'
+  | 'password';
 
 export interface FieldSchema {
   type: FieldType;

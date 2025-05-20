@@ -35,11 +35,11 @@ def insert_permissions(session):
     ]
 
     session.add_all(permissions)
-    print(f"✅ {NUM_PERMISSIONS} permissões criadas.")
+    print(f"{NUM_PERMISSIONS} permissões criadas.")
     return permissions
 
 
-def insert_users(session, permissoes):
+def insert_users(session, permissions):
     users = []
     keys_engine = get_keys_engine()
     KeysSession = sessionmaker(bind=keys_engine)
@@ -54,7 +54,8 @@ def insert_users(session, permissoes):
         login="a",
         email=fernet.encrypt("alice@mail.com".encode()).decode(),
         password=fernet.encrypt(default_password.encode()).decode(),
-        version_terms_agreement=fernet.encrypt("v1".encode()).decode(),
+        version_terms_agreement=fernet.encrypt("v1.0".encode()).decode(),
+        permission_id=2
     )
     users.append(user)
     session.add(user)
@@ -66,7 +67,7 @@ def insert_users(session, permissoes):
         name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        permission = random.choice(permissoes)
+        permission = random.choice(permissions)
 
         raw_password = fake.password()
         hashed_password = bcrypt.hashpw(

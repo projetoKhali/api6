@@ -8,7 +8,8 @@ interface DynamicFormProps {
   onSubmit: (data: Record<string, string>) => void;
 }
 function DynamicForm({ schema, initialValues, onSubmit }: DynamicFormProps) {
-  const [formData, setFormData] = useState<Record<string, string>>(initialValues);
+  const [formData, setFormData] =
+    useState<Record<string, string>>(initialValues);
 
   // Sempre que initialValues mudar, atualizar o estado
   useEffect(() => {
@@ -33,6 +34,7 @@ function DynamicForm({ schema, initialValues, onSubmit }: DynamicFormProps) {
         <div key={field.name}>
           <label>{field.label}</label>
           <input
+            autoComplete={field.type === 'password' ? 'off' : 'on'}
             type={field.type}
             name={field.name}
             value={formData[field.name] || ''}

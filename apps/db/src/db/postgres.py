@@ -39,20 +39,22 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    name = Column(String)
-    email = Column(String, index=True, unique=True)
-    login = Column(String, index=True, unique=True)
-    password = Column(Text)
+    name = Column(String, nullable=False)
+    email = Column(String, index=True, unique=True, nullable=False)
+    login = Column(String, index=True, unique=True, nullable=False)
+    password = Column(Text, nullable=False)
     version_terms_agreement = Column(String)
     disabled_since = Column(Date)
 
-    permission_id = Column(BigInteger, ForeignKey("permissions.id"))
+    permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
+
 
 class Permission(Base):
     __tablename__ = "permissions"
     id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
-    name = Column(String, unique=True)
-    description = Column(Text)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(Text, nullable=False)
+
 
 def create_tables(engine):
     Base.metadata.create_all(engine)
