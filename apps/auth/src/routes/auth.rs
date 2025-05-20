@@ -15,7 +15,16 @@ use sea_orm::{
 };
 
 use crate::{
-    entities::user, infra::server::DatabaseClientPostgres, jwt::*, models::{auth::*, jwt::Claims}
+    entities::user,
+    infra::server::{
+        DatabaseClientKeys,
+        DatabaseClientPostgres, //
+    },
+    jwt::*,
+    models::{
+        auth::*,
+        jwt::Claims, //
+    }, //
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
@@ -123,10 +132,10 @@ pub async fn login(
 
 pub async fn validate_token(
     data: web::Json<ValidateRequest>,
-    postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret, &postgres_client.client).await {
+    match verify_jwt(&data.token, &config.jwt_secret, &keys_client.client).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
         Err(_) => HttpResponse::Unauthorized().body("Invalid token"),
     }
@@ -144,7 +153,7 @@ pub async fn validate_token(
 
 pub async fn logout(
     req: HttpRequest,
-    postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientPostgres>,
     cfg: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
     let token = match extract_bearer(&req) {
@@ -152,7 +161,7 @@ pub async fn logout(
         Err(msg) => return HttpResponse::BadRequest().body(msg),
     };
 
-    if let Err(_) = revoke_token(token, &cfg.jwt_secret, &postgres_client.client).await {
+    if let Err(_) = revoke_token(token, &cfg.jwt_secret, &keys_client.client).await {
         return HttpResponse::InternalServerError().finish();
     }
 
