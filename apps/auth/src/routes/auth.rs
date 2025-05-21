@@ -21,6 +21,7 @@ use crate::{
         DatabaseClientPostgres, //
     },
     service::{
+        fernet::*,
         jwt::*,
     },
     models::{

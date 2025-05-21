@@ -1,20 +1,18 @@
 use actix_web::{web, HttpResponse, Responder};
+use bcrypt::{hash, DEFAULT_COST};
+use fernet::Fernet;
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{
-    ActiveModelTrait,
-    EntityTrait,
-    IntoActiveModel,
-    QuerySelect,
-    PaginatorTrait,
+    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect,
 };
-use bcrypt::{hash, DEFAULT_COST};
 
-use crate::entities::user as user_entity;
-use crate::infra::server::DatabaseClientPostgres;
+use crate::entities::{keys as keys_entity, user as user_entity};
+use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
+use crate::service::fernet::{decrypt_database_user, decrypt_field};
 
-use super::common::{handle_server_error_body, ErrorType};
+use super::common::{handle_server_error_body, CustomError, ServerErrorType};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -35,6 +33,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     request_body = PaginatedRequest,
     responses(
         (status = 200, description = "Users found", body = PaginatedResponse<UserPublic>),
+        (status = 404, description = "Not Found"),
         (status = 400, description = "Invalid pagination parameters"),
         (status = 500, description = "Server error")
     ),
@@ -43,6 +42,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 
 async fn get_users(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     pagination: web::Json<PaginatedRequest>,
 ) -> impl Responder {
@@ -56,42 +56,61 @@ async fn get_users(
         .all(&postgres_client.client)
         .await;
 
-    match result {
-        Ok(users) => {
-            let users: Vec<UserPublic> = users
-                .into_iter()
-                .map(|user| UserPublic {
-                    id: user.id,
-                    name: user.name,
-                    login: user.login,
-                    email: user.email,
-                    version_terms: user.version_terms_agreement,
-                    permission_id: user.permission_id,
-                    disabled_since: match user.disabled_since {
-                        Some(dt) => Some(dt.format("%Y-%m-%d").to_string()),
-                        None => None,
-                    },
-                })
-                .collect();
+    let raw_users = match result {
+        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
+        Ok(raw_users) => raw_users,
+    };
 
-            let total_users = user_entity::Entity::find()
-                .count(&postgres_client.client)
-                .await
-                .unwrap_or(0);
+    let mut users_public = Vec::with_capacity(raw_users.len());
 
-            let total_pages = (total_users as f64 / size as f64).ceil() as u64;
+    for encrypted_user in raw_users {
+        let user_key_result = keys_entity::Entity::find_by_id(encrypted_user.id)
+            .one(&keys_client.client)
+            .await;
 
-            let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
-                total: users.len() as u64,
-                page,
-                total_pages,
-                items: users,
-            };
+        let user_decryption_key = match user_key_result {
+            Err(err) => {
+                return handle_server_error_body(
+                    "Database Error",
+                    err,
+                    &config,
+                    Some(ServerErrorType::InternalServerError),
+                )
+            }
+            Ok(None) => {
+                return handle_server_error_body(
+                    "Database Error",
+                    CustomError::UserKeyNotFound(encrypted_user.id),
+                    &config,
+                    Some(ServerErrorType::NotFound),
+                )
+            }
+            Ok(Some(user_key)) => user_key.key,
+        };
 
-            HttpResponse::Ok().json(users_page)
-        }
-        Err(err) => handle_server_error_body("Database Error", err, &config, None),
+        users_public.push(
+            match decrypt_database_user(&user_decryption_key, encrypted_user) {
+                Ok(decrypted_user) => decrypted_user,
+                Err(err) => return handle_server_error_body("Parse error", err, &config, None),
+            },
+        );
     }
+
+    let total_users = user_entity::Entity::find()
+        .count(&postgres_client.client)
+        .await
+        .unwrap_or(0);
+
+    let total_pages = (total_users as f64 / size as f64).ceil() as u64;
+
+    let users_page: PaginatedResponse<UserPublic> = PaginatedResponse {
+        total: users_public.len() as u64,
+        page,
+        total_pages,
+        items: users_public,
+    };
+
+    HttpResponse::Ok().json(users_page)
 }
 
 #[utoipa::path(
@@ -110,6 +129,7 @@ async fn get_users(
 
 async fn get_user(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
 ) -> impl Responder {
@@ -117,21 +137,49 @@ async fn get_user(
         .one(&postgres_client.client)
         .await;
 
-    match result {
-        Ok(Some(user)) => HttpResponse::Ok().json(UserPublic {
-            id: user.id,
-            name: user.name,
-            login: user.login,
-            email: user.email,
-            version_terms: user.version_terms_agreement,
-            permission_id: user.permission_id,
-            disabled_since: match user.disabled_since {
-                Some(dt) => Some(dt.format("%Y-%m-%d)").to_string()),
-                None => None,
-            },
-        }),
-        Ok(None) => HttpResponse::NotFound().finish(),
-        Err(err) => handle_server_error_body("Database Error", err, &config, None),
+    let encrypted_user = match result {
+        Ok(Some(user)) => user,
+        Ok(None) => {
+            return handle_server_error_body(
+                "Database Error",
+                std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "User not found in `users` table",
+                ),
+                &config,
+                Some(ServerErrorType::NotFound),
+            )
+        }
+        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
+    };
+
+    let user_key_result = keys_entity::Entity::find_by_id(encrypted_user.id)
+        .one(&keys_client.client)
+        .await;
+
+    let user_decryption_key = match user_key_result {
+        Err(err) => {
+            return handle_server_error_body(
+                "Database Error",
+                err,
+                &config,
+                Some(ServerErrorType::InternalServerError),
+            )
+        }
+        Ok(None) => {
+            return handle_server_error_body(
+                "Database Error",
+                CustomError::UserKeyNotFound(encrypted_user.id),
+                &config,
+                Some(ServerErrorType::NotFound),
+            )
+        }
+        Ok(Some(user_key)) => user_key.key,
+    };
+
+    match decrypt_database_user(&user_decryption_key, encrypted_user) {
+        Ok(decrypted_user) => HttpResponse::Ok().json(decrypted_user),
+        Err(err) => return handle_server_error_body("Parse error", err, &config, None),
     }
 }
 
@@ -152,6 +200,7 @@ async fn get_user(
 
 async fn update_user(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
     user_update: web::Json<UserUpdate>,
@@ -173,7 +222,7 @@ async fn update_user(
                                 "Parse error",
                                 err,
                                 &config,
-                                Some(ErrorType::BadRequest),
+                                Some(ServerErrorType::BadRequest),
                             )
                         }
                     },
@@ -235,6 +284,7 @@ async fn update_user(
 
 async fn delete_user(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
 ) -> impl Responder {
