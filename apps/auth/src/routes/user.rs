@@ -306,7 +306,6 @@ async fn update_user(
 
 async fn delete_user(
     postgres_client: web::Data<DatabaseClientPostgres>,
-    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
 ) -> impl Responder {
