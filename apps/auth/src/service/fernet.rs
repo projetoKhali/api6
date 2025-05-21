@@ -24,7 +24,7 @@ pub fn decrypt_database_user(
         login: user.login,
         email: decrypt_field(&fernet, &user.email),
         version_terms: decrypt_field(&fernet, &user.version_terms_agreement),
-        permission_id: decrypt_field(&fernet, &user.permission_id.to_string()).parse()?,
+        permission_id: user.permission_id,
         disabled_since: match user.disabled_since {
             Some(dt) => Some(decrypt_field(&fernet, &dt.format("%Y-%m-%d").to_string())),
             None => None,
