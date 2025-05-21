@@ -1,4 +1,12 @@
 use actix_web::{web, HttpResponse};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum CustomError {
+    /// Missing decryption key for a given user ID
+    #[error("Decryption key not found in `user_key` table for user ID {0}")]
+    UserKeyNotFound(i64),
+}
 
 pub enum ServerErrorType {
     #[allow(dead_code)]
