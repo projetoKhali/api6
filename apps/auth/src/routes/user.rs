@@ -3,14 +3,12 @@ use bcrypt::{hash, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect,
-};
+use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect};
 
 use crate::entities::{keys as keys_entity, user as user_entity};
 use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
-use crate::service::fernet::{decrypt_database_user, decrypt_field};
+use crate::service::fernet::{decrypt_database_user, encrypt_field};
 
 use super::common::{handle_server_error_body, CustomError, ServerErrorType};
 
@@ -209,62 +207,86 @@ async fn update_user(
         .one(&postgres_client.client)
         .await;
 
-    match existing {
-        Ok(Some(model)) => {
-            let mut update_model = model.into_active_model();
+    let mut user_update_model = match existing {
+        Ok(Some(model)) => model.into_active_model(),
+        Ok(None) => return HttpResponse::NotFound().body("User not found"),
+        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
+    };
 
-            update_model.disabled_since = match &user_update.disabled_since {
-                Some(dt) => match dt {
-                    Some(dt) => match Date::parse_from_str(&dt, "%Y-%m-%d") {
-                        Ok(valid_update_date) => Set(Some(valid_update_date.into())),
-                        Err(err) => {
-                            return handle_server_error_body(
-                                "Parse error",
-                                err,
-                                &config,
-                                Some(ServerErrorType::BadRequest),
-                            )
-                        }
-                    },
-                    None => Set(None),
-                },
-                None => NotSet,
-            };
+    let user_key_result = keys_entity::Entity::find_by_id(*user_id)
+        .one(&keys_client.client)
+        .await;
 
-            update_model.name = match user_update.name {
-                Some(ref name) => Set(name.clone()),
-                None => NotSet,
-            };
-            update_model.login = match user_update.login {
-                Some(ref login) => Set(login.clone()),
-                None => NotSet,
-            };
-            update_model.email = match user_update.email {
-                Some(ref email) => Set(email.clone()),
-                None => NotSet,
-            };
-            update_model.version_terms_agreement = match user_update.version_terms {
-                Some(ref version_terms) => Set(version_terms.clone()),
-                None => NotSet,
-            };
-            update_model.permission_id = match user_update.permission_id {
-                Some(permission_id) => Set(permission_id),
-                None => NotSet,
-            };
-            update_model.password = match user_update.password {
-                Some(ref password) => match hash(password, DEFAULT_COST) {
-                    Ok(h) => Set(h),
-                    Err(_) => return HttpResponse::InternalServerError().body("Hashing error"),
-                },
-                None => NotSet,
-            };
-
-            match update_model.update(&postgres_client.client).await {
-                Ok(_) => HttpResponse::Ok().finish(),
-                Err(err) => handle_server_error_body("Database Error", err, &config, None),
-            }
+    let user_decryption_key = match user_key_result {
+        Err(err) => {
+            return handle_server_error_body(
+                "Database Error",
+                err,
+                &config,
+                Some(ServerErrorType::InternalServerError),
+            )
         }
-        Ok(None) => HttpResponse::NotFound().body("User not found"),
+        Ok(None) => {
+            return handle_server_error_body(
+                "Database Error",
+                CustomError::UserKeyNotFound(*user_id),
+                &config,
+                Some(ServerErrorType::NotFound),
+            )
+        }
+        Ok(Some(user_key)) => user_key.key,
+    };
+
+    user_update_model.disabled_since = match &user_update.disabled_since {
+        Some(dt) => match dt {
+            Some(dt) => match Date::parse_from_str(&dt, "%Y-%m-%d") {
+                Ok(valid_update_date) => Set(Some(valid_update_date.into())),
+                Err(err) => {
+                    return handle_server_error_body(
+                        "Parse error",
+                        err,
+                        &config,
+                        Some(ServerErrorType::BadRequest),
+                    )
+                }
+            },
+            None => Set(None),
+        },
+        None => NotSet,
+    };
+
+    let fernet = Fernet::new(&user_decryption_key).unwrap();
+
+    user_update_model.name = match user_update.name {
+        Some(ref name) => Set(encrypt_field(&fernet, &name)),
+        None => NotSet,
+    };
+    user_update_model.login = match user_update.login {
+        Some(ref login) => Set(encrypt_field(&fernet, &login)),
+        None => NotSet,
+    };
+    user_update_model.email = match user_update.email {
+        Some(ref email) => Set(encrypt_field(&fernet, &email)),
+        None => NotSet,
+    };
+    user_update_model.version_terms_agreement = match user_update.version_terms {
+        Some(ref version_terms) => Set(encrypt_field(&fernet, &version_terms)),
+        None => NotSet,
+    };
+    user_update_model.permission_id = match user_update.permission_id {
+        Some(permission_id) => Set(permission_id),
+        None => NotSet,
+    };
+    user_update_model.password = match user_update.password {
+        Some(ref password) => match hash(password, DEFAULT_COST) {
+            Ok(ref hashed_password) => Set(encrypt_field(&fernet, hashed_password)),
+            Err(_) => return HttpResponse::InternalServerError().body("Hashing error"),
+        },
+        None => NotSet,
+    };
+
+    match user_update_model.update(&postgres_client.client).await {
+        Ok(_) => HttpResponse::Ok().finish(),
         Err(err) => handle_server_error_body("Database Error", err, &config, None),
     }
 }
