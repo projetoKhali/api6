@@ -53,7 +53,7 @@ def insert_users(session, permissions):
             email=fernet.encrypt(user.email.encode()).decode(),
             password=fernet.encrypt(user.password.encode()).decode(),
             version_terms_agreement=fernet.encrypt(user.version_terms_agreement.encode()).decode(),
-            permission_id=user.permission_id
+            permission_id=fernet.encrypt(user.permission_id.encode()).decode(),
         )
 
     def add_user(
