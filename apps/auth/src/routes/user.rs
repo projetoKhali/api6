@@ -309,6 +309,9 @@ async fn delete_user(
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
 ) -> impl Responder {
+    // TODO: use `disabled_since` field of `users` table
+    // OR insert user into `deleted_users` table
+
     let result = user_entity::Entity::delete_by_id(user_id.into_inner())
         .exec(&postgres_client.client)
         .await;
