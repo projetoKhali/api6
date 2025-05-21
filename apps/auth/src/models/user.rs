@@ -10,7 +10,7 @@ pub struct UserPublic {
     pub login: String,
     pub email: String,
     pub version_terms: String,
-    pub permission_id: Option<i64>,
+    pub permission_id: i64,
     pub disabled_since: Option<String>,
 }
 
