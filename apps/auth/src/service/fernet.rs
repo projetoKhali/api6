@@ -7,6 +7,11 @@ use crate::{
     models::UserPublic,
 };
 
+pub fn encrypt_field(f: &Fernet, value: &str) -> String {
+    let ciphertext = f.encrypt(value.as_bytes());
+    String::from_utf8(ciphertext.into_bytes()).expect("UTF-8 encode error")
+}
+
 pub fn decrypt_field(f: &Fernet, value: &str) -> String {
     let plaintext = f.decrypt(value).expect("Fernet decryption error");
     String::from_utf8(plaintext).expect("UTF-8 decode error")
