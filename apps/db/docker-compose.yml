@@ -11,6 +11,18 @@ services:
     networks:
       - api6
 
+  keys:
+    image: postgres:16
+    container_name: api6_keys
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: api6_keys
+    ports:
+      - "5433:5432"
+    networks:
+      - api6
+
   mongo:
     image: mongo:latest
     container_name: api6_mongo

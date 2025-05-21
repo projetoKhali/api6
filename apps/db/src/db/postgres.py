@@ -10,10 +10,8 @@ from sqlalchemy import (
     Sequence,
     ForeignKey,
     Date,
-    DateTime,
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
-import datetime
 
 
 def get_engine():
@@ -38,7 +36,6 @@ def get_engine():
 
 Base = declarative_base()
 
-
 class User(Base):
     __tablename__ = "users"
     id = Column(BigInteger, primary_key=True, autoincrement=True)
@@ -52,12 +49,6 @@ class User(Base):
     permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
 
 
-class AuthorizedClient(Base):
-    __tablename__ = "authorized_clients"
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    client_id = Column(String, index=True, unique=True, nullable=False)
-
-
 class Permission(Base):
     __tablename__ = "permissions"
     id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
@@ -65,37 +56,10 @@ class Permission(Base):
     description = Column(Text, nullable=False)
 
 
-class DeletedUser(Base):
-    __tablename__ = "deleted_users"
-    id = Column(BigInteger, primary_key=True)
-    delete_date = Column(Date, default=text("now(, nullable=False)"))
-
-
-class UserKey(Base):
-    __tablename__ = "user_key"
-    id = Column(
-        BigInteger,
-        primary_key=True
-    )
-    key = Column(String, unique=True, nullable=False)
-
-
-class RevokedToken(Base):
-    __tablename__ = "revoked_tokens"
-    jti = Column(String, primary_key=True)
-    revoked_at = Column(
-        DateTime,
-        nullable=False,
-        default=datetime.datetime.utcnow,
-    )
-
-
 def create_tables(engine):
     Base.metadata.create_all(engine)
 
-
 Session = sessionmaker(bind=get_engine())
-
 
 def test_connection(engine):
     try:

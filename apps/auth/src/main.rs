@@ -1,5 +1,5 @@
 mod infra;
-mod jwt;
+mod service;
 
 mod entities;
 mod models;

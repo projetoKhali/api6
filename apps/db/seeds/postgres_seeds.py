@@ -3,12 +3,15 @@ from cryptography.fernet import Fernet
 from faker import Faker
 from datetime import datetime, timedelta
 import random
+from db.keys import (
+    get_keys_engine,
+    UserKey,
+    DeletedUser
+)
 from db.postgres import (
     get_engine,
     test_connection,
     User,
-    UserKey,
-    DeletedUser,
     Permission
 )
 from sqlalchemy.orm import sessionmaker
@@ -37,27 +40,62 @@ def insert_permissions(session):
 
 
 def insert_users(session, permissions):
-    users = [
-        # default user for easy login
-        User(
-            name="Alice",
-            email="alice@mail.com",
-            login="a",
-            password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
-            version_terms_agreement="v1",
-            permission_id=2,
-        )]
+    users = []
+    keys_session = sessionmaker(bind=get_keys_engine())()
+
+    def encrypt_user(
+        fernet: Fernet,
+        user: User,
+    ):
+        return User (
+            name=fernet.encrypt(user.name.encode()).decode(),
+            login=user.login,
+            email=fernet.encrypt(user.email.encode()).decode(),
+            password=fernet.encrypt(user.password.encode()).decode(),
+            version_terms_agreement=fernet.encrypt(user.version_terms_agreement.encode()).decode(),
+            permission_id=user.permission_id
+        )
+
+    def add_user(
+        name: str,
+        login: str,
+        email: str,
+        password: str,
+        version_terms_agreement: str,
+        permission_id: int,
+        disabled_since: datetime | None = None
+    ):
+        key = Fernet.generate_key()
+        fernet = Fernet(key)
+        user = encrypt_user(fernet, User(
+            name=name,
+            login=login,
+            email=email,
+            password=password,
+            version_terms_agreement=version_terms_agreement,
+            permission_id=permission_id,
+            disabled_since=disabled_since,
+        ))
+        users.append(user)
+        session.add(user)
+        session.flush()  # get user.id
+
+        keys_session.add(UserKey(id=user.id, key=key.decode()))
+
+    add_user( # default user for easy login
+        name="Alice",
+        login="a",
+        email="alice@mail.com",
+        password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i", # "secret"
+        version_terms_agreement="v1.0",
+        permission_id=2
+    )
 
     for i in range(NUM_USERS):
-        name = fake.name()
-        email = fake.unique.email()
-        login = fake.unique.user_name()
-        permission = random.choice(permissions)
-
         hashed_password = bcrypt.hashpw(
             fake.password().encode("utf-8"),
             bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
-        )
+        ).decode("utf-8")
 
         # Decide se o usuário será soft-deletado
         if i < NUM_SOFT_DELETED:
@@ -65,30 +103,21 @@ def insert_users(session, permissions):
         else:
             disabled_date = None
 
-        user = User(
-            name=name,
-            email=email,
-            login=login,
-            password=hashed_password.decode("utf-8"),
+        add_user(
+            name = fake.name(),
+            email = fake.unique.email(),
+            login = fake.unique.user_name(),
+            password=hashed_password,
             version_terms_agreement="v1.0",
-            permission_id=permission.id,
+            permission_id = random.choice(permissions).id,
             disabled_since=disabled_date
         )
-        users.append(user)
-
-    session.add_all(users)
-    print(f"{NUM_USERS} usuários inseridos.")
-
-    # Gera chaves para cada usuário
-    keys = [UserKey(
-        id=user.id,
-        key=Fernet.generate_key().decode()
-    ) for user in users]
-
-    session.add_all(keys)
-    print(f"{NUM_USERS} chaves de usuário inseridas.")
 
     session.commit()
+    keys_session.commit()
+    print(f"{NUM_USERS} usuários inseridos e encriptados.")
+    print(f"{NUM_USERS + 1} chaves de usuário inseridas na base de chaves.")
+
     return users
 
 

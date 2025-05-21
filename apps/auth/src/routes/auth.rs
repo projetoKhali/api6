@@ -8,7 +8,6 @@ use bcrypt::{hash, verify, DEFAULT_COST};
 use sea_orm::{
     ActiveModelTrait, //
     ColumnTrait,
-    DatabaseConnection,
     EntityTrait,
     NotSet,
     QueryFilter,
@@ -17,8 +16,18 @@ use sea_orm::{
 
 use crate::{
     entities::user,
-    jwt::*,
-    models::{auth::*, jwt::Claims},
+    infra::server::{
+        DatabaseClientKeys,
+        DatabaseClientPostgres, //
+    },
+    service::{
+        fernet::*,
+        jwt::*,
+    },
+    models::{
+        auth::*,
+        jwt::Claims, //
+    }, //
 };
 
 use super::common::{handle_server_error_body, handle_server_error_string};
@@ -45,8 +54,8 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 )]
 
 pub async fn register(
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    config: web::Data<crate::infra::types::Config>,
     data: web::Json<RegisterRequest>,
 ) -> impl Responder {
     let hashed = match hash(&data.password, DEFAULT_COST) {
@@ -65,7 +74,7 @@ pub async fn register(
         disabled_since: NotSet,
     };
 
-    match new_user.insert(db.get_ref()).await {
+    match new_user.insert(&postgres_client.client).await {
         Ok(_) => HttpResponse::Ok().body("User registered"),
         Err(err) => handle_server_error_body("Failed to register user: {:?}", err, &config, None),
     }
@@ -84,13 +93,13 @@ pub async fn register(
 )]
 
 pub async fn login(
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    config: web::Data<crate::infra::types::Config>,
     data: web::Json<LoginRequest>,
 ) -> impl Responder {
     let user_result = user::Entity::find()
         .filter(user::Column::Login.eq(data.login.clone()))
-        .one(db.get_ref())
+        .one(&postgres_client.client)
         .await;
 
     match user_result {
@@ -120,10 +129,10 @@ pub async fn login(
 
 pub async fn validate_token(
     data: web::Json<ValidateRequest>,
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    keys_client: web::Data<DatabaseClientKeys>,
+    config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret, db.get_ref()).await {
+    match verify_jwt(&data.token, &config.jwt_secret, &keys_client.client).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
         Err(err) => handle_server_error_body("Invalid token", err, &config, None),
     }
@@ -141,15 +150,15 @@ pub async fn validate_token(
 
 pub async fn logout(
     req: HttpRequest,
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    keys_client: web::Data<DatabaseClientPostgres>,
+    config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
     let token = match extract_bearer(&req) {
         Ok(t) => t,
         Err(msg) => return HttpResponse::BadRequest().body(msg),
     };
 
-    match revoke_token(token, &config.jwt_secret, db.get_ref()).await {
+    match revoke_token(token, &config.jwt_secret, &keys_client.client).await {
         Ok(_) => HttpResponse::Ok().body("Token invalidated"),
         Err(err) => handle_server_error_body("Token Invalidation error", err, &config, None),
     }
