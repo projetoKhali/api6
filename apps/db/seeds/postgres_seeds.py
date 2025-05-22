@@ -9,7 +9,8 @@ from db.postgres import (
     User,
     UserKey,
     DeletedUser,
-    Permission
+    Permission,
+    Role
 )
 from sqlalchemy.orm import sessionmaker
 
@@ -26,44 +27,69 @@ NUM_HARD_DELETED = 0
 
 
 def insert_permissions(session):
+    permission_names = ["dashboard", "register", "analitic", "terms"]
     permissions = [
-        Permission(name=f"perm_{i}", description=fake.sentence())
-        for i in range(NUM_PERMISSIONS)
+        Permission(name=name, description=fake.sentence())
+        for name in permission_names
     ]
 
     session.add_all(permissions)
-    print(f"{NUM_PERMISSIONS} permissões criadas.")
+    session.commit()
+    print(f"{len(permissions)} permissões criadas: {', '.join(permission_names)}.")
     return permissions
 
 
-def insert_users(session, permissions):
+def insert_roles(session, permissions):
+    permission_dict = {perm.name: perm for perm in permissions}
+
+    # ADM - todas as permissões
+    adm_role = Role(
+        name="adm",
+        description="Administrador com acesso total",
+        permissions=list(permissions)
+    )
+
+    # Agent - apenas algumas permissões
+    agent_role = Role(
+        name="agent",
+        description="Agente com permissões limitadas",
+        permissions=[
+            permission_dict["dashboard"],
+            permission_dict["analitic"],
+            permission_dict["terms"]
+        ]
+    )
+
+    roles = [adm_role, agent_role]
+    session.add_all(roles)
+    session.commit()
+
+    print("Roles criadas: adm (todas permissões), agent (dashboard, analitic, terms).")
+    return roles
+
+def insert_users(session, roles):
     users = [
-        # default user for easy login
         User(
             name="Alice",
             email="alice@mail.com",
             login="a",
-            password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",  # "secret"
+            password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",
             version_terms_agreement="v1",
-            permission_id=2,
-        )]
+            role_id=roles[0].id
+        )
+    ]
 
     for i in range(NUM_USERS):
         name = fake.name()
         email = fake.unique.email()
         login = fake.unique.user_name()
-        permission = random.choice(permissions)
-
+        role = random.choice(roles)
         hashed_password = bcrypt.hashpw(
             fake.password().encode("utf-8"),
             bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
         )
 
-        # Decide se o usuário será soft-deletado
-        if i < NUM_SOFT_DELETED:
-            disabled_date = datetime.now() - timedelta(days=random.randint(31, 365))
-        else:
-            disabled_date = None
+        disabled_date = datetime.now() - timedelta(days=random.randint(31, 365)) if i < NUM_SOFT_DELETED else None
 
         user = User(
             name=name,
@@ -71,7 +97,7 @@ def insert_users(session, permissions):
             login=login,
             password=hashed_password.decode("utf-8"),
             version_terms_agreement="v1.0",
-            permission_id=permission.id,
+            role_id=role.id,
             disabled_since=disabled_date
         )
         users.append(user)
@@ -79,17 +105,14 @@ def insert_users(session, permissions):
     session.add_all(users)
     print(f"{NUM_USERS} usuários inseridos.")
 
-    # Gera chaves para cada usuário
-    keys = [UserKey(
-        id=user.id,
-        key=Fernet.generate_key().decode()
-    ) for user in users]
-
+    # Gera chaves
+    keys = [UserKey(id=user.id, key=Fernet.generate_key().decode()) for user in users]
     session.add_all(keys)
     print(f"{NUM_USERS} chaves de usuário inseridas.")
 
     session.commit()
     return users
+
 
 
 def insert_deleted_users(session, users):
@@ -109,19 +132,15 @@ def insert_deleted_users(session, users):
 
 def insert_seeds():
     engine = get_engine()
-
     test_connection(engine)
-
     session = sessionmaker(bind=engine)()
 
     print("Iniciando seeds...")
+
     permissions = insert_permissions(session)
-
-    users = insert_users(session, permissions)
-
+    roles = insert_roles(session, permissions)
+    users = insert_users(session, roles)
     insert_deleted_users(session, users)
-
-    session.commit()
 
     print("Seed finalizada com sucesso.")
 
