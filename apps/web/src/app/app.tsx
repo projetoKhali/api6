@@ -18,6 +18,8 @@ import ProjectionCostumPage from '../pages/ProjectionCostumPage';
 import { useEffect, useState } from 'react';
 import ReportPage from '../pages/ReportPage';
 import { isUserLoggedIn } from '../store/storage';
+import TermsPage from '../pages/Terms';
+import TermsModal from '../pages/TermsModal';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -66,6 +68,10 @@ function App() {
                           <Route path="event" element={<EventsRegister />} />
                         </Route>
                         <Route path='/user-data' element={<UserInformation userId={getUserIdFromLocalStorage()} />} />
+                        <Route path="/terms" element={<TermsPage />} />
+                        <Route path="/terms-acceptance" element={<TermsModal onAccept={function (newsletterOptIn: boolean): void {
+                          throw new Error('Function not implemented.');
+                        }} />} />
                       </Routes>
                     </div>
                   </>
