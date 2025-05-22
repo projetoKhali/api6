@@ -8,14 +8,15 @@ from api.service.dashboard_service import (
 
 def create_blueprint(db):
     dashboard_blueprint = Blueprint(
-        'yield_dashboard', __name__, url_prefix="/api")
+        'dashboard', __name__, url_prefix="/dashboard")
 
-    @dashboard_blueprint.route("/get_yield_data", methods=["POST", "OPTIONS"])
+    @dashboard_blueprint.route('/', methods=['OPTIONS'])
+    def options():
+        return '', 200
+
+    @dashboard_blueprint.route("/", methods=["POST"])
     @require_auth
     def get_yield_data():
-        if request.method == "OPTIONS":
-            return _build_cors_preflight_response()
-
         if not request.is_json:
             return jsonify({"error": "O corpo da requisição deve ser JSON"}), 400
 
@@ -53,7 +54,7 @@ def create_blueprint(db):
                 "crops_totals": crops_totals
             })
 
-            return _corsify_actual_response(response), 200
+            return response, 200
 
         except ValueError as e:
             return jsonify({
@@ -66,7 +67,7 @@ def create_blueprint(db):
                 "details": str(e)
             }), 500
 
-    @dashboard_blueprint.route("/get_filters", methods=["GET", "OPTIONS"])
+    @dashboard_blueprint.route("/filters", methods=["GET"])
     @require_auth
     def get_filters():
         crop_years, seasons, crops, states = get_filter()
@@ -76,18 +77,5 @@ def create_blueprint(db):
             "crops": crops,
             "states": states
         })
-
-    def _build_cors_preflight_response():
-        response = jsonify()
-        response.status_code = 204
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "*")
-        response.headers.add(
-            "Access-Control-Allow-Methods", "POST, OPTIONS, GET")
-        return response
-
-    def _corsify_actual_response(response):
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
 
     return dashboard_blueprint

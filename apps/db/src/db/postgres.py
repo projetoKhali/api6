@@ -42,27 +42,33 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    name = Column(String)
-    email = Column(String, index=True, unique=True)
-    login = Column(String, index=True, unique=True)
-    password = Column(Text)
+    name = Column(String, nullable=False)
+    email = Column(String, index=True, unique=True, nullable=False)
+    login = Column(String, index=True, unique=True, nullable=False)
+    password = Column(Text, nullable=False)
     version_terms_agreement = Column(String)
     disabled_since = Column(Date)
 
-    permission_id = Column(BigInteger, ForeignKey("permissions.id"))
+    permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
+
+
+class AuthorizedClient(Base):
+    __tablename__ = "authorized_clients"
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    client_id = Column(String, index=True, unique=True, nullable=False)
 
 
 class Permission(Base):
     __tablename__ = "permissions"
     id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
-    name = Column(String, unique=True)
-    description = Column(Text)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(Text, nullable=False)
 
 
 class DeletedUser(Base):
     __tablename__ = "deleted_users"
     id = Column(BigInteger, primary_key=True)
-    delete_date = Column(Date, default=text("now()"))
+    delete_date = Column(Date, default=text("now(, nullable=False)"))
 
 
 class UserKey(Base):
@@ -71,7 +77,7 @@ class UserKey(Base):
         BigInteger,
         primary_key=True
     )
-    key = Column(String, unique=True)
+    key = Column(String, unique=True, nullable=False)
 
 
 class RevokedToken(Base):
@@ -80,7 +86,7 @@ class RevokedToken(Base):
     revoked_at = Column(
         DateTime,
         nullable=False,
-        default=datetime.datetime.utcnow
+        default=datetime.datetime.utcnow,
     )
 
 

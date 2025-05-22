@@ -11,16 +11,20 @@ import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
+import UserInformation from '../pages/PersonalData';
+import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
 import ProjectionCostumPage from '../pages/ProjectionCostumPage';
-import { getUserFromLocalStorage } from '../store/UserStorage';
-import { useState } from 'react';
-import Terms from '../pages/Terms';
+import { useEffect, useState } from 'react';
+import ReportPage from '../pages/ReportPage';
+import { isUserLoggedIn } from '../store/storage';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    getUserFromLocalStorage() !== null
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  useEffect(() => {
+    isUserLoggedIn().then((result) => setIsAuthenticated(result));
+  }, []);
 
   return (
     <Router>
@@ -33,7 +37,7 @@ function App() {
                 element={
                   <>
                     <div style={{ width: '100%', backgroundColor: '#026734' }}>
-                      <Navbar />
+                      <Navbar setIsAuthenticated={setIsAuthenticated} />
                     </div>
                     <div style={{ height: '100%', width: '100%' }}>
                       <Routes>
@@ -56,11 +60,12 @@ function App() {
                           path="/register"
                           element={<Navigate to="/register/yield" replace />}
                         />
+                        <Route path="/report" element={<ReportPage />} />
                         <Route path="/register">
                           <Route path="yield" element={<YieldRegister />} />
                           <Route path="event" element={<EventsRegister />} />
                         </Route>
-                        <Route path="/terms" element={<Terms />} />
+                        <Route path='/user-data' element={<UserInformation userId={getUserIdFromLocalStorage()} />} />
                       </Routes>
                     </div>
                   </>
@@ -69,9 +74,10 @@ function App() {
             </Routes>
           ) : (
             <Routes>
-              <Route path="/login" element={<Login
-                setIsAuthenticated={setIsAuthenticated}
-              />} />
+              <Route
+                path="/login"
+                element={<Login setIsAuthenticated={setIsAuthenticated} />}
+              />
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           )}
