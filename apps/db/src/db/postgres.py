@@ -70,10 +70,7 @@ class User(Base):
     password = Column(Text, nullable=False)
     version_terms_agreement = Column(String)
     disabled_since = Column(Date)
-
-    permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
     role_id = Column(BigInteger, ForeignKey("roles.id"), nullable=False)
-
     role = relationship("Role", back_populates="users")
 
 class AuthorizedClient(Base):

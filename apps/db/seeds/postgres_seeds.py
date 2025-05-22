@@ -27,30 +27,44 @@ NUM_HARD_DELETED = 0
 
 
 def insert_permissions(session):
+    permission_names = ["dashboard", "register", "analitic", "terms"]
     permissions = [
-        Permission(name=f"perm_{i}", description=fake.sentence())
-        for i in range(NUM_PERMISSIONS)
+        Permission(name=name, description=fake.sentence())
+        for name in permission_names
     ]
 
     session.add_all(permissions)
-    print(f"{NUM_PERMISSIONS} permissões criadas.")
+    session.commit()
+    print(f"{len(permissions)} permissões criadas: {', '.join(permission_names)}.")
     return permissions
 
+
 def insert_roles(session, permissions):
-    roles = []
+    permission_dict = {perm.name: perm for perm in permissions}
 
-    for i in range(3):  # 3 tipos de roles arbitrárias
-        selected_permissions = random.sample(permissions, k=random.randint(1, len(permissions)))
-        role = Role(
-            name=f"role_{i}",
-            description=f"Descrição da role_{i}",
-            permissions=selected_permissions  # relacionamento many-to-many
-        )
-        roles.append(role)
+    # ADM - todas as permissões
+    adm_role = Role(
+        name="adm",
+        description="Administrador com acesso total",
+        permissions=list(permissions)
+    )
 
+    # Agent - apenas algumas permissões
+    agent_role = Role(
+        name="agent",
+        description="Agente com permissões limitadas",
+        permissions=[
+            permission_dict["dashboard"],
+            permission_dict["analitic"],
+            permission_dict["terms"]
+        ]
+    )
+
+    roles = [adm_role, agent_role]
     session.add_all(roles)
     session.commit()
-    print(f"{len(roles)} roles criadas com permissões.")
+
+    print("Roles criadas: adm (todas permissões), agent (dashboard, analitic, terms).")
     return roles
 
 def insert_users(session, roles):
@@ -61,8 +75,7 @@ def insert_users(session, roles):
             login="a",
             password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i",
             version_terms_agreement="v1",
-            role_id=roles[0].id,
-            permission_id=roles[0].permissions[0].id
+            role_id=roles[0].id
         )
     ]
 
@@ -71,8 +84,6 @@ def insert_users(session, roles):
         email = fake.unique.email()
         login = fake.unique.user_name()
         role = random.choice(roles)
-        permission = random.choice(role.permissions)
-
         hashed_password = bcrypt.hashpw(
             fake.password().encode("utf-8"),
             bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
@@ -86,7 +97,6 @@ def insert_users(session, roles):
             login=login,
             password=hashed_password.decode("utf-8"),
             version_terms_agreement="v1.0",
-            permission_id=permission.id,
             role_id=role.id,
             disabled_since=disabled_date
         )
