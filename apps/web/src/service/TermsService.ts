@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   CreateTermRequest,
   NewTermVersionRequest,
@@ -9,48 +8,91 @@ import {
   TermResponse,
 } from '../schemas/TermsSchema';
 
-const API_BASE_URL = '/terms';
+import {
+  processGET,
+  processPOST,
+  processRequest,
+  API_BASE_URL } from './service';
+  
+const TERMS_BASE_PATH = '/terms';
 
 export class TermsService {
-  // 1. Criar novo termo
   static async createTerm(data: CreateTermRequest): Promise<TermResponse> {
-    const response = await axios.post(`${API_BASE_URL}/new`, data);
-    return response.data;
+    return await processPOST({
+      path: `${TERMS_BASE_PATH}/new`,
+      body: data,
+    });
   }
 
-  // 2. Listar todos os termos
   static async listTerms(): Promise<TermResponse[]> {
-    const response = await axios.get(API_BASE_URL);
-    return response.data;
+    return await processGET({
+      path: TERMS_BASE_PATH,
+    });
   }
 
-  // 3. Aceitação do usuário
   static async acceptTerms(data: UserAcceptanceRequest): Promise<{ success: boolean }> {
-    const response = await axios.post(`${API_BASE_URL}/user/accept`, data);
-    return response.data;
+    return await processPOST({
+      path: `${TERMS_BASE_PATH}/user/accept`,
+      body: data,
+    });
   }
 
-  // 4. Obter termo ativo
   static async getActiveTerm(): Promise<ActiveTermResponse> {
-    const response = await axios.get(`${API_BASE_URL}/active`);
-    return response.data;
+    return await processGET({
+      path: `${TERMS_BASE_PATH}/active`,
+    });
   }
 
-  // 5. Criar nova versão
   static async createNewVersion(data: NewTermVersionRequest): Promise<TermResponse> {
-    const response = await axios.post(`${API_BASE_URL}/new-version`, data);
-    return response.data;
+    return await processPOST({
+      path: `${TERMS_BASE_PATH}/new-version`,
+      body: data,
+    });
   }
 
-  // 6. Atualizar aceitação
-  static async updateUserAcceptance(userId: string, data: UpdateAcceptanceRequest): Promise<{ success: boolean }> {
-    const response = await axios.put(`${API_BASE_URL}/user/update/${userId}`, data);
-    return response.data;
-  }
+  // static async updateUserAcceptance(userId: string, data: UpdateAcceptanceRequest): Promise<{ success: boolean }> {
+  //   return await processRequest<'PUT', { success: boolean }>('PUT', {
+  //     path: `${TERMS_BASE_PATH}/user/update/${userId}`,
+  //     body: data,
+  //   });
+  // }
 
-  // 7. Verificar conformidade
   static async checkCompliance(userId: string): Promise<ComplianceResponse> {
-    const response = await axios.get(`${API_BASE_URL}/user/compliance/${userId}`);
-    return response.data;
+    return await processGET({
+      path: `${TERMS_BASE_PATH}/user/compliance/${userId}`,
+    });
+  }
+
+  static async hasUserAcceptedTerms(userId: string): Promise<boolean> {
+    try {
+      const response = await processGET<{ 
+        _id: string; 
+        topics: { accepted: boolean; description: string; status: string }[]; 
+        user_id: string; 
+      }>({
+        path: `${TERMS_BASE_PATH}/user/${userId}`,
+      });
+
+      if (!response || !response.topics || response.topics.length === 0) {
+        // Sem dados, retorna false
+        return false;
+      }
+
+      // Se algum termo ativo não foi aceito, retorna false
+      const hasRejectedActiveTerm = response.topics.some(
+        (topic) => topic.status === 'ativo' && topic.accepted === false
+      );
+
+      if (hasRejectedActiveTerm) {
+        return false;
+      }
+
+      // Caso contrário, todos os termos ativos estão aceitos, retorna true
+      return true;
+    } catch (error) {
+      // Caso de erro na requisição, considera que usuário não aceitou
+      return false;
+    }
   }
 }
+

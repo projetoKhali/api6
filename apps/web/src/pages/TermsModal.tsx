@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+// Ajuste o import conforme a exportação real do TermsService
+import { TermsService } from '../service/TermsService';
+import { AcceptedTopic } from '../schemas/TermsSchema';
 
 interface TermsModalProps {
     onAccept: (newsletterOptIn: boolean) => void;
@@ -14,7 +17,33 @@ const TermsModal: React.FC<TermsModalProps> = ({
 }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [newsletterOptIn, setNewsletterOptIn] = useState(initialNewsletterOptIn);
+    const [termsText, setTermsText] = useState<string>('');
     const navigate = useNavigate();
+    const [termTopics, setTermTopics] = useState<AcceptedTopic[]>([]);
+
+
+    useEffect(() => {
+        const fetchActiveTerm = async () => {
+            try {
+                const term = await TermsService.getActiveTerm();
+                console.log('Termo ativo:', term);
+                setTermsText(term.text);
+
+                // Inicializa os tópicos para controle de aceite do usuário
+                const initialTopics: AcceptedTopic[] = term.topics.map(topic => ({
+                    description: topic.description,
+                    status: topic.status,
+                    accepted: false, // inicia não aceito
+                }));
+                setTermTopics(initialTopics);
+
+            } catch (error) {
+                console.error('Erro ao buscar os termos ativos:', error);
+            }
+        };
+        fetchActiveTerm();
+    }, []);
+
 
     const handleAccept = () => {
         if (isChecked) {
@@ -58,94 +87,49 @@ const TermsModal: React.FC<TermsModalProps> = ({
                     overflowY: 'auto',
                     paddingRight: '10px'
                 }}>
-                    <p>
-                        Bem-vindo à plataforma Kersys. Antes de continuar, por favor leia e concorde com nossos Termos e Condições.
-                    </p>
+                    {termsText ? (
+                        <div dangerouslySetInnerHTML={{ __html: termsText }} />
+                    ) : (
+                        <p>Carregando termos...</p>
+                    )}
 
-                    {/* Conteúdo resumido dos termos */}
-                    <p style={{ marginTop: '15px' }}>
-                        <strong>1. Aceitação dos Termos:</strong> Ao utilizar nossa plataforma, você concorda com estes termos.
-                    </p>
-                    <p>
-                        <strong>2. Uso Adequado:</strong> Você concorda em utilizar a plataforma apenas para fins legais.
-                    </p>
-                    <p>
-                        <strong>3. Privacidade:</strong> Respeitamos sua privacidade conforme nossa Política de Privacidade.
-                    </p>
-                    <p>
-                        <strong>4. Comunicações Opcionais:</strong> Você pode optar por receber newsletters e atualizações.
-                    </p>
-                    <p>
-                        <strong>5. Alterações:</strong> Você pode rever ou revogar seu aceite a qualquer momento.
-                    </p>
-
-                    <p style={{ marginTop: '15px', fontStyle: 'italic' }}>
-                        Para ler os Termos completos, <a
-                            href="/terms"
-                            style={{ color: '#026734', fontWeight: 'bold' }}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate('/terms');
-                            }}
-                        >clique aqui</a>.
-                    </p>
                 </div>
 
-                {/* Opção de Newsletter */}
-                <div style={{
-                    margin: '20px 0',
-                    padding: '15px',
-                    backgroundColor: 'rgba(0,100,50,0.05)',
-                    borderRadius: '4px'
-                }}>
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        marginBottom: '10px'
-                    }}>
-                        <input
-                            type="checkbox"
-                            checked={newsletterOptIn}
-                            onChange={(e) => setNewsletterOptIn(e.target.checked)}
-                            style={{
-                                marginRight: '10px',
-                                width: '18px',
-                                height: '18px',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        <span>Desejo receber newsletters e atualizações por e-mail (opcional)</span>
-                    </label>
-                </div>
-
-                {/* Aceite Obrigatório */}
                 <div style={{
                     margin: '20px 0',
                     padding: '15px',
                     backgroundColor: 'rgba(0,100,50,0.1)',
                     borderRadius: '4px'
                 }}>
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        cursor: 'pointer'
-                    }}>
-                        <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={(e) => setIsChecked(e.target.checked)}
-                            style={{
-                                marginRight: '10px',
-                                width: '18px',
-                                height: '18px',
-                                cursor: 'pointer'
-                            }}
-                        />
-                        <span style={{ fontWeight: 'bold' }}>
-                            Eu li e concordo com os Termos e Condições de Uso (obrigatório)
-                        </span>
-                    </label>
+                    <h3>Concordância com os tópicos:</h3>
+                    {termTopics.map((topic, index) => (
+                        <label key={index} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            marginBottom: '10px'
+                        }}>
+                            <input
+                                type="checkbox"
+                                checked={topic.accepted}
+                                onChange={() => {
+                                    const newTopics = [...termTopics];
+                                    newTopics[index].accepted = !newTopics[index].accepted;
+                                    setTermTopics(newTopics);
+                                }}
+                                style={{
+                                    marginRight: '10px',
+                                    width: '18px',
+                                    height: '18px',
+                                    cursor: 'pointer'
+                                }}
+                                disabled={!topic} // bloqueia checkbox se for obrigatório? Ou deixa liberado? (opcional)
+                            />
+                            <span style={{ fontWeight: topic ? 'bold' : 'normal' }}>
+                                {topic.description} {topic ? '(Obrigatório)' : '(Opcional)'}
+                            </span>
+                        </label>
+                    ))}
                 </div>
 
                 <div style={{
