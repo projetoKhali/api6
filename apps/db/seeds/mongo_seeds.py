@@ -140,5 +140,6 @@ def seed_user_acceptance():
 
 
 if __name__ == "__main__":
+    seed_populate(df)
     seed_terms_of_use()
     seed_user_acceptance()
