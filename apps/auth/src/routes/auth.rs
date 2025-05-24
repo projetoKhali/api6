@@ -20,7 +20,10 @@ use crate::{
         DatabaseClientKeys,
         DatabaseClientPostgres, //
     },
-    jwt::*,
+    service::{
+        fernet::*,
+        jwt::*,
+    },
     models::{
         auth::*,
         jwt::Claims, //

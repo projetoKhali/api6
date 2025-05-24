@@ -9,7 +9,7 @@ pub struct RegisterRequest {
     pub email: String,
     pub password: String,
     pub version_terms: String,
-    pub permission_id: Option<i64>,
+    pub permission_id: i64,
 }
 
 #[derive(Deserialize, ToSchema)]

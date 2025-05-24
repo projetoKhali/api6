@@ -1,6 +1,14 @@
 use actix_web::{web, HttpResponse};
+use thiserror::Error;
 
-pub enum ErrorType {
+#[derive(Debug, Error)]
+pub enum CustomError {
+    /// Missing decryption key for a given user ID
+    #[error("Decryption key not found in `user_key` table for user ID {0}")]
+    UserKeyNotFound(i64),
+}
+
+pub enum ServerErrorType {
     #[allow(dead_code)]
     NotFound,
     BadRequest,
@@ -16,17 +24,17 @@ pub fn handle_server_error_body<E>(
     generic_text: &str,
     err: E,
     config: &web::Data<crate::infra::types::Config>,
-    error_type_option: Option<ErrorType>,
+    error_type_option: Option<ServerErrorType>,
 ) -> HttpResponse
 where
     E: std::error::Error,
 {
     let mut response = match error_type_option {
-        Some(ErrorType::BadRequest) => HttpResponse::BadRequest(),
-        Some(ErrorType::NotFound) => HttpResponse::NotFound(),
-        Some(ErrorType::Unauthorized) => HttpResponse::Unauthorized(),
-        Some(ErrorType::Forbidden) => HttpResponse::Forbidden(),
-        Some(ErrorType::InternalServerError) => HttpResponse::InternalServerError(),
+        Some(ServerErrorType::BadRequest) => HttpResponse::BadRequest(),
+        Some(ServerErrorType::NotFound) => HttpResponse::NotFound(),
+        Some(ServerErrorType::Unauthorized) => HttpResponse::Unauthorized(),
+        Some(ServerErrorType::Forbidden) => HttpResponse::Forbidden(),
+        Some(ServerErrorType::InternalServerError) => HttpResponse::InternalServerError(),
         None => HttpResponse::InternalServerError(),
     };
 
