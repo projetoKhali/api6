@@ -97,6 +97,48 @@ def seed_populate(df):
     except Exception as e:
         raise Exception("Erro ao popular banco de dados:", e) from e
 
+def seed_terms_of_use():
+    terms = {
+        "text": "Estes são os termos de uso padrão da aplicação...",
+        "status": "ativo",
+        "version": "1.0.0",
+        "topics": [
+            {
+                "description": "Privacidade de dados",
+                "status": "ativo",
+                "required": True
+            },
+            {
+                "description": "Compartilhamento com terceiros",
+                "status": "ativo",
+                "required": False
+            },
+        ]
+    }
+    db.terms_of_use_collection.insert_one(terms)
+    print("Seed: Termos de uso inseridos.")
+
+
+def seed_user_acceptance():
+    user_acceptance = {
+        "user_id": "user123",
+        "topics": [
+            {
+                "description": "Privacidade de dados",
+                "status": "ativo",
+                "accepted": True
+            },
+            {
+                "description": "Compartilhamento com terceiros",
+                "status": "ativo",
+                "accepted": False
+            },
+        ]
+    }
+    db.user_acceptance_collection.insert_one(user_acceptance)
+    print("Seed: Aceite do usuário inserido.")
+
 
 if __name__ == "__main__":
-    seed_populate(df)
+    seed_terms_of_use()
+    seed_user_acceptance()
