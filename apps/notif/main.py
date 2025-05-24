@@ -52,7 +52,7 @@ def filter_users(session, filters):
                 'id': user.id,
                 'name': decrypt(user.name, key),
                 'email': decrypt(user.email, key),
-                'login': user.login,  # Não está criptografado no seu modelo
+                'login': user.login,
                 'permission_id': user.permission_id,
                 'disabled_since': user.disabled_since
             })
@@ -60,7 +60,6 @@ def filter_users(session, filters):
             print(f"Erro ao descriptografar dados do usuário ID {user.id}: {e}")
             continue
 
-    # Aplicar filtros
     filtered_users = []
     for user in decrypted_users:
         skip = False
