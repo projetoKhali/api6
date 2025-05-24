@@ -3,6 +3,7 @@ import DynamicForm from '../components/FormsComponent';
 import { FieldSchema } from '../schemas/FormsSchema';
 import { getUser, updateUser } from '../service/UserService';
 import { NewUser, User } from '../schemas/UserSchema';
+import { useNavigate } from 'react-router-dom'; // Importe o useNavigate
 
 const editFormSchema: FieldSchema[] = [
     { name: 'name', label: 'Nome Completo', type: 'text' },
@@ -15,6 +16,7 @@ const editFormSchema: FieldSchema[] = [
 const EditUserPage = ({ userId }: { userId: number }) => {
     const [currentUser, setCurrentUser] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate(); // Hook para navegação
 
     const loadUser = async () => {
         setIsLoading(true);
@@ -62,6 +64,10 @@ const EditUserPage = ({ userId }: { userId: number }) => {
         loadUser();
     };
 
+    const handleTermsClick = () => {
+        navigate('/terms-acceptance');
+    };
+
     return (
         <div
             className="edit-user-container"
@@ -86,6 +92,18 @@ const EditUserPage = ({ userId }: { userId: number }) => {
                         initialValues={currentUser}
                         onSubmit={handleEditSubmit}
                     />
+                    {/* Botão para termos de aceitação */}
+                    <button
+                        onClick={handleTermsClick}
+                        style={{
+                            padding: '10px 20px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            marginTop: '20px'
+                        }}
+                    >
+                        Editar Termos de Aceitação
+                    </button>
                 </>
             )}
         </div>
