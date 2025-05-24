@@ -15,6 +15,7 @@ from db.postgres import (
     Permission
 )
 from sqlalchemy.orm import sessionmaker
+from base64 import b64encode
 
 fake = Faker()
 Faker.seed(42)
@@ -48,11 +49,11 @@ def insert_users(session, permissions):
         user: User,
     ):
         return User (
-            name=fernet.encrypt(user.name.encode()).decode(),
+            name=b64encode(fernet.encrypt(user.name.encode())).decode(),
             login=user.login,
-            email=fernet.encrypt(user.email.encode()).decode(),
-            password=fernet.encrypt(user.password.encode()).decode(),
-            version_terms_agreement=fernet.encrypt(user.version_terms_agreement.encode()).decode(),
+            email=b64encode(fernet.encrypt(user.email.encode())).decode(),
+            password=b64encode(fernet.encrypt(user.password.encode())).decode(),
+            version_terms_agreement=b64encode(fernet.encrypt(user.version_terms_agreement.encode())),
             permission_id=user.permission_id
         )
 
@@ -85,7 +86,7 @@ def insert_users(session, permissions):
     add_user( # default user for easy login
         name="Alice",
         login="a",
-        email="alice@mail.com",
+        email="alice@email.com",
         password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i", # "secret"
         version_terms_agreement="v1.0",
         permission_id=2
