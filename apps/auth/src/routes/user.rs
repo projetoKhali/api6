@@ -5,12 +5,14 @@ use sea_orm::prelude::Date;
 use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect};
 
-use crate::entities::{keys as keys_entity, user as user_entity};
+use crate::entities::user as user_entity;
 use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
-use crate::service::fernet::{decrypt_database_user, encrypt_field};
+use crate::service::fernet::{
+    decrypt_database_user, encrypt_field, get_user_key, GetUserKeyResult,
+};
 
-use super::common::{handle_server_error_body, CustomError, ServerErrorType};
+use super::common::{handle_server_error_body, ServerErrorType};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -62,28 +64,10 @@ async fn get_users(
     let mut users_public = Vec::with_capacity(raw_users.len());
 
     for encrypted_user in raw_users {
-        let user_key_result = keys_entity::Entity::find_by_id(encrypted_user.id)
-            .one(&keys_client.client)
-            .await;
-
-        let user_decryption_key = match user_key_result {
-            Err(err) => {
-                return handle_server_error_body(
-                    "Database Error",
-                    err,
-                    &config,
-                    Some(ServerErrorType::InternalServerError),
-                )
-            }
-            Ok(None) => {
-                return handle_server_error_body(
-                    "Database Error",
-                    CustomError::UserKeyNotFound(encrypted_user.id),
-                    &config,
-                    Some(ServerErrorType::NotFound),
-                )
-            }
-            Ok(Some(user_key)) => user_key.key,
+        let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await
+        {
+            GetUserKeyResult::Ok(key) => key,
+            GetUserKeyResult::Err(err) => return err,
         };
 
         users_public.push(
@@ -151,28 +135,9 @@ async fn get_user(
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    let user_key_result = keys_entity::Entity::find_by_id(encrypted_user.id)
-        .one(&keys_client.client)
-        .await;
-
-    let user_decryption_key = match user_key_result {
-        Err(err) => {
-            return handle_server_error_body(
-                "Database Error",
-                err,
-                &config,
-                Some(ServerErrorType::InternalServerError),
-            )
-        }
-        Ok(None) => {
-            return handle_server_error_body(
-                "Database Error",
-                CustomError::UserKeyNotFound(encrypted_user.id),
-                &config,
-                Some(ServerErrorType::NotFound),
-            )
-        }
-        Ok(Some(user_key)) => user_key.key,
+    let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await {
+        GetUserKeyResult::Ok(key) => key,
+        GetUserKeyResult::Err(err) => return err,
     };
 
     match decrypt_database_user(&user_decryption_key, encrypted_user) {
@@ -213,28 +178,9 @@ async fn update_user(
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    let user_key_result = keys_entity::Entity::find_by_id(*user_id)
-        .one(&keys_client.client)
-        .await;
-
-    let user_decryption_key = match user_key_result {
-        Err(err) => {
-            return handle_server_error_body(
-                "Database Error",
-                err,
-                &config,
-                Some(ServerErrorType::InternalServerError),
-            )
-        }
-        Ok(None) => {
-            return handle_server_error_body(
-                "Database Error",
-                CustomError::UserKeyNotFound(*user_id),
-                &config,
-                Some(ServerErrorType::NotFound),
-            )
-        }
-        Ok(Some(user_key)) => user_key.key,
+    let user_decryption_key = match get_user_key(*user_id, &keys_client, &config).await {
+        GetUserKeyResult::Ok(key) => key,
+        GetUserKeyResult::Err(err) => return err,
     };
 
     user_update_model.disabled_since = match &user_update.disabled_since {

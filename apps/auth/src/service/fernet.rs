@@ -1,11 +1,53 @@
 use std::num::ParseIntError;
 
+use actix_web::{web, HttpResponse};
 use fernet::Fernet;
 
+use sea_orm::EntityTrait;
+
 use crate::{
-    entities::user::Model as user_model, //
+    entities::{
+        keys as keys_entity, //
+        user::Model as user_model,
+    },
     models::UserPublic,
+    routes::common::{
+        handle_server_error_body, //
+        CustomError,
+        ServerErrorType,
+    },
 };
+
+pub enum GetUserKeyResult {
+    Ok(String),
+    Err(HttpResponse),
+}
+
+pub async fn get_user_key(
+    user_id: i64,
+    keys_client: &web::Data<crate::infra::server::DatabaseClientKeys>,
+    config: &web::Data<crate::infra::types::Config>,
+) -> GetUserKeyResult {
+    let user_key_result = keys_entity::Entity::find_by_id(user_id)
+        .one(&keys_client.client)
+        .await;
+
+    match user_key_result {
+        Err(err) => GetUserKeyResult::Err(handle_server_error_body(
+            "Database Error",
+            err,
+            &config,
+            Some(ServerErrorType::InternalServerError),
+        )),
+        Ok(None) => GetUserKeyResult::Err(handle_server_error_body(
+            "Database Error",
+            CustomError::UserKeyNotFound(user_id),
+            &config,
+            Some(ServerErrorType::NotFound),
+        )),
+        Ok(Some(user_key)) => GetUserKeyResult::Ok(user_key.key),
+    }
+}
 
 pub fn encrypt_field(f: &Fernet, value: &str) -> String {
     let ciphertext = f.encrypt(value.as_bytes());
