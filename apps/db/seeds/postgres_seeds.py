@@ -44,16 +44,25 @@ def insert_users(session, permissions):
     users = []
     keys_session = sessionmaker(bind=get_keys_engine())()
 
+    def encrypt_field(
+        fernet: Fernet,
+        field: str,
+    ):
+        return b64encode(fernet.encrypt(field.encode())).decode()
+
     def encrypt_user(
         fernet: Fernet,
         user: User,
     ):
-        return User (
-            name=b64encode(fernet.encrypt(user.name.encode())).decode(),
+        return User(
+            name=encrypt_field(fernet, user.name),
             login=user.login,
-            email=b64encode(fernet.encrypt(user.email.encode())).decode(),
-            password=b64encode(fernet.encrypt(user.password.encode())).decode(),
-            version_terms_agreement=b64encode(fernet.encrypt(user.version_terms_agreement.encode())),
+            email=encrypt_field(fernet, user.email),
+            password=encrypt_field(fernet, user.password),
+            version_terms_agreement=encrypt_field(
+                fernet,
+                user.version_terms_agreement
+            ),
             permission_id=user.permission_id
         )
 
@@ -83,21 +92,22 @@ def insert_users(session, permissions):
 
         keys_session.add(UserKey(id=user.id, key=key.decode()))
 
-    add_user( # default user for easy login
+    def hash_password(password: str) -> str:
+        return bcrypt.hashpw(
+            password.encode("utf-8"),
+            bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
+        ).decode("utf-8")
+
+    add_user(  # default user for easy login
         name="Alice",
         login="a",
         email="alice@email.com",
-        password="$2b$12$Z/6HIJK2f/uJ56UHCS6hYeAf2uZkd2wDc6uxrHp99z38VJIO3Ri8i", # "secret"
+        password=hash_password("secret"),
         version_terms_agreement="v1.0",
         permission_id=2
     )
 
     for i in range(NUM_USERS):
-        hashed_password = bcrypt.hashpw(
-            fake.password().encode("utf-8"),
-            bcrypt.gensalt(rounds=DEFAULT_HASH_COST)
-        ).decode("utf-8")
-
         # Decide se o usuário será soft-deletado
         if i < NUM_SOFT_DELETED:
             disabled_date = datetime.now() - timedelta(days=random.randint(31, 365))
@@ -105,12 +115,12 @@ def insert_users(session, permissions):
             disabled_date = None
 
         add_user(
-            name = fake.name(),
-            email = fake.unique.email(),
-            login = fake.unique.user_name(),
-            password=hashed_password,
+            name=fake.name(),
+            email=fake.unique.email(),
+            login=fake.unique.user_name(),
+            password=hash_password(fake.password()),
             version_terms_agreement="v1.0",
-            permission_id = random.choice(permissions).id,
+            permission_id=random.choice(permissions).id,
             disabled_since=disabled_date
         )
 
