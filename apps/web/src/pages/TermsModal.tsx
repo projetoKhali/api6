@@ -7,19 +7,26 @@ import {
   TermStatus,
   UserAcceptanceRequest,
 } from '../schemas/TermsSchema';
-import { getUserIdFromLocalStorage } from '../store/storage';
+import { clearLocalStorageData, clearUserIdFromLocalStorage, getUserIdFromLocalStorage } from '../store/storage';
 import { deleteUser } from '../service/UserService';
+import { logout } from '../service/AuthService';
 
 interface TermsModalProps {
   onAccept: (newsletterOptIn: boolean) => void;
   initialNewsletterOptIn?: boolean;
   showBackOption?: boolean;
+  setIsAuthenticated: (auth: boolean) => void;
+}
+
+interface NavbarProps {
+  setIsAuthenticated: (auth: boolean) => void;
 }
 
 const TermsModal: React.FC<TermsModalProps> = ({
   onAccept,
   initialNewsletterOptIn = false,
   showBackOption = false,
+  setIsAuthenticated,
 }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(
@@ -132,7 +139,17 @@ const TermsModal: React.FC<TermsModalProps> = ({
 
       if (confirmDelete) {
         // Chama handleDelete para apagar o usuário e resetar
-        await handleDelete();
+        try {
+              await handleDelete();
+              await logout();
+              setIsAuthenticated(false);
+
+              clearUserIdFromLocalStorage();
+              clearLocalStorageData();
+              navigate('/login');
+            } catch (err) {
+              console.error('Erro ao fazer logout:', err);
+            }
         return; // interrompe para não continuar com update
       } else {
         // Usuário cancelou, não salva nada

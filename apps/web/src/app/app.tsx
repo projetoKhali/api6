@@ -74,17 +74,13 @@ function App() {
                         </>
                       )}
 
-                      {permissions.includes('terms') && (
-                        <Route path="/terms" element={<TermsPage />} />
-                      )}
-
                       <Route
                         path="/user-data"
                         element={<UserInformation userId={getUserIdFromLocalStorage()} />}
                       />
 
-                      <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} />} />
-
+                      <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} setIsAuthenticated={setIsAuthenticated}  />} />
+                        <Route path="/terms" element={<TermsPage />} />
                       </Routes>
                     </div>
                   </>

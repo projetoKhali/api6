@@ -35,11 +35,9 @@ const Login = ({
       savePermissionsToLocalStorage(['dashboard ', 'register ', 'analitic', 'terms']);
     } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
-      setUserIdToLocalStorage('2');
       if (await TermsService.hasUserAcceptedTerms(String(getUserIdFromLocalStorage()))) {
         setIsAuthenticated(true);
         navigate('/', { replace: true });
-        savePermissionsToLocalStorage(['dashboard ', 'register ', 'analitic', 'terms']);
       } else {
         navigate('/terms-acceptance', { replace: true });
         setIsAuthenticated(true);
