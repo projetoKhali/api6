@@ -19,8 +19,10 @@ pub struct LoginRequest {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct TokenResponse {
+pub struct LoginResponse {
     pub token: String,
+    pub id: i64,
+    pub permissions: Vec<String>,
 }
 
 #[derive(Deserialize, ToSchema)]

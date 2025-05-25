@@ -23,7 +23,7 @@ use utoipa::OpenApi;
         // Authentication models
         models::auth::RegisterRequest,
         models::auth::LoginRequest,
-        models::auth::TokenResponse,
+        models::auth::LoginResponse,
         models::auth::ValidateRequest,
         // User models
         models::UserPublic,

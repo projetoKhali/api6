@@ -5,6 +5,7 @@ use actix_web::{
     Responder,
 };
 use bcrypt::{hash, verify, DEFAULT_COST};
+use fernet::Fernet;
 use sea_orm::{
     ActiveModelTrait, //
     ColumnTrait,
@@ -15,19 +16,16 @@ use sea_orm::{
 };
 
 use crate::{
-    entities::user,
+    entities::{keys as keys_entity, user as user_entity},
     infra::server::{
         DatabaseClientKeys,
         DatabaseClientPostgres, //
-    },
-    service::{
-        fernet::*,
-        jwt::*,
     },
     models::{
         auth::*,
         jwt::Claims, //
     }, //
+    service::{fernet::*, jwt::*},
 };
 
 use super::common::{handle_server_error_body, handle_server_error_string};
@@ -55,6 +53,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 
 pub async fn register(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     data: web::Json<RegisterRequest>,
 ) -> impl Responder {
@@ -63,29 +62,52 @@ pub async fn register(
         Err(err) => handle_server_error_string("Hashing error", err, &config),
     };
 
-    let new_user = user::ActiveModel {
+    let new_user_decryption_key = Fernet::generate_key();
+
+    let fernet = Fernet::new(&new_user_decryption_key).unwrap();
+
+    let new_user = user_entity::ActiveModel {
         id: NotSet,
-        name: Set(data.name.clone()),
-        login: Set(data.login.clone()),
-        email: Set(data.email.clone()),
-        password: Set(hashed),
-        version_terms_agreement: Set(data.version_terms.clone()),
+        name: Set(encrypt_field(&fernet, &data.name)),
+        login: Set(encrypt_field(&fernet, &data.login)),
+        email: Set(encrypt_field(&fernet, &data.email)),
+        password: Set(encrypt_field(&fernet, &hashed)),
+        version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
         permission_id: Set(data.permission_id),
         disabled_since: NotSet,
     };
 
-    match new_user.insert(&postgres_client.client).await {
+    let inserted_user = match new_user.insert(&postgres_client.client).await {
+        Ok(inserted_user) => inserted_user,
+        Err(err) => {
+            return handle_server_error_body("Failed to register user: {:?}", err, &config, None)
+        }
+    };
+
+    let new_user_key = keys_entity::ActiveModel {
+        id: Set(inserted_user.id),
+        key: Set(new_user_decryption_key.clone()),
+    };
+
+    match new_user_key.insert(&keys_client.client).await {
         Ok(_) => HttpResponse::Ok().body("User registered"),
-        Err(err) => handle_server_error_body("Failed to register user: {:?}", err, &config, None),
+        Err(err) => {
+            return handle_server_error_body(
+                "Failed to register user key: {:?}",
+                err,
+                &config,
+                None,
+            )
+        }
     }
 }
 
 #[utoipa::path(
     post,
-    path = "/login",
+    path = "/",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login successful", body = TokenResponse),
+        (status = 200, description = "Login successful", body = LoginResponse),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Database error")
     ),
@@ -94,19 +116,34 @@ pub async fn register(
 
 pub async fn login(
     postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     data: web::Json<LoginRequest>,
 ) -> impl Responder {
-    let user_result = user::Entity::find()
-        .filter(user::Column::Login.eq(data.login.clone()))
+    let user_result = user_entity::Entity::find()
+        .filter(user_entity::Column::Login.eq(data.login.clone()))
         .one(&postgres_client.client)
         .await;
 
     match user_result {
         Ok(Some(user)) => {
-            if verify(&data.password, &user.password).unwrap_or(false) {
+            let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
+                GetUserKeyResult::Ok(key) => key,
+                GetUserKeyResult::Err(err) => return err,
+            };
+
+            let decrypted_password = decrypt_field(
+                &fernet::Fernet::new(&user_decryption_key).unwrap(),
+                &user.password,
+            );
+
+            if verify(&data.password, &decrypted_password).unwrap_or(false) {
                 let token = create_jwt(&user.id.to_string(), &config.jwt_secret);
-                HttpResponse::Ok().json(TokenResponse { token })
+                HttpResponse::Ok().json(LoginResponse {
+                    token,
+                    id: user.id,
+                    permissions: vec![],
+                })
             } else {
                 HttpResponse::Unauthorized().body("Invalid credentials")
             }
