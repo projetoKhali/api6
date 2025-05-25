@@ -33,3 +33,7 @@ export const setUserIdToLocalStorage = (userId: string): void => {
 export const clearUserIdFromLocalStorage = (): void => {
   localStorage.removeItem('khali_api6:uid');
 }
+
+export const savePermissionsToLocalStorage = (permissions: string[]): void => {
+  localStorage.setItem('khali_api6:permissions', JSON.stringify(permissions));
+}

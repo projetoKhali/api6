@@ -23,9 +23,16 @@ import TermsModal from '../pages/TermsModal';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   useEffect(() => {
     isUserLoggedIn().then((result) => setIsAuthenticated(result));
+
+    const localPermissions = localStorage.getItem('khali_api6:permissions');
+    if (localPermissions) {
+      const parsed = JSON.parse(localPermissions).map((p: string) => p.trim());
+      setPermissions(parsed);
+    }
   }, []);
 
   return (
@@ -43,35 +50,41 @@ function App() {
                     </div>
                     <div style={{ height: '100%', width: '100%' }}>
                       <Routes>
-                        <Route
-                          path="/"
-                          element={<Navigate to="/dashboard" />}
-                        />
-                        <Route path="/login" element={<Navigate to="/" />} />
+                        <Route path="/" element={<Navigate to="/dashboard" />} />
+                      <Route path="/login" element={<Navigate to="/" />} />
+
+                      {permissions.includes('dashboard') && (
                         <Route path="/dashboard" element={<Dashboard />} />
-                        <Route
-                          path="/projection"
-                          element={<ProjectionPage />}
-                        />
-                        <Route
-                          path="/prevision"
-                          element={<ProjectionCostumPage />}
-                        />
-                        <Route path="/user" element={<UserManagementPage />} />
-                        <Route
-                          path="/register"
-                          element={<Navigate to="/register/yield" replace />}
-                        />
-                        <Route path="/report" element={<ReportPage />} />
-                        <Route path="/register">
-                          <Route path="yield" element={<YieldRegister />} />
-                          <Route path="event" element={<EventsRegister />} />
-                        </Route>
-                        <Route path='/user-data' element={<UserInformation userId={getUserIdFromLocalStorage()} />} />
+                      )}
+
+                      {permissions.includes('register') && (
+                        <>
+                          <Route path="/register" element={<Navigate to="/register/yield" replace />} />
+                          <Route path="/register/yield" element={<YieldRegister />} />
+                          <Route path="/register/event" element={<EventsRegister />} />
+                          <Route path="/user" element={<UserManagementPage />} />
+                        </>
+                      )}
+
+                      {permissions.includes('analitic') && (
+                        <>
+                          <Route path="/projection" element={<ProjectionPage />} />
+                          <Route path="/prevision" element={<ProjectionCostumPage />} />
+                          <Route path="/report" element={<ReportPage />} />
+                        </>
+                      )}
+
+                      {permissions.includes('terms') && (
                         <Route path="/terms" element={<TermsPage />} />
-                        <Route path="/terms-acceptance" element={<TermsModal onAccept={function (newsletterOptIn: boolean): void {
-                          throw new Error('Function not implemented.');
-                        }} />} />
+                      )}
+
+                      <Route
+                        path="/user-data"
+                        element={<UserInformation userId={getUserIdFromLocalStorage()} />}
+                      />
+
+                      <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} />} />
+
                       </Routes>
                     </div>
                   </>

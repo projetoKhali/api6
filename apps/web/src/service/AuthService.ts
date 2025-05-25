@@ -21,6 +21,7 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
   });
 
   if (!result.token) {
+    setTokenToLocalStorage(result?.token ? result.token : '');
     return false;
   }
 

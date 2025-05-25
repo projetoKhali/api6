@@ -6,6 +6,7 @@ import {
   UpdateAcceptanceRequest,
   ComplianceResponse,
   TermResponse,
+  AcceptedTopic,
 } from '../schemas/TermsSchema';
 
 import {
@@ -94,5 +95,20 @@ export class TermsService {
       return false;
     }
   }
+
+    static async getUserAcceptance(userId: string): Promise<{ _id: string; topics: AcceptedTopic[]; user_id: string }> {
+      return await processGET({
+          path: `${TERMS_BASE_PATH}/user/${userId}`
+      });
+  }
+
+  static async updateUserAcceptance(acceptanceId: string, data: UpdateAcceptanceRequest): Promise<{ success: boolean }> {
+        return await processRequest<UpdateAcceptanceRequest, { success: boolean }>('PUT', {
+      path: `${TERMS_BASE_PATH}/user/update/${acceptanceId}`,
+      body: data,
+    });
+  }
+
+
 }
 
