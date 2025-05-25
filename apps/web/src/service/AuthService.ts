@@ -25,9 +25,9 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
   }
 
   setTokenToLocalStorage(result.token);
-  
+
   try{
-    const decoded: any = jwtDecode(result.token);
+    const decoded = jwtDecode(result.token);
     const userId = decoded.sub;
     if (userId) {
       setUserIdToLocalStorage(userId);
