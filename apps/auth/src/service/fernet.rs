@@ -94,15 +94,6 @@ pub fn decrypt_database_user(
         CustomError::UnsuccessfulDecryption("version_terms_agreement".to_string(), err)
     })?;
 
-    let disabled_since = match user.disabled_since {
-        Some(dt) => Some(
-            decrypt_field(&fernet, &dt.format("%Y-%m-%d").to_string()).map_err(|err| {
-                CustomError::UnsuccessfulDecryption("disabled_since".to_string(), err)
-            })?,
-        ),
-        None => None,
-    };
-
     Ok(UserPublic {
         id: user.id,
         name,
@@ -110,6 +101,9 @@ pub fn decrypt_database_user(
         email,
         version_terms,
         permission_id: user.permission_id,
-        disabled_since,
+        disabled_since: match user.disabled_since {
+            Some(dt) => Some(dt.format("%Y-%m-%d").to_string()),
+            None => None,
+        },
     })
 }
