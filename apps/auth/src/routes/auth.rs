@@ -127,6 +127,10 @@ pub async fn login(
 
     match user_result {
         Ok(Some(user)) => {
+            if user.disabled_since.is_some() {
+                return HttpResponse::Unauthorized().body("Inactive user");
+            }
+
             let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
                 GetUserKeyResult::Ok(key) => key,
                 GetUserKeyResult::Err(err) => return err,
