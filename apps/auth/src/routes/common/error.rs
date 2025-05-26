@@ -16,8 +16,6 @@ pub enum ServerErrorType {
     Unauthorized,
     #[allow(dead_code)]
     Forbidden,
-    #[allow(dead_code)]
-    InternalServerError,
 }
 
 pub fn handle_server_error_body<E>(
@@ -34,7 +32,6 @@ where
         Some(ServerErrorType::NotFound) => HttpResponse::NotFound(),
         Some(ServerErrorType::Unauthorized) => HttpResponse::Unauthorized(),
         Some(ServerErrorType::Forbidden) => HttpResponse::Forbidden(),
-        Some(ServerErrorType::InternalServerError) => HttpResponse::InternalServerError(),
         None => HttpResponse::InternalServerError(),
     };
 

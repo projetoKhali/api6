@@ -37,7 +37,7 @@ pub async fn get_user_key(
             "Database Error",
             err,
             &config,
-            Some(ServerErrorType::InternalServerError),
+            None,
         )),
         Ok(None) => GetUserKeyResult::Err(handle_server_error_body(
             "Database Error",
