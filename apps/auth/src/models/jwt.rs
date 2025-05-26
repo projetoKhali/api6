@@ -4,6 +4,7 @@ use thiserror::Error;
 use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Claims {
     /// Subject (user ID or similar)
     pub sub: String,

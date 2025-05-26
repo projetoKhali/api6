@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DynamicForm from '../components/FormsComponent';
 import TableComponent from '../components/TableComponent';
 import { FieldSchema } from '../schemas/FormsSchema';
-import { getUsers, createUser, updateUser, deleteUser } from '../service/UserService';
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../service/UserService';
 import { User, NewUser } from '../schemas/UserSchema';
+import { Pagination } from '../components/Pagination';
 
 // Dados mockados para teste
 const mockUsers: User[] = [
@@ -12,25 +18,25 @@ const mockUsers: User[] = [
     name: 'João Silva',
     login: 'joao.silva',
     email: 'joao@example.com',
-    version_terms_agreement: '1.0',
-    permission_id: 1
+    versionTerms: '1.0',
+    permissionId: 1,
   },
   {
     id: 2,
     name: 'Maria Souza',
     login: 'maria.souza',
     email: 'maria@example.com',
-    version_terms_agreement: '1.0',
-    permission_id: 2,
-    disabled_since: '2023-01-01'
+    versionTerms: '1.0',
+    permissionId: 2,
+    disabledSince: '2023-01-01',
   },
   {
     id: 3,
     name: 'Carlos Oliveira',
     login: 'carlos.oliveira',
     email: 'carlos@example.com',
-    version_terms_agreement: '1.1',
-    permission_id: 1
+    versionTerms: '1.1',
+    permissionId: 1,
   },
 ];
 
@@ -38,142 +44,121 @@ const mockUsers: User[] = [
 const mockGetUsers = async (page: number, size: number) => {
   return {
     items: mockUsers,
-    totalItems: mockUsers.length,
-    totalPages: 1,
-    size: size
+    total: mockUsers.length,
+    totalPages: page,
+    size: size,
   };
 };
 
 // Schema para cadastro de usuários
 const registerFormSchema: FieldSchema[] = [
-  { name: 'name', label: 'Nome Completo', type: 'text',},
-  { name: 'login', label: 'Nome de Usuário', type: 'text',},
-  { name: 'email', label: 'E-mail', type: 'text',},
-  { name: 'password', label: 'Senha', type: 'text',}
+  { name: 'name', label: 'Nome Completo', type: 'text' },
+  { name: 'login', label: 'Nome de Usuário', type: 'text' },
+  { name: 'email', label: 'E-mail', type: 'text' },
+  { name: 'password', label: 'Senha', type: 'password' },
 ];
 
 // Schema para edição de usuários
 const editFormSchema: FieldSchema[] = [
-  { name: 'name', label: 'Nome Completo', type: 'text',},
-  { name: 'login', label: 'Nome de Usuário', type: 'text',},
-  { name: 'email', label: 'E-mail', type: 'text',},
-  { 
-    name: 'permission_id', 
-    label: 'Permissão', 
-    type: 'text'
+  { name: 'name', label: 'Nome Completo', type: 'text' },
+  { name: 'login', label: 'Nome de Usuário', type: 'text' },
+  { name: 'email', label: 'E-mail', type: 'text' },
+  {
+    name: 'permissionId',
+    label: 'Permissão',
+    type: 'text',
   },
-
 ];
 
 const tableSchema = [
   { key: 'name', label: 'Nome', type: 'text' as const },
   { key: 'email', label: 'E-mail', type: 'text' as const },
   { key: 'login', label: 'Usuário', type: 'text' as const },
-  { key: 'disabled_since', label: 'Status', type: 'text' as const },
+  { key: 'disabledSince', label: 'Status', type: 'text' as const },
   { key: 'actions', label: 'Ações', type: 'actions' as const },
 ];
 
 const UserManagementPage = () => {
-  // Estado inicial
   const [users, setUsers] = useState<User[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUser, setCurrentUser] = useState<Record<string, string>>({});
+  const [currentUser, setCurrentUser] = useState<Partial<User>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [useMockData, setUseMockData] = useState(true);
+  const useMockData = false;
+
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // Carrega os usuários
-  const loadUsers = async () => {
+  const loadUsers = async (pageToLoad: number, size = 5) => {
+    setPage(pageToLoad);
     setIsLoading(true);
-    try {
-      let response;
-      if (useMockData) {
-        response = await mockGetUsers(0, 50);
-      } else {
-        response = await getUsers(0, 50);
-      }
-      setUsers(response.items);
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    const response = useMockData
+      ? await mockGetUsers(1, size)
+      : await getUsers(pageToLoad, size);
+    setTotalPages(response.totalPages);
+    setUsers(response.items);
+    setIsLoading(false);
   };
 
   // Efeito para carregar os dados iniciais
   useEffect(() => {
-    loadUsers();
-  }, [useMockData]);
+    loadUsers(page);
+  }, [page]);
 
   // Manipuladores de eventos
   const handleRegisterSubmit = async (formData: Record<string, string>) => {
-    try {
-      const newUser: NewUser = {
-        name: formData.name,
-        login: formData.login,
-        email: formData.email,
-        password: formData.password,
-        version_terms_agreement: '1.0',
-        permission_id: 1,
-      };
-      await createUser(newUser);
-      await loadUsers();
-    } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error);
-    }
+    const newUser: NewUser = {
+      name: formData.name,
+      login: formData.login,
+      email: formData.email,
+      password: formData.password,
+      versionTerms: '1.0',
+      permissionId: 1,
+    };
+    await createUser(newUser);
+    await loadUsers(1);
   };
 
   const handleEditSubmit = async (formData: Record<string, string>) => {
-    try {
-      if (currentUser.id) {
-        const userData: Partial<User> = {
-          name: formData.name,
-          login: formData.login,
-          email: formData.email,
-          permission_id: Number(formData.permission_id),
-        };
-        await updateUser(currentUser.id, userData);
-        await loadUsers();
-        resetForm();
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
+    if (currentUser.id) {
+      const userData: Partial<User> = {
+        name: formData.name,
+        login: formData.login,
+        email: formData.email,
+        permissionId: Number(formData.permissionId),
+      };
+      await updateUser(currentUser.id, userData);
+      await loadUsers(1);
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEdit = (row: Record<string, any>) => {
     const user: User = {
       id: Number(row.id),
       name: row.name,
       login: row.login,
       email: row.email,
-      version_terms_agreement: row.version_terms_agreement || '1.0',
-      permission_id: Number(row.permission_id),
-      disabled_since: row.disabled_since,
+      versionTerms: row.versionTerms || '1.0',
+      permissionId: Number(row.permissionId),
+      disabledSince: row.disabledSince,
     };
-  
+
     console.log('Editando usuário:', user);
     setIsEditing(true);
-  
-    // Atualize o estado corretamente
-    setCurrentUser({
-      id: user.id ? user.id.toString() : '',
-      name: user.name,
-      login: user.login,
-      email: user.email,
-      permission_id: user.permission_id.toString(),
 
-    });
+    // Atualize o estado corretamente
+    setCurrentUser(user);
   };
-  
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-      try {
-        await deleteUser(id.toString());
-        await loadUsers();
-      } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
-      }
+    if (
+      currentUser.id &&
+      window.confirm('Tem certeza que deseja excluir este usuário?')
+    ) {
+      await deleteUser(id);
+      await loadUsers(1);
+      resetForm();
     }
   };
 
@@ -183,33 +168,37 @@ const UserManagementPage = () => {
   };
 
   // Transforma os dados para a tabela
-  const tableData = users.map(user => ({
+  const tableData = users.map((user) => ({
     ...user,
-    disabled_since: user.disabled_since ? 'Desativado' : 'Ativo',
+    disabledSince: user.disabledSince ? 'Desativado' : 'Ativo',
     actions: user.id,
   }));
 
   return (
-    <div className="user-management-container"
-        style={{
-            maxWidth: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: '100vh',
-            padding: '20px',
-            gap: '20px',
-        }}>
-      <div className="form-section"
+    <div
+      className="user-management-container"
       style={{
+        maxWidth: '100%',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '20%',
-        height: '100%',
-      }}>
+        justifyContent: 'space-between',
+        height: '100vh',
+        padding: '20px',
+        gap: '20px',
+      }}
+    >
+      <div
+        className="form-section"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '20%',
+          height: '100%',
+        }}
+      >
         {!isEditing ? (
           <>
             <h2>Cadastrar Usuário</h2>
@@ -223,68 +212,86 @@ const UserManagementPage = () => {
           <>
             <h2>Editar Usuário</h2>
             <DynamicForm
-                schema={editFormSchema}
-                initialValues={currentUser}
-                onSubmit={handleEditSubmit}
+              schema={editFormSchema}
+              initialValues={currentUser as Record<string, string>}
+              onSubmit={handleEditSubmit}
             />
             <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-                <button
+              <button
                 onClick={resetForm}
                 style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#6c757d', // cinza para "cancelar"
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d', // cinza para "cancelar"
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
                 }}
-                >
+              >
                 Cancelar Edição
-                </button>
+              </button>
 
-                <button
-                onClick={async () => {
-                    if (currentUser.id && window.confirm('Tem certeza que deseja excluir este usuário?')) {
-                    await handleDelete(Number(currentUser.id));
-                    resetForm();
-                    }
-                }}
+              <button
+                onClick={async () => await handleDelete(Number(currentUser.id))}
                 style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#dc3545', // vermelho para "excluir"
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                  padding: '8px 16px',
+                  backgroundColor: '#dc3545', // vermelho para "excluir"
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
                 }}
-                >
+              >
                 Excluir Usuário
-                </button>
+              </button>
             </div>
-            </>
+          </>
         )}
       </div>
 
-      <div className="table-section"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '78%',
-        height: '100%',
-      }}>
+      <div
+        className="table-section"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '78%',
+          height: '100%',
+        }}
+      >
         <h2>Lista de Usuários</h2>
         {isLoading ? (
           <p>Carregando usuários...</p>
         ) : (
-          <TableComponent
-            schema={tableSchema}
-            data={tableData}
-            onEdit={(row) => handleEdit(row)}
-            onRowSelect={(row) => handleEdit(row)}
-            style={{ width: '100%' }}
-          />
+          <>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignContent: 'center',
+                justifyContent: 'space-between',
+                padding: 10,
+                marginBlock: 10,
+              }}
+            >
+              <Pagination
+                getPage={() => page}
+                setPage={async (newPage) => await loadUsers(newPage)}
+                getTotalPages={() => totalPages}
+                onPageChange={async (newPage) => await loadUsers(newPage)}
+                style={{ marginTop: '30px', gap: '10px' }}
+              />
+            </div>
+            <TableComponent
+              schema={tableSchema}
+              data={tableData}
+              onEdit={(row) => handleEdit(row)}
+              onRowSelect={(row) => handleEdit(row)}
+              style={{ width: '100%' }}
+            />
+          </>
         )}
       </div>
     </div>

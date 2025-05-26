@@ -11,14 +11,29 @@ import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
+import UserInformation from '../pages/PersonalData';
+import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
-import { getUserFromLocalStorage } from '../store/UserStorage';
-import { useState } from 'react';
+import ProjectionCustomPage from '../pages/ProjectionCustomPage';
+import { useEffect, useState } from 'react';
+import ReportPage from '../pages/ReportPage';
+import { isUserLoggedIn } from '../store/storage';
+import TermsPage from '../pages/Terms';
+import TermsModal from '../pages/TermsModal';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(
-    getUserFromLocalStorage() !== null
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [permissions, setPermissions] = useState<string[]>([]);
+
+  useEffect(() => {
+    isUserLoggedIn().then((result) => setIsAuthenticated(result));
+
+    const localPermissions = localStorage.getItem('khali_api6:permissions');
+    if (localPermissions) {
+      const parsed = JSON.parse(localPermissions).map((p: string) => p.trim());
+      setPermissions(parsed);
+    }
+  }, []);
 
   return (
     <Router>
@@ -31,29 +46,41 @@ function App() {
                 element={
                   <>
                     <div style={{ width: '100%', backgroundColor: '#026734' }}>
-                      <Navbar />
+                      <Navbar setIsAuthenticated={setIsAuthenticated} />
                     </div>
                     <div style={{ height: '100%', width: '100%' }}>
                       <Routes>
-                        <Route
-                          path="/"
-                          element={<Navigate to="/dashboard" />}
-                        />
-                        <Route path="/login" element={<Navigate to="/" />} />
+                        <Route path="/" element={<Navigate to="/dashboard" />} />
+                      <Route path="/login" element={<Navigate to="/" />} />
+
+                      {permissions.includes('dashboard') && (
                         <Route path="/dashboard" element={<Dashboard />} />
-                        <Route
-                          path="/projection"
-                          element={<ProjectionPage />}
-                        />
-                        <Route path="/user" element={<UserManagementPage />} />
-                        <Route
-                          path="/register"
-                          element={<Navigate to="/register/yield" replace />}
-                        />
-                        <Route path="/register">
-                          <Route path="yield" element={<YieldRegister />} />
-                          <Route path="event" element={<EventsRegister />} />
-                        </Route>
+                      )}
+
+                      {permissions.includes('register') && (
+                        <>
+                          <Route path="/register" element={<Navigate to="/register/yield" replace />} />
+                          <Route path="/register/yield" element={<YieldRegister />} />
+                          <Route path="/register/event" element={<EventsRegister />} />
+                          <Route path="/user" element={<UserManagementPage />} />
+                        </>
+                      )}
+
+                      {permissions.includes('analitic') && (
+                        <>
+                          <Route path="/projection" element={<ProjectionPage />} />
+                          <Route path="/prevision" element={<ProjectionCustomPage />} />
+                          <Route path="/report" element={<ReportPage />} />
+                        </>
+                      )}
+
+                      <Route
+                        path="/user-data"
+                        element={<UserInformation userId={getUserIdFromLocalStorage()} />}
+                      />
+
+                      <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} setIsAuthenticated={setIsAuthenticated}  />} />
+                        <Route path="/terms" element={<TermsPage />} />
                       </Routes>
                     </div>
                   </>
@@ -62,9 +89,10 @@ function App() {
             </Routes>
           ) : (
             <Routes>
-              <Route path="/login" element={<Login
-                setIsAuthenticated={setIsAuthenticated}
-              />} />
+              <Route
+                path="/login"
+                element={<Login setIsAuthenticated={setIsAuthenticated} />}
+              />
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           )}

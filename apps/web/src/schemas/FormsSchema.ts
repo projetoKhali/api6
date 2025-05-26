@@ -1,6 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-export type FieldType = 'text' | 'number' | 'date' | 'select' | 'actions';
+export type FieldType =
+  | 'text'
+  | 'number'
+  | 'date'
+  | 'select'
+  | 'actions'
+  | 'password';
 
 export interface FieldSchema {
   type: FieldType;
@@ -27,6 +31,7 @@ export const schema: FieldSchema[] = [
   { type: 'number', label: 'Rendimento', name: 'yield' },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const initialValues: Record<string, any> = {
   crop: 'Milho',
   crop_year: 2023,

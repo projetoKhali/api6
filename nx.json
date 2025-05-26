@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -12,9 +15,11 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ]
   },
-  "nxCloudId": "67be5b38b03dd173f694b81e",
+  "nxCloudId": "68337fa84e04cd39edca2774",
   "plugins": [
     {
       "plugin": "@nxlv/python"
@@ -67,7 +72,11 @@
   "tasksRunnerOptions": {
     "default": {
       "options": {
-        "cacheableOperations": ["test", "build", "lint"],
+        "cacheableOperations": [
+          "test",
+          "build",
+          "lint"
+        ],
         "env": {
           "VIRTUAL_ENV": "{workspaceRoot}/.venv",
           "PATH": "{workspaceRoot}/.venv/bin:{env.PATH}"

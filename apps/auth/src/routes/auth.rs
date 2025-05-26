@@ -5,10 +5,10 @@ use actix_web::{
     Responder,
 };
 use bcrypt::{hash, verify, DEFAULT_COST};
+use fernet::Fernet;
 use sea_orm::{
     ActiveModelTrait, //
     ColumnTrait,
-    DatabaseConnection,
     EntityTrait,
     NotSet,
     QueryFilter,
@@ -16,10 +16,19 @@ use sea_orm::{
 };
 
 use crate::{
-    entities::user,
-    jwt::*,
-    models::{auth::*, jwt::Claims},
+    entities::{keys as keys_entity, user as user_entity},
+    infra::server::{
+        DatabaseClientKeys,
+        DatabaseClientPostgres, //
+    },
+    models::{
+        auth::*,
+        jwt::Claims, //
+    }, //
+    service::{fernet::*, jwt::*},
 };
+
+use super::common::{handle_server_error_body, handle_server_error_string, CustomError};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -43,40 +52,62 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 )]
 
 pub async fn register(
-    db: web::Data<DatabaseConnection>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
+    config: web::Data<crate::infra::types::Config>,
     data: web::Json<RegisterRequest>,
 ) -> impl Responder {
     let hashed = match hash(&data.password, DEFAULT_COST) {
         Ok(h) => h,
-        Err(_) => return HttpResponse::InternalServerError().body("Hashing error"),
+        Err(err) => handle_server_error_string("Hashing error", err, &config),
     };
 
-    let new_user = user::ActiveModel {
+    let new_user_decryption_key = Fernet::generate_key();
+
+    let fernet = Fernet::new(&new_user_decryption_key).unwrap();
+
+    let new_user = user_entity::ActiveModel {
         id: NotSet,
-        name: Set(data.name.clone()),
-        login: Set(data.login.clone()),
-        email: Set(data.email.clone()),
-        password: Set(hashed),
-        version_terms_agreement: Set(data.version_terms.clone()),
+        name: Set(encrypt_field(&fernet, &data.name)),
+        login: Set(encrypt_field(&fernet, &data.login)),
+        email: Set(encrypt_field(&fernet, &data.email)),
+        password: Set(encrypt_field(&fernet, &hashed)),
+        version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
         permission_id: Set(data.permission_id),
         disabled_since: NotSet,
     };
 
-    match new_user.insert(db.get_ref()).await {
+    let inserted_user = match new_user.insert(&postgres_client.client).await {
+        Ok(inserted_user) => inserted_user,
+        Err(err) => {
+            return handle_server_error_body("Failed to register user: {:?}", err, &config, None)
+        }
+    };
+
+    let new_user_key = keys_entity::ActiveModel {
+        id: Set(inserted_user.id),
+        key: Set(new_user_decryption_key.clone()),
+    };
+
+    match new_user_key.insert(&keys_client.client).await {
         Ok(_) => HttpResponse::Ok().body("User registered"),
-        Err(e) => {
-            eprintln!("Failed to register user: {:?}", e);
-            HttpResponse::InternalServerError().body("Database error")
+        Err(err) => {
+            return handle_server_error_body(
+                "Failed to register user key: {:?}",
+                err,
+                &config,
+                None,
+            )
         }
     }
 }
 
 #[utoipa::path(
     post,
-    path = "/login",
+    path = "/",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login successful", body = TokenResponse),
+        (status = 200, description = "Login successful", body = LoginResponse),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Database error")
     ),
@@ -84,32 +115,55 @@ pub async fn register(
 )]
 
 pub async fn login(
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    postgres_client: web::Data<DatabaseClientPostgres>,
+    keys_client: web::Data<DatabaseClientKeys>,
+    config: web::Data<crate::infra::types::Config>,
     data: web::Json<LoginRequest>,
 ) -> impl Responder {
-    let user_result = user::Entity::find()
-        .filter(user::Column::Login.eq(data.login.clone()))
-        .one(db.get_ref())
+    let user_result = user_entity::Entity::find()
+        .filter(user_entity::Column::Login.eq(data.login.clone()))
+        .one(&postgres_client.client)
         .await;
 
     match user_result {
         Ok(Some(user)) => {
-            if verify(&data.password, &user.password).unwrap_or(false) {
+            if user.disabled_since.is_some() {
+                return HttpResponse::Unauthorized().body("Inactive user");
+            }
+
+            let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
+                GetUserKeyResult::Ok(key) => key,
+                GetUserKeyResult::Err(err) => return err,
+            };
+
+            let decrypted_password = match decrypt_field(
+                &fernet::Fernet::new(&user_decryption_key).unwrap(),
+                &user.password,
+            ) {
+                Ok(p) => p,
+                Err(err) => {
+                    return handle_server_error_body(
+                        "Decryption error",
+                        CustomError::UnsuccessfulDecryption("password".to_string(), err),
+                        &config,
+                        None,
+                    );
+                }
+            };
+
+            if verify(&data.password, &decrypted_password).unwrap_or(false) {
                 let token = create_jwt(&user.id.to_string(), &config.jwt_secret);
-                HttpResponse::Ok().json(TokenResponse { token })
+                HttpResponse::Ok().json(LoginResponse {
+                    token,
+                    id: user.id,
+                    permissions: vec![],
+                })
             } else {
                 HttpResponse::Unauthorized().body("Invalid credentials")
             }
         }
         Ok(None) => HttpResponse::Unauthorized().body("User not found"),
-        Err(err) => HttpResponse::InternalServerError().body(format!(
-            "Database error: {}",
-            match &config.dev_mode {
-                true => format!(": {:?}", err),
-                false => "".to_string(),
-            }
-        )),
+        Err(err) => handle_server_error_body("Database Error", err, &config, None),
     }
 }
 
@@ -126,12 +180,12 @@ pub async fn login(
 
 pub async fn validate_token(
     data: web::Json<ValidateRequest>,
-    db: web::Data<DatabaseConnection>,
-    config: web::Data<crate::infra::config::Config>,
+    keys_client: web::Data<DatabaseClientKeys>,
+    config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret, db.get_ref()).await {
+    match verify_jwt(&data.token, &config.jwt_secret, &keys_client.client).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
-        Err(_) => HttpResponse::Unauthorized().body("Invalid token"),
+        Err(err) => handle_server_error_body("Invalid token", err, &config, None),
     }
 }
 
@@ -147,17 +201,16 @@ pub async fn validate_token(
 
 pub async fn logout(
     req: HttpRequest,
-    db: web::Data<DatabaseConnection>,
-    cfg: web::Data<crate::infra::config::Config>,
+    keys_client: web::Data<DatabaseClientPostgres>,
+    config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
     let token = match extract_bearer(&req) {
         Ok(t) => t,
         Err(msg) => return HttpResponse::BadRequest().body(msg),
     };
 
-    if let Err(_) = revoke_token(token, &cfg.jwt_secret, db.get_ref()).await {
-        return HttpResponse::InternalServerError().finish();
+    match revoke_token(token, &config.jwt_secret, &keys_client.client).await {
+        Ok(_) => HttpResponse::Ok().body("Token invalidated"),
+        Err(err) => handle_server_error_body("Token Invalidation error", err, &config, None),
     }
-
-    HttpResponse::Ok().body("Token invalidated")
 }

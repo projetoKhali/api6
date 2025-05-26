@@ -12,7 +12,7 @@ pub struct Model {
     pub password: String,
     pub version_terms_agreement: String,
     pub disabled_since: Option<DateTime>,
-    pub permission_id: Option<i64>,
+    pub permission_id: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

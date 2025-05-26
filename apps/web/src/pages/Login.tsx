@@ -4,8 +4,18 @@ import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
+import {
+  setTokenToLocalStorage,
+  setPermissionsToLocalStorage,
+  getUserIdFromLocalStorage,
+} from '../store/storage';
+import { TermsService } from '../service/TermsService';
 
-const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => void }) => {
+const Login = ({
+  setIsAuthenticated,
+}: {
+  setIsAuthenticated: (_: boolean) => void;
+}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,14 +31,29 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
 
     console.log('Login attempt:', { username, password });
 
-    if (
-      (username === 'admin' && password === 'admin123') ||
-      (await login(username, password))
-    ) {
+    if (username === 'admin' && password === 'admin123') {
+      setTokenToLocalStorage('token');
       setIsAuthenticated(true);
       navigate('/', { replace: true });
-    } else {
-      setError('Credenciais inválidas');
+      setPermissionsToLocalStorage([
+        'dashboard ',
+        'register ',
+        'analitic',
+        'terms',
+      ]);
+    } else if (await login({ login: username, password })) {
+      setIsAuthenticated(true);
+      if (
+        await TermsService.hasUserAcceptedTerms(
+          String(getUserIdFromLocalStorage())
+        )
+      ) {
+        setIsAuthenticated(true);
+        navigate('/', { replace: true });
+      } else {
+        navigate('/terms-acceptance', { replace: true });
+        setIsAuthenticated(true);
+      }
     }
   };
 
@@ -48,6 +73,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
         padding: 0,
       }}
     >
+      {/* Seu JSX continua aqui normalmente */}
       <div
         style={{
           position: 'fixed',
@@ -73,6 +99,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
           boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         }}
       >
+        {/* Logo */}
         <div
           style={{
             marginBottom: '30px',
@@ -91,6 +118,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
           />
         </div>
 
+        {/* Error message */}
         {error && (
           <div
             style={{
@@ -106,7 +134,9 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
           </div>
         )}
 
+        {/* Form */}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          {/* Username */}
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
             <label
               style={{
@@ -138,6 +168,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
             />
           </div>
 
+          {/* Password */}
           <div style={{ marginBottom: '30px', textAlign: 'left' }}>
             <label
               style={{
@@ -169,6 +200,7 @@ const Login = ({ setIsAuthenticated }: { setIsAuthenticated: (_: boolean) => voi
             />
           </div>
 
+          {/* Submit button */}
           <button
             type="submit"
             style={{

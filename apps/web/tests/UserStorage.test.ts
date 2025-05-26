@@ -1,56 +1,97 @@
+import { validate } from '../src/service/AuthService';
 import {
-    getUserFromLocalStorage,
-    setUserToLocalStorage,
-    clearUserFromLocalStorage,
+    getTokenFromLocalStorage,
+    setTokenToLocalStorage,
+    clearLocalStorageData,
     isUserLoggedIn,
-} from '../src/store/UserStorage';
+    getUserIdFromLocalStorage,
+    setUserIdToLocalStorage,
+    clearUserIdFromLocalStorage,
+} from '../src/store/storage';
 
+jest.mock('../src/service/AuthService', () => ({
+validate: jest.fn(),
+}));
 
+describe('storage', () => {
+const tokenKey = 'khali_api6:utoken';
+const userIdKey = 'khali_api6:uid';
 
-it('should get a user token from localStorage', () => {
-    const mockToken = 'mockToken123';
-    localStorage.setItem('utoken', JSON.stringify(mockToken));
-
-    const result = getUserFromLocalStorage();
-
-    expect(result).toEqual(mockToken);
+beforeEach(() => {
+  localStorage.clear();
+  jest.clearAllMocks();
 });
 
-it('should set a user token to localStorage', () => {
-    const mockToken = 'mockToken123';
-    setUserToLocalStorage(mockToken);
+describe('getTokenFromLocalStorage', () => {
+  it('returns token if present', () => {
+    localStorage.setItem(tokenKey, 'abc123');
+    expect(getTokenFromLocalStorage()).toBe('abc123');
+  });
 
-    const storedToken = localStorage.getItem('utoken');
-    expect(storedToken).toEqual(JSON.stringify(mockToken));
+  it('returns null if token not present', () => {
+    expect(getTokenFromLocalStorage()).toBeNull();
+  });
 });
 
-it('should clear a user token from localStorage', () => {
-    const mockToken = 'mockToken123';
-    localStorage.setItem('utoken', JSON.stringify(mockToken));
-
-    clearUserFromLocalStorage();
-
-    const storedToken = localStorage.getItem('utoken');
-    expect(storedToken).toBeNull();
+describe('setTokenToLocalStorage', () => {
+  it('sets token in localStorage', () => {
+    setTokenToLocalStorage('xyz789');
+    expect(localStorage.getItem(tokenKey)).toBe('xyz789');
+  });
 });
 
-it('should return null if no user token is in localStorage', () => {
-    const result = getUserFromLocalStorage();
-
-    expect(result).toBeNull();
+describe('clearLocalStorageData', () => {
+  it('removes token from localStorage', () => {
+    localStorage.setItem(tokenKey, 'abc123');
+    clearLocalStorageData();
+    expect(localStorage.getItem(tokenKey)).toBeNull();
+  });
 });
 
-it('should return false if no user token is present in localStorage', () => {
-    const result = isUserLoggedIn();
+describe('isUserLoggedIn', () => {
+  it('returns false if no token', async () => {
+    (validate as jest.Mock).mockResolvedValue(true);
+    expect(await isUserLoggedIn()).toBe(false);
+    expect(validate).not.toHaveBeenCalled();
+  });
 
-    expect(result).toBe(false);
+  it('calls validate and returns its result if token exists', async () => {
+    localStorage.setItem(tokenKey, 'abc123');
+    (validate as jest.Mock).mockResolvedValue(true);
+    expect(await isUserLoggedIn()).toBe(true);
+    expect(validate).toHaveBeenCalledWith('abc123');
+  });
+
+  it('returns false if validate returns false', async () => {
+    localStorage.setItem(tokenKey, 'abc123');
+    (validate as jest.Mock).mockResolvedValue(false);
+    expect(await isUserLoggedIn()).toBe(false);
+  });
 });
 
-it('should return true if a user token is present in localStorage', () => {
-    const mockToken = 'mockToken123';
-    localStorage.setItem('utoken', JSON.stringify(mockToken));
+describe('getUserIdFromLocalStorage', () => {
+    it('returns empty string if userId not present', () => {
+        expect(getUserIdFromLocalStorage()).toBe('');
+    });
 
-    const result = isUserLoggedIn();
+    it('returns userId if present', () => {
+      localStorage.setItem(userIdKey, '42');
+      expect(getUserIdFromLocalStorage()).toBe('42');
+    });
+});
 
-    expect(result).toBe(true);
+describe('setUserIdToLocalStorage', () => {
+  it('sets userId in localStorage', () => {
+    setUserIdToLocalStorage('1');
+    expect(localStorage.getItem(userIdKey)).toBe('1');
+  });
+});
+
+describe('clearUserIdFromLocalStorage', () => {
+  it('removes userId from localStorage', () => {
+    localStorage.setItem(userIdKey, '42');
+    clearUserIdFromLocalStorage();
+    expect(localStorage.getItem(userIdKey)).toBeNull();
+  });
+});
 });

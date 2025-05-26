@@ -1,3 +1,7 @@
+export type Season = 'Spring' | 'Summer' | 'Autumn' | 'Winter';
+
+export type SeasonExpanded = Season | 'Whole Year';
+
 // Interface para cada item de dados agrícolas
 export interface AgriculturalData {
   _id: string;
@@ -8,7 +12,7 @@ export interface AgriculturalData {
   fertilizer: number;
   pesticide: number;
   production: number;
-  season: string; // Pode ser 'Spring', 'Summer', 'Autumn', 'Winter', etc.
+  season: SeasonExpanded;
   state: string;
   yield: number;
 }

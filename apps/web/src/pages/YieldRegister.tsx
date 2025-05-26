@@ -57,7 +57,7 @@ function YieldRegister() {
         />
       </div>
       <div className="separator"></div>
-      <div className="table-container" style={{ width: '100%'}}>
+      <div className="table-container" style={{ width: '100%' }}>
         <TableComponent
           style={{ width: '100%' }}
           schema={tableSchema}

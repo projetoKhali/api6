@@ -12,7 +12,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
-        "command": "poetry run python {projectRoot}/main.py"
+        "command": "nx run-many -p db -t init-pg init-mongo init-keys"
       }
     },
     "init-postgres": {
@@ -22,11 +22,25 @@
         "command": "poetry run python {projectRoot}/src/db/postgres.py"
       }
     },
+    "init-keys": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install", "keys-up"],
+      "options": {
+        "command": "poetry run python {projectRoot}/src/db/keys.py"
+      }
+    },
     "init-mongo": {
       "executor": "nx:run-commands",
       "dependsOn": ["install"],
       "options": {
         "command": "poetry run python {projectRoot}/src/db/mongo.py"
+      }
+    },
+    "seeds": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["install", "init"],
+      "options": {
+        "command": "nx run-many -p db -t pg-seeds mongo-seeds keys-seeds"
       }
     },
     "postgres-seeds": {
@@ -60,19 +74,25 @@
     "up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-up mongo-up"
+        "command": "nx run-many -p db -t pg-up mongo-up keys-up"
       }
     },
     "down": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run-many -p $NX_TASK_TARGET_PROJECT -t pg-down mongo-down"
+        "command": "nx run-many -p db -t pg-down mongo-down keys-down"
       }
     },
     "postgres-up": {
       "executor": "nx:run-commands",
       "options": {
         "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d postgres --build"
+      }
+    },
+    "keys-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f {projectRoot}/docker-compose.yml up -d keys --build"
       }
     },
     "mongo-up": {
@@ -96,25 +116,25 @@
     "pg-up": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-up"
+        "command": "nx run db:postgres-up"
       }
     },
     "pg-down": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-down"
+        "command": "nx run db:postgres-down"
       }
     },
     "init-pg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run $NX_TASK_TARGET_PROJECT:init-postgres"
+        "command": "nx run db:init-postgres"
       }
     },
     "pg-seeds": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run $NX_TASK_TARGET_PROJECT:postgres-seeds"
+        "command": "nx run db:postgres-seeds"
       }
     },
     "lint": {
