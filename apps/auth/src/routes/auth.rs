@@ -28,7 +28,7 @@ use crate::{
     service::{fernet::*, jwt::*},
 };
 
-use super::common::{handle_server_error_body, handle_server_error_string};
+use super::common::{handle_server_error_body, handle_server_error_string, CustomError};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -132,10 +132,20 @@ pub async fn login(
                 GetUserKeyResult::Err(err) => return err,
             };
 
-            let decrypted_password = decrypt_field(
+            let decrypted_password = match decrypt_field(
                 &fernet::Fernet::new(&user_decryption_key).unwrap(),
                 &user.password,
-            );
+            ) {
+                Ok(p) => p,
+                Err(err) => {
+                    return handle_server_error_body(
+                        "Decryption error",
+                        CustomError::UnsuccessfulDecryption("password".to_string(), err),
+                        &config,
+                        None,
+                    );
+                }
+            };
 
             if verify(&data.password, &decrypted_password).unwrap_or(false) {
                 let token = create_jwt(&user.id.to_string(), &config.jwt_secret);

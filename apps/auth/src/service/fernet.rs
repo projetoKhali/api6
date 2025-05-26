@@ -1,9 +1,10 @@
-use std::num::ParseIntError;
-
-use actix_web::{web, HttpResponse};
+use base64::{engine::general_purpose, Engine as _};
 use fernet::Fernet;
 
+use actix_web::{web, HttpResponse};
+
 use sea_orm::EntityTrait;
+use thiserror::Error;
 
 use crate::{
     entities::{
@@ -51,30 +52,64 @@ pub async fn get_user_key(
 
 pub fn encrypt_field(f: &Fernet, value: &str) -> String {
     let ciphertext = f.encrypt(value.as_bytes());
-    String::from_utf8(ciphertext.into_bytes()).expect("UTF-8 encode error")
+    general_purpose::STANDARD.encode(ciphertext)
 }
 
-pub fn decrypt_field(f: &Fernet, value: &str) -> String {
-    let plaintext = f.decrypt(value).expect("Fernet decryption error");
-    String::from_utf8(plaintext).expect("UTF-8 decode error")
+#[derive(Debug, Error)]
+pub enum DecryptionError {
+    #[error("Unsuccessful decoding of value `{0}`: {1}")]
+    UnsuccessfulDecoding(String, #[source] base64::DecodeError),
+    #[error("Unsuccessful decryption of value `{0}`: {1}")]
+    UnsuccessfulDecryption(String, #[source] fernet::DecryptionError),
+    #[error("Unsuccessful utf8 conversion of decrypted value `{0}`: {1}")]
+    UnsuccessfulUtf8Conversion(String, #[source] std::string::FromUtf8Error),
+}
+
+pub fn decrypt_field(f: &Fernet, value: &str) -> Result<String, DecryptionError> {
+    let decoded = general_purpose::STANDARD
+        .decode(value)
+        .map_err(|err| DecryptionError::UnsuccessfulDecoding(value.to_string(), err))?;
+    let decoded_utf8 = String::from_utf8(decoded)
+        .map_err(|err| DecryptionError::UnsuccessfulUtf8Conversion(value.to_string(), err))?;
+    let plaintext = f
+        .decrypt(&decoded_utf8)
+        .map_err(|err| DecryptionError::UnsuccessfulDecryption(value.to_string(), err))?;
+    Ok(String::from_utf8(plaintext)
+        .map_err(|err| DecryptionError::UnsuccessfulUtf8Conversion(value.to_string(), err))?)
 }
 
 pub fn decrypt_database_user(
     user_decryption_key: &str,
     user: user_model,
-) -> Result<UserPublic, ParseIntError> {
+) -> Result<UserPublic, CustomError> {
     let fernet = Fernet::new(&user_decryption_key).unwrap();
+
+    let name = decrypt_field(&fernet, &user.name)
+        .map_err(|err| CustomError::UnsuccessfulDecryption("name".to_string(), err))?;
+
+    let email = decrypt_field(&fernet, &user.email)
+        .map_err(|err| CustomError::UnsuccessfulDecryption("email".to_string(), err))?;
+
+    let version_terms = decrypt_field(&fernet, &user.version_terms_agreement).map_err(|err| {
+        CustomError::UnsuccessfulDecryption("version_terms_agreement".to_string(), err)
+    })?;
+
+    let disabled_since = match user.disabled_since {
+        Some(dt) => Some(
+            decrypt_field(&fernet, &dt.format("%Y-%m-%d").to_string()).map_err(|err| {
+                CustomError::UnsuccessfulDecryption("disabled_since".to_string(), err)
+            })?,
+        ),
+        None => None,
+    };
 
     Ok(UserPublic {
         id: user.id,
-        name: decrypt_field(&fernet, &user.name),
+        name,
         login: user.login,
-        email: decrypt_field(&fernet, &user.email),
-        version_terms: decrypt_field(&fernet, &user.version_terms_agreement),
+        email,
+        version_terms,
         permission_id: user.permission_id,
-        disabled_since: match user.disabled_since {
-            Some(dt) => Some(decrypt_field(&fernet, &dt.format("%Y-%m-%d").to_string())),
-            None => None,
-        },
+        disabled_since,
     })
 }
