@@ -87,7 +87,8 @@ export class TermsService {
 
       // Caso contrário, todos os termos ativos estão aceitos, retorna true
       return true;
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
       // Caso de erro na requisição, considera que usuário não aceitou
       return false;
     }
