@@ -33,15 +33,15 @@ use super::common::{handle_server_error_body, handle_server_error_string, Custom
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("")
-            .wrap(HttpAuthentication::bearer(validator))
-            .route("/register", web::post().to(register)),
-    )
-    .service(
         web::scope("/auth")
             .route("/login", web::post().to(login))
             .route("/validate", web::post().to(validate_token))
             .route("/logout", web::post().to(logout)),
+    )
+    .service(
+        web::scope("")
+            .wrap(HttpAuthentication::bearer(validator))
+            .route("/register", web::post().to(register)),
     );
 }
 
