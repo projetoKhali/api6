@@ -4,6 +4,7 @@ import { FieldSchema } from '../schemas/FormsSchema';
 import { getUser, updateUser } from '../service/UserService';
 import { NewUser } from '../schemas/UserSchema';
 import { useNavigate } from 'react-router-dom';
+import { getLocalStorageData } from '../store/storage';
 
 const editFormSchema: FieldSchema[] = [
   { name: 'name', label: 'Nome Completo', type: 'text' },
@@ -13,14 +14,15 @@ const editFormSchema: FieldSchema[] = [
   { name: 'confirmPassword', label: 'Confirmar Senha', type: 'password' },
 ];
 
-const EditUserPage = ({ userId }: { userId: number }) => {
+const EditUserPage = () => {
+  const [userId, setUserId] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const loadUser = async () => {
-    setIsLoading(true);
-    try {
+    if (userId) {
+      setIsLoading(true);
       const user = await getUser(userId);
       setCurrentUser({
         id: user.id,
@@ -28,9 +30,6 @@ const EditUserPage = ({ userId }: { userId: number }) => {
         login: user.login,
         email: user.email,
       });
-    } catch (error) {
-      console.error('Erro ao carregar usuário:', error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -39,8 +38,18 @@ const EditUserPage = ({ userId }: { userId: number }) => {
     loadUser();
   }, [userId]);
 
+  useEffect(() => {
+    const storedUserId = getLocalStorageData()?.id || null;
+    if (storedUserId) {
+      setUserId(storedUserId);
+    } else {
+      console.error('ID do usuário não encontrado no localStorage.');
+      navigate('/login');
+    }
+  }, []);
+
   const handleEditSubmit = async (formData: Record<string, string>) => {
-    try {
+    if (userId) {
       const userData: Partial<NewUser> = {
         name: formData.name,
         login: formData.login,
@@ -55,8 +64,6 @@ const EditUserPage = ({ userId }: { userId: number }) => {
       }
       await updateUser(userId, userData);
       alert('Usuário atualizado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
     }
   };
 
