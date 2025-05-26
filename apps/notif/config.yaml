@@ -1,5 +1,5 @@
 filters:
-  permission_id: 2                    # opcional: Ex: enviar só para usuários com permissão específica
+  role_id: 2                    # opcional: Ex: enviar só para usuários com permissão específica
   disabled: false                     # opcional: true = desabilitados, false = ativos
   email_domain: '@gmail.com'          # opcional: filtra domínio do email (ex: só gmail)
   user_id:                            # opcional: filtra por ID de usuário específico
