@@ -78,7 +78,7 @@ pub async fn register(
         email: Set(encrypt_field(&fernet, &data.email)),
         password: Set(encrypt_field(&fernet, &hashed)),
         version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
-        permission_id: Set(data.permission_id),
+        role_id: Set(data.role_id),
         disabled_since: NotSet,
     };
 

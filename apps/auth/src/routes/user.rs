@@ -223,8 +223,8 @@ async fn update_user(
         Some(ref version_terms) => Set(encrypt_field(&fernet, &version_terms)),
         None => NotSet,
     };
-    user_update_model.permission_id = match user_update.permission_id {
-        Some(permission_id) => Set(permission_id),
+    user_update_model.role_id = match user_update.role_id {
+        Some(role_id) => Set(role_id),
         None => NotSet,
     };
     user_update_model.password = match user_update.password {
