@@ -9,7 +9,7 @@ from sqlalchemy import (
     Text,
     Sequence,
     ForeignKey,
-    Date,
+    DateTime,
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -44,7 +44,7 @@ class User(Base):
     login = Column(String, index=True, unique=True, nullable=False)
     password = Column(Text, nullable=False)
     version_terms_agreement = Column(String)
-    disabled_since = Column(Date)
+    disabled_since = Column(DateTime, nullable=True)
 
     permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
 
