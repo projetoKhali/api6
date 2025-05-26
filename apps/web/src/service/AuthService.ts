@@ -10,7 +10,7 @@ import { AUTH_BASE_URL, processPOST } from './service';
 
 export const login = async (params: LoginRequest): Promise<boolean> => {
   const result = await processPOST<LoginRequest, LoginResponse>({
-    path: '/',
+    path: '/auth/login',
     body: params,
     overrideURL: AUTH_BASE_URL,
   });
@@ -25,7 +25,7 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
 
 export const validate = async (token: string) => {
   return await processPOST<ValidateRequest, ValidateResponse>({
-    path: '/validate',
+    path: '/auth/validate',
     body: { token },
     overrideURL: AUTH_BASE_URL,
   }).catch(() => false);
@@ -33,7 +33,7 @@ export const validate = async (token: string) => {
 
 export const logout = async (): Promise<void> => {
   const result = await processPOST({
-    path: '/logout',
+    path: '/auth/logout',
     body: {
       token: getLocalStorageData()?.token,
     },

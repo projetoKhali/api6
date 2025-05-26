@@ -4,6 +4,7 @@ use actix_web::{
     HttpResponse,
     Responder,
 };
+use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::{
@@ -33,8 +34,12 @@ use super::common::{handle_server_error_body, handle_server_error_string, Custom
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("")
-            .route("/", web::post().to(login))
-            .route("/register", web::post().to(register))
+            .wrap(HttpAuthentication::bearer(validator))
+            .route("/register", web::post().to(register)),
+    )
+    .service(
+        web::scope("/auth")
+            .route("/login", web::post().to(login))
             .route("/validate", web::post().to(validate_token))
             .route("/logout", web::post().to(logout)),
     );
@@ -104,7 +109,7 @@ pub async fn register(
 
 #[utoipa::path(
     post,
-    path = "/",
+    path = "/auth/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = LoginResponse),
@@ -169,7 +174,7 @@ pub async fn login(
 
 #[utoipa::path(
     post,
-    path = "/validate",
+    path = "/auth/validate",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token is valid", body = Claims),
@@ -191,7 +196,7 @@ pub async fn validate_token(
 
 #[utoipa::path(
     post,
-    path = "/logout",
+    path = "/auth/logout",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token invalidated")
