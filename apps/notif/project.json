@@ -1,0 +1,23 @@
+{
+    "name": "notif",
+    "targets": {
+        "install": {
+            "executor": "nx:run-commands",
+            "dependsOn": [
+                "lock"
+            ],
+            "options": {
+                "command": "poetry install"
+            }
+        },
+        "init": {
+            "executor": "nx:run-commands",
+            "dependsOn": [
+                "install"
+            ],
+            "options": {
+                "command": "poetry run python {projectRoot}/main.py"
+            }
+        }
+    }
+}

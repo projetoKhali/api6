@@ -1,0 +1,25 @@
+filters:
+  permission_id: 2                    # opcional: Ex: enviar só para usuários com permissão específica
+  disabled: false                     # opcional: true = desabilitados, false = ativos
+  email_domain: '@gmail.com'          # opcional: filtra domínio do email (ex: só gmail)
+  user_id:                            # opcional: filtra por ID de usuário específico
+  - 1
+  login_conteins: 'a'                 # opcional: filtra todos os logins que contem o valor
+  name_conteins: 'alice'              # opcional: filtra todos os nomes que contem o valor
+
+email:
+  from: 'host@email.com'
+  subject: 'Atualização Importante'
+  body: |
+    Olá {{name}},
+
+    Temos uma mensagem importante para você.
+
+    Atenciosamente,
+    Equipe Empresa
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  user: 'host@email.com'
+  password: 'app_password'
