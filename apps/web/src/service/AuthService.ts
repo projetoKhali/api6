@@ -5,14 +5,8 @@ import {
   ValidateResponse,
 } from '../schemas/auth';
 
-import {
-  getTokenFromLocalStorage,
-  setPermissionsToLocalStorage,
-  setTokenToLocalStorage,
-  setUserIdToLocalStorage
-} from '../store/storage';
+import { getLocalStorageData, setLocalStorageData } from '../store/storage';
 import { AUTH_BASE_URL, processPOST } from './service';
-import { jwtDecode } from "jwt-decode";
 
 export const login = async (params: LoginRequest): Promise<boolean> => {
   const result = await processPOST<LoginRequest, LoginResponse>({
@@ -21,22 +15,11 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
     overrideURL: AUTH_BASE_URL,
   });
 
-  if (!result.token) {
+  if (!result.user) {
     return false;
   }
-  setPermissionsToLocalStorage(result.permissions);
-  setTokenToLocalStorage(result.token);
 
-  try{
-    const decoded = jwtDecode(result.token);
-    const userId = decoded.sub;
-    if (userId) {
-      setUserIdToLocalStorage(userId);
-    }
-  } catch (error) {
-    console.error('Error decoding token:', error);
-    return false;
-  }
+  setLocalStorageData(result.user);
   return true;
 };
 
@@ -52,7 +35,7 @@ export const logout = async (): Promise<void> => {
   const result = await processPOST({
     path: '/logout',
     body: {
-      token: getTokenFromLocalStorage(),
+      token: getLocalStorageData()?.token,
     },
     overrideURL: AUTH_BASE_URL,
   });

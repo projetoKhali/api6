@@ -5,7 +5,6 @@ use crate::service::fernet::DecryptionError;
 
 #[derive(Debug, Error)]
 pub enum CustomError {
-    /// Missing decryption key for a given user ID
     #[error("Decryption key not found in `user_key` table for user ID {0}")]
     UserKeyNotFound(i64),
     #[error("Unsuccessful decryption of field `{0}`: {1}")]

@@ -4,11 +4,7 @@ import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
-import {
-  setTokenToLocalStorage,
-  setPermissionsToLocalStorage,
-  getUserIdFromLocalStorage,
-} from '../store/storage';
+import { setLocalStorageData, getLocalStorageData } from '../store/storage';
 import { TermsService } from '../service/TermsService';
 
 const Login = ({
@@ -32,20 +28,18 @@ const Login = ({
     console.log('Login attempt:', { username, password });
 
     if (username === 'admin' && password === 'admin123') {
-      setTokenToLocalStorage('token');
+      setLocalStorageData({
+        id: 1,
+        token: 'token',
+        permissions: ['dashboard ', 'register ', 'analitic', 'terms'],
+      });
       setIsAuthenticated(true);
       navigate('/', { replace: true });
-      setPermissionsToLocalStorage([
-        'dashboard ',
-        'register ',
-        'analitic',
-        'terms',
-      ]);
     } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
       if (
         await TermsService.hasUserAcceptedTerms(
-          String(getUserIdFromLocalStorage())
+          String(getLocalStorageData()?.id)
         )
       ) {
         setIsAuthenticated(true);
