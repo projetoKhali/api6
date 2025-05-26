@@ -12,15 +12,13 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 BACKUP_DIR = os.getenv("BACKUP_DIR", "./bkp")
 DOCKER_CONTAINER = os.getenv("container_name", "api6_postgres")
 
-TABELAS = ["users", "permissions"]
-
 
 def generate_file_name(bkp_file_name):
     data = datetime.now().strftime("%Y-%m-%d")
     return f"{bkp_file_name}{data}.dump"
 
 
-def create_backup(bkp_file_name="backup_users_permissions_"):
+def create_backup(bkp_file_name="backup_full_"):
     # Garante que a pasta local existe
     os.makedirs(BACKUP_DIR, exist_ok=True)
 
@@ -37,7 +35,6 @@ def create_backup(bkp_file_name="backup_users_permissions_"):
         "-p", DB_PORT,
         "-d", DB_NAME,
         "-F", "c",
-        *sum([["-t", tabela] for tabela in TABELAS], []),
         "-f", container_path
     ]
 

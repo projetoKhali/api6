@@ -1,35 +1,34 @@
 use dotenv::dotenv;
-use std::env;
+use std::{collections::HashMap, env};
 
-pub struct DatabaseConfig {
-    pub db_user: String,
-    pub db_pass: String,
-    pub db_host: String,
-    pub db_port: u16,
-    pub db_name: String,
-}
-
-pub struct Config {
-    pub db: DatabaseConfig,
-    pub server_port: u16,
-    pub jwt_secret: String,
-    pub dev_mode: bool,
-}
+use super::types::*;
 
 pub fn setup() -> Config {
     dotenv().ok();
 
-    Config {
-        db: DatabaseConfig {
-            db_user: env::var("DB_POSTGRES_USER").unwrap_or_else(|_| "postgres".to_string()),
-            db_pass: env::var("DB_POSTGRES_PASS").unwrap_or_else(|_| "secret".to_string()),
-            db_host: env::var("AUTH_DB_HOST").unwrap_or_else(|_| "localhost".to_string()),
-            db_name: env::var("DB_POSTGRES_NAME").unwrap_or_else(|_| "api6_postgres".to_string()),
-            db_port: env::var("DB_POSTGRES_PORT")
-                .unwrap_or_else(|_| "5432".into())
-                .parse()
-                .unwrap(),
+    let database_presets = [
+        DatabasePreset {
+            name: "postgres".to_string(),
+            db_name: PresetField::new("DB_POSTGRES_NAME", "api6_postgres"),
+            db_host: PresetField::new("AUTH_DB_POSTGRES_HOST", "localhost"),
+            db_port: PresetField::new("DB_POSTGRES_PORT", "5432"),
+            db_user: PresetField::new("DB_POSTGRES_USER", "postgres"),
+            db_pass: PresetField::new("DB_POSTGRES_PASS", "secret"),
         },
+        DatabasePreset {
+            name: "keys".to_string(),
+            db_name: PresetField::new("DB_KEYS_NAME", "api6_keys"),
+            db_host: PresetField::new("AUTH_DB_KEYS_HOST", "localhost"),
+            db_port: PresetField::new("DB_KEYS_PORT", "5433"),
+            db_user: PresetField::new("DB_KEYS_USER", "postgres"),
+            db_pass: PresetField::new("DB_KEYS_PASS", "secret"),
+        },
+    ];
+
+    Config {
+        database_clients: HashMap::from(
+            database_presets.map(|preset| (preset.name.clone(), preset.create())),
+        ),
 
         jwt_secret: env::var("AUTH_JWT_SECRET").expect("AUTH_JWT_SECRET must be set"),
 

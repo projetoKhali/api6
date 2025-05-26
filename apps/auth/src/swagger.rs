@@ -15,6 +15,7 @@ use utoipa::OpenApi;
         routes::auth::validate_token,
         routes::auth::logout,
         // User routes
+        routes::user::get_users,
         routes::user::get_user,
         routes::user::update_user,
         routes::user::delete_user,
@@ -23,7 +24,7 @@ use utoipa::OpenApi;
         // Authentication models
         models::auth::RegisterRequest,
         models::auth::LoginRequest,
-        models::auth::TokenResponse,
+        models::auth::LoginResponse,
         models::auth::ValidateRequest,
         // User models
         models::UserPublic,

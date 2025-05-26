@@ -14,7 +14,7 @@ import UserManagementPage from '../pages/UserManagementPage';
 import UserInformation from '../pages/PersonalData';
 import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
-import ProjectionCostumPage from '../pages/ProjectionCostumPage';
+import ProjectionCustomPage from '../pages/ProjectionCustomPage';
 import { useEffect, useState } from 'react';
 import ReportPage from '../pages/ReportPage';
 import { isUserLoggedIn } from '../store/storage';
@@ -69,7 +69,7 @@ function App() {
                       {permissions.includes('analitic') && (
                         <>
                           <Route path="/projection" element={<ProjectionPage />} />
-                          <Route path="/prevision" element={<ProjectionCostumPage />} />
+                          <Route path="/prevision" element={<ProjectionCustomPage />} />
                           <Route path="/report" element={<ReportPage />} />
                         </>
                       )}

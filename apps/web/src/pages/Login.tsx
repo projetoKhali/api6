@@ -4,10 +4,13 @@ import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
-import { setTokenToLocalStorage, savePermissionsToLocalStorage, setUserIdToLocalStorage, getUserIdFromLocalStorage } from '../store/storage';
+import {
+  setTokenToLocalStorage,
+  setPermissionsToLocalStorage,
+  getUserIdFromLocalStorage,
+} from '../store/storage';
 import { TermsService } from '../service/TermsService';
-import { get } from 'http';
-import { number } from 'echarts';
+
 const Login = ({
   setIsAuthenticated,
 }: {
@@ -32,10 +35,19 @@ const Login = ({
       setTokenToLocalStorage('token');
       setIsAuthenticated(true);
       navigate('/', { replace: true });
-      savePermissionsToLocalStorage(['dashboard ', 'register ', 'analitic', 'terms']);
+      setPermissionsToLocalStorage([
+        'dashboard ',
+        'register ',
+        'analitic',
+        'terms',
+      ]);
     } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
-      if (await TermsService.hasUserAcceptedTerms(String(getUserIdFromLocalStorage()))) {
+      if (
+        await TermsService.hasUserAcceptedTerms(
+          String(getUserIdFromLocalStorage())
+        )
+      ) {
         setIsAuthenticated(true);
         navigate('/', { replace: true });
       } else {

@@ -1,16 +1,16 @@
 import { validate } from '../service/AuthService';
 
 export const getTokenFromLocalStorage = (): string | null => {
-  const userToken = localStorage.getItem('khali_api6:utoken');
+  const userToken = localStorage.getItem('khali_api6:token');
   return userToken ? userToken : null;
 };
 
 export const setTokenToLocalStorage = (token: string): void => {
-  localStorage.setItem('khali_api6:utoken', token);
+  localStorage.setItem('khali_api6:token', token);
 };
 
 export const clearLocalStorageData = (): void => {
-  localStorage.removeItem('khali_api6:utoken');
+  localStorage.removeItem('khali_api6:token');
 };
 
 export const isUserLoggedIn = async (): Promise<boolean> => {
@@ -22,18 +22,18 @@ export const isUserLoggedIn = async (): Promise<boolean> => {
 };
 
 export const getUserIdFromLocalStorage = (): number => {
-  const userId = localStorage.getItem('khali_api6:uid');
+  const userId = localStorage.getItem('khali_api6:id');
   return userId ? parseInt(userId) : 0;
 };
 
 export const setUserIdToLocalStorage = (userId: string): void => {
-  localStorage.setItem('khali_api6:uid', userId);
-}
+  localStorage.setItem('khali_api6:id', userId);
+};
 
 export const clearUserIdFromLocalStorage = (): void => {
-  localStorage.removeItem('khali_api6:uid');
-}
+  localStorage.removeItem('khali_api6:id');
+};
 
-export const savePermissionsToLocalStorage = (permissions: string[]): void => {
+export const setPermissionsToLocalStorage = (permissions: string[]): void => {
   localStorage.setItem('khali_api6:permissions', JSON.stringify(permissions));
-}
+};

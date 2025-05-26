@@ -116,7 +116,7 @@ const UserManagementPage = () => {
       permissionId: 1,
     };
     await createUser(newUser);
-    await loadUsers(1)
+    await loadUsers(1);
   };
 
   const handleEditSubmit = async (formData: Record<string, string>) => {
@@ -128,7 +128,7 @@ const UserManagementPage = () => {
         permissionId: Number(formData.permissionId),
       };
       await updateUser(currentUser.id, userData);
-      await loadUsers(1)
+      await loadUsers(1);
     }
   };
 
@@ -280,7 +280,7 @@ const UserManagementPage = () => {
                 getPage={() => page}
                 setPage={async (newPage) => await loadUsers(newPage)}
                 getTotalPages={() => totalPages}
-                onPageChange={async(newPage) => await loadUsers(newPage)}
+                onPageChange={async (newPage) => await loadUsers(newPage)}
                 style={{ marginTop: '30px', gap: '10px' }}
               />
             </div>

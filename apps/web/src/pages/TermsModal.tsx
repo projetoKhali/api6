@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Ajuste o import conforme a exportação real do TermsService
+
 import { TermsService } from '../service/TermsService';
 import {
   AcceptedTopic,
   TermStatus,
   UserAcceptanceRequest,
 } from '../schemas/TermsSchema';
-import { clearLocalStorageData, clearUserIdFromLocalStorage, getUserIdFromLocalStorage } from '../store/storage';
+import {
+  clearLocalStorageData,
+  clearUserIdFromLocalStorage,
+  getUserIdFromLocalStorage,
+} from '../store/storage';
 import { deleteUser } from '../service/UserService';
 import { logout } from '../service/AuthService';
 
@@ -42,49 +46,39 @@ const TermsModal: React.FC<TermsModalProps> = ({
 
   useEffect(() => {
     const fetchTermsAndUserAcceptance = async () => {
-      try {
-        const userId = String(getUserIdFromLocalStorage());
-        const term = await TermsService.getActiveTerm();
-        setTermsText(term.text);
+      const userId = String(getUserIdFromLocalStorage());
+      const term = await TermsService.getActiveTerm();
+      setTermsText(term.text);
 
-        let initialTopics: AcceptedTopic[] = term.topics.map((topic) => ({
-          description: topic.description,
-          status: topic.status,
-          accepted: false,
-        }));
+      let initialTopics: AcceptedTopic[] = term.topics.map((topic) => ({
+        description: topic.description,
+        status: topic.status,
+        accepted: false,
+      }));
 
-        if (userId) {
-          try {
-            const userAcceptance = await TermsService.getUserAcceptance(userId);
+      if (userId) {
+        const userAcceptance = await TermsService.getUserAcceptance(userId);
 
-            if (userAcceptance && userAcceptance.topics) {
-              // Atualiza os tópicos para refletir os aceitos anteriormente
-              setInitialAcceptedTopics(userAcceptance.topics);
-              initialTopics = term.topics.map((termTopic) => {
-                const userTopic = userAcceptance.topics.find(
-                  (t) => t.description === termTopic.description
-                );
-                return {
-                  description: termTopic.description,
-                  status:
-                    termTopic.required === true
-                      ? TermStatus.ACTIVE
-                      : TermStatus.INACTIVE,
-                  accepted: userTopic ? userTopic.accepted : false,
-                };
-              });
-              setAcceptanceId(userAcceptance.user_id);
-              // para saber se deve atualizar
-            }
-          } catch (err) {
-            console.log('Usuário ainda não aceitou termos anteriormente.');
-          }
+        if (userAcceptance && userAcceptance.topics) {
+          setInitialAcceptedTopics(userAcceptance.topics);
+          initialTopics = term.topics.map((termTopic) => {
+            const userTopic = userAcceptance.topics.find(
+              (t) => t.description === termTopic.description
+            );
+            return {
+              description: termTopic.description,
+              status:
+                termTopic.required === true
+                  ? TermStatus.ACTIVE
+                  : TermStatus.INACTIVE,
+              accepted: userTopic ? userTopic.accepted : false,
+            };
+          });
+          setAcceptanceId(userAcceptance.user_id);
         }
-
-        setTermTopics(initialTopics);
-      } catch (error) {
-        console.error('Erro ao carregar termos ou aceite do usuário:', error);
       }
+
+      setTermTopics(initialTopics);
     };
 
     fetchTermsAndUserAcceptance();
@@ -107,20 +101,8 @@ const TermsModal: React.FC<TermsModalProps> = ({
       }
     };
 
-    // Verificar se o usuário já aceitou antes
     const hasAcceptedBefore = acceptanceId !== null;
 
-    // Verificar se algum tópico obrigatório foi desmarcado após já ter sido aceito
-    // Para isso, compararemos o estado atual com o estado inicial vindo do backend (acceptance)
-    // Precisamos guardar o estado inicial dos tópicos aceitos para essa comparação
-
-    // Vamos assumir que você crie um state para guardar os tópicos aceitos antes, por exemplo:
-    // const [initialAcceptedTopics, setInitialAcceptedTopics] = useState<AcceptedTopic[]>([]);
-
-    // No useEffect, após buscar userAcceptance, você também pode definir isso:
-    // setInitialAcceptedTopics(userAcceptance.topics);
-
-    // Agora, verificamos:
     const isUncheckingMandatory =
       hasAcceptedBefore &&
       termTopics.some((topic) => {
@@ -138,50 +120,39 @@ const TermsModal: React.FC<TermsModalProps> = ({
       );
 
       if (confirmDelete) {
-        // Chama handleDelete para apagar o usuário e resetar
-        try {
-              await handleDelete();
-              await logout();
-              setIsAuthenticated(false);
+        await handleDelete();
+        await logout();
+        setIsAuthenticated(false);
 
-              clearUserIdFromLocalStorage();
-              clearLocalStorageData();
-              navigate('/login');
-            } catch (err) {
-              console.error('Erro ao fazer logout:', err);
-            }
-        return; // interrompe para não continuar com update
+        clearUserIdFromLocalStorage();
+        clearLocalStorageData();
+        navigate('/login');
+        return;
       } else {
-        // Usuário cancelou, não salva nada
         return;
       }
     }
 
-    // Caso contrário, segue com a atualização ou aceite normal
     const data: UserAcceptanceRequest = {
       user_id: String(userId),
       topics: termTopics,
     };
 
-    try {
-      let response;
-      if (acceptanceId) {
-        response = await TermsService.updateUserAcceptance(acceptanceId, {
-          topics: termTopics,
-        });
-        navigate('/', { replace: true });
-      } else {
-        response = await TermsService.acceptTerms(data);
-        navigate('/', { replace: true });
-      }
+    let response;
+    if (acceptanceId) {
+      response = await TermsService.updateUserAcceptance(acceptanceId, {
+        topics: termTopics,
+      });
+      navigate('/', { replace: true });
+    } else {
+      response = await TermsService.acceptTerms(data);
+      navigate('/', { replace: true });
+    }
 
-      if (response.success) {
-        onAccept(newsletterOptIn);
-      } else {
-        console.error('Erro ao registrar/atualizar aceite dos termos.');
-      }
-    } catch (error) {
-      console.error('Erro ao enviar aceite dos termos:', error);
+    if (response.success) {
+      onAccept(newsletterOptIn);
+    } else {
+      console.error('Erro ao registrar/atualizar aceite dos termos.');
     }
   };
 
@@ -282,7 +253,7 @@ const TermsModal: React.FC<TermsModalProps> = ({
                   height: '18px',
                   cursor: 'pointer',
                 }}
-                disabled={!topic} // bloqueia checkbox se for obrigatório? Ou deixa liberado? (opcional)
+                disabled={!topic}
               />
               <span style={{ fontWeight: topic ? 'bold' : 'normal' }}>
                 {topic.description}{' '}

@@ -405,9 +405,11 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "argon2",
+ "base64",
  "bcrypt",
  "dotenv",
  "env_logger",
+ "fernet",
  "jsonwebtoken",
  "sea-orm",
  "sea-orm-codegen",
@@ -1032,6 +1034,19 @@ name = "fastrand"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
+
+[[package]]
+name = "fernet"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c66b725fe9483b9ee72ccaec072b15eb8ad95a3ae63a8c798d5748883b72fd33"
+dependencies = [
+ "base64",
+ "byteorder",
+ "getrandom 0.2.15",
+ "openssl",
+ "zeroize",
+]
 
 [[package]]
 name = "flate2"
@@ -4026,6 +4041,20 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
+]
 
 [[package]]
 name = "zerovec"
