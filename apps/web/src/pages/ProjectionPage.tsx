@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import '../styles.css';
 import {
-  fetchYieldData,
   FilterParams,
   getFilterData,
 } from '../service/DashboardService';
 import { AgriculturalData, filterListSchema } from '../schemas/DashboardSchema';
 import TableComponent, { Column } from '../components/TableComponent';
 import {
-  PredictCustomRequest,
   PredictCustomResponseItem,
 } from '../schemas/ProjectionSchema';
 import { fetchYielPredictiondData } from '../service/ProjectionService';

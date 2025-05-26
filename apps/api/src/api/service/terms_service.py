@@ -143,27 +143,24 @@ def get_user_acceptance(user_acceptance_collection, user_id):
     )
 
 
-def update_user_acceptance(user_acceptance_collection, acceptance_id, new_topics):
-    """
-    Atualiza os tópicos aceitos por um usuário.
-
-    Args:
-        user_acceptance_collection: Coleção de aceitação
-        acceptance_id (str): ID do registro de aceitação
-        new_topics (list): Nova lista de tópicos aceitos
-
-    Returns:
-        bool: True se atualizado com sucesso, False caso contrário
-    """
+def update_user_acceptance(collection, user_id, topics):
     try:
-        result = user_acceptance_collection.update_one(
-            {'_id': ObjectId(acceptance_id)},
-            {'$set': {'topics': new_topics, 'updated_at': datetime.utcnow()}}
-        )
-        return result.modified_count > 0
-    except Exception:
-        return False
+        # Garantir que user_id é string
+        user_id = str(user_id)
 
+        # Debug opcional:
+        print(f"Atualizando user_id: {user_id} com topics: {topics}")
+
+        result = collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"topics": topics}}
+        )
+
+        print(f"Matched: {result.matched_count}, Modified: {result.modified_count}")
+        return result.matched_count > 0
+    except Exception as e:
+        print(f"Erro ao atualizar aceitação: {e}")
+        return False
 
 def check_user_acceptance_compliance(user_acceptance_collection, terms_collection, user_id):
     """

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { fetchCustomPrediction } from '../service/ProjectionCostumService';
+import { fetchCustomPrediction } from '../service/ProjectionCustomService';
 import {
   CustomPredictionRequest,
   CustomPredictionResponse,
-} from '../schemas/ProjectionCostumSchema';
+} from '../schemas/ProjectionCustomSchema';
 import TableComponent, { Column } from '../components/TableComponent';
 
-function ProjectionCostumPage() {
+function ProjectionCustomPage() {
   const [formData, setFormData] = useState<CustomPredictionRequest>({
     state: undefined,
     crop: undefined,
@@ -157,4 +157,4 @@ function ProjectionCostumPage() {
   );
 }
 
-export default ProjectionCostumPage;
+export default ProjectionCustomPage;

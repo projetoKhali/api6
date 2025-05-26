@@ -7,6 +7,7 @@ import {
 
 import {
   getTokenFromLocalStorage,
+  setPermissionsToLocalStorage,
   setTokenToLocalStorage,
   setUserIdToLocalStorage
 } from '../store/storage';
@@ -23,7 +24,7 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
   if (!result.token) {
     return false;
   }
-
+  setPermissionsToLocalStorage(result.permissions);
   setTokenToLocalStorage(result.token);
 
   try{

@@ -12,6 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+
 def get_keys_engine():
     load_dotenv()
 
@@ -28,12 +29,9 @@ def get_keys_engine():
         max_overflow=20
     )
 
+
 Base = declarative_base()
 
-class DeletedUser(Base):
-    __tablename__ = "deleted_users"
-    id = Column(BigInteger, primary_key=True)
-    delete_date = Column(Date, default=text("now()"))
 
 class UserKey(Base):
     __tablename__ = "user_key"
@@ -42,6 +40,7 @@ class UserKey(Base):
         primary_key=True
     )
     key = Column(String, unique=True, nullable=False)
+
 
 class RevokedToken(Base):
     __tablename__ = "revoked_tokens"
@@ -52,10 +51,13 @@ class RevokedToken(Base):
         default=datetime.datetime.utcnow
     )
 
+
 def create_tables(engine):
     Base.metadata.create_all(engine)
 
+
 Session = sessionmaker(bind=get_keys_engine())
+
 
 def test_connection(engine):
     try:
@@ -65,9 +67,11 @@ def test_connection(engine):
     except Exception as e:
         raise Exception("Erro ao conectar ao banco de dados:", e) from e
 
+
 def initialize_keys_database():
     engine = get_keys_engine()
     create_tables(engine)
+
 
 if __name__ == "__main__":
     initialize_keys_database()

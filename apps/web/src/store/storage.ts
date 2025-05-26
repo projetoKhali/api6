@@ -28,8 +28,12 @@ export const getUserIdFromLocalStorage = (): number => {
 
 export const setUserIdToLocalStorage = (userId: string): void => {
   localStorage.setItem('khali_api6:id', userId);
-}
+};
 
 export const clearUserIdFromLocalStorage = (): void => {
   localStorage.removeItem('khali_api6:id');
-}
+};
+
+export const setPermissionsToLocalStorage = (permissions: string[]): void => {
+  localStorage.setItem('khali_api6:permissions', JSON.stringify(permissions));
+};

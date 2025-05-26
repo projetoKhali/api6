@@ -1,3 +1,4 @@
+from api.service.terms_service import update_user_acceptance
 from flask import Blueprint, jsonify, request
 from bson import ObjectId
 from datetime import datetime
@@ -12,6 +13,14 @@ def create_terms_blueprint(db):
     assert user_acceptance_collection is not None
 
     terms_blueprint = Blueprint('terms', __name__, url_prefix="/terms")
+    
+    def create_user_acceptance_service(collection, user_id, topics):
+        result = collection.insert_one({
+            'user_id': user_id,
+            'topics': topics,
+            'created_at': datetime.utcnow()
+        })
+        return result.inserted_id
 
     # Endpoint existente para criar termos
     @terms_blueprint.route('/new', methods=['POST'])
@@ -60,17 +69,16 @@ def create_terms_blueprint(db):
         if not all(field in data for field in required_fields):
             return jsonify({'error': 'Campos obrigatórios ausentes'}), 400
         
-        # Verifica se já existe uma aceitação para este usuário
         existing = user_acceptance_collection.find_one({'user_id': data['user_id']})
         if existing:
             return jsonify({'error': 'Usuário já possui uma aceitação registrada'}), 400
         
-        acceptance_id = create_user_acceptance(
+        acceptance_id = create_user_acceptance_service(
             user_acceptance_collection,
             data['user_id'],
             data['topics']
         )
-        
+                
         if not acceptance_id:
             return jsonify({'error': 'Falha ao registrar aceitação'}), 500
             
@@ -129,24 +137,28 @@ def create_terms_blueprint(db):
         }), 201
 
     # 5. Endpoint para atualizar aceitação do usuário
-    @terms_blueprint.route('/user/update/<acceptance_id>', methods=['PUT'])
+    @terms_blueprint.route('/user/update/<user_id>', methods=['PUT'])
     @require_auth
-    def update_acceptance(acceptance_id):
+    def update_acceptance(user_id):
         data = request.get_json()
+        print(data)
+
         
         if 'topics' not in data:
             return jsonify({'error': 'Campo topics é obrigatório'}), 400
-        
+
         success = update_user_acceptance(
             user_acceptance_collection,
-            acceptance_id,
+            user_id,
             data['topics']
         )
-        
+
         if not success:
             return jsonify({'error': 'Falha ao atualizar aceitação'}), 400
-            
+
         return jsonify({'message': 'Aceitação atualizada com sucesso'}), 200
+
+
 
     # 6. Endpoint para verificar conformidade do usuário
     @terms_blueprint.route('/user/compliance/<user_id>', methods=['GET'])

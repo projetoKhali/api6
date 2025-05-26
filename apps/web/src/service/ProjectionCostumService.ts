@@ -1,7 +1,7 @@
 import {
   CustomPredictionRequest,
   CustomPredictionResponse,
-} from '../schemas/ProjectionCostumSchema';
+} from '../schemas/ProjectionCustomSchema';
 import { API_PREDICTION_URL, processPOST } from './service';
 
 export async function fetchCustomPrediction(

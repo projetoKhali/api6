@@ -6,13 +6,13 @@ import random
 from db.keys import (
     get_keys_engine,
     UserKey,
-    DeletedUser
 )
 from db.postgres import (
     get_engine,
     test_connection,
     User,
-    Permission
+    Permission,
+    Role
 )
 from sqlalchemy.orm import sessionmaker
 from base64 import b64encode
@@ -30,17 +30,48 @@ NUM_HARD_DELETED = 0
 
 
 def insert_permissions(session):
+    permission_names = ["dashboard", "register", "analitic", "terms"]
     permissions = [
-        Permission(name=f"perm_{i}", description=fake.sentence())
-        for i in range(NUM_PERMISSIONS)
+        Permission(name=name, description=fake.sentence())
+        for name in permission_names
     ]
 
     session.add_all(permissions)
-    print(f"{NUM_PERMISSIONS} permissões criadas.")
+    session.commit()
+    print(f"{len(permissions)} permissões criadas: {', '.join(permission_names)}.")
     return permissions
 
 
-def insert_users(session, permissions):
+def insert_roles(session, permissions):
+    permission_dict = {perm.name: perm for perm in permissions}
+
+    # ADM - todas as permissões
+    adm_role = Role(
+        name="adm",
+        description="Administrador com acesso total",
+        permissions=list(permissions)
+    )
+
+    # Agent - apenas algumas permissões
+    agent_role = Role(
+        name="agent",
+        description="Agente com permissões limitadas",
+        permissions=[
+            permission_dict["dashboard"],
+            permission_dict["analitic"],
+            permission_dict["terms"]
+        ]
+    )
+
+    roles = [adm_role, agent_role]
+    session.add_all(roles)
+    session.commit()
+
+    print("Roles criadas: adm (todas permissões), agent (dashboard, analitic, terms).")
+    return roles
+
+
+def insert_users(session, roles):
     users = []
     keys_session = sessionmaker(bind=get_keys_engine())()
 
@@ -63,7 +94,7 @@ def insert_users(session, permissions):
                 fernet,
                 user.version_terms_agreement
             ),
-            permission_id=user.permission_id
+            role_id=user.role_id
         )
 
     def add_user(
@@ -72,7 +103,7 @@ def insert_users(session, permissions):
         email: str,
         password: str,
         version_terms_agreement: str,
-        permission_id: int,
+        role_id: int,
         disabled_since: datetime | None = None
     ):
         key = Fernet.generate_key()
@@ -83,7 +114,7 @@ def insert_users(session, permissions):
             email=email,
             password=password,
             version_terms_agreement=version_terms_agreement,
-            permission_id=permission_id,
+            role_id=role_id,
             disabled_since=disabled_since,
         ))
         users.append(user)
@@ -104,15 +135,14 @@ def insert_users(session, permissions):
         email="alice@email.com",
         password=hash_password("secret"),
         version_terms_agreement="v1.0",
-        permission_id=2
+        role_id=roles[0].id
     )
 
     for i in range(NUM_USERS):
         # Decide se o usuário será soft-deletado
+        disabled_date = None
         if i < NUM_SOFT_DELETED:
             disabled_date = datetime.now() - timedelta(days=random.randint(31, 365))
-        else:
-            disabled_date = None
 
         add_user(
             name=fake.name(),
@@ -120,48 +150,31 @@ def insert_users(session, permissions):
             login=fake.unique.user_name(),
             password=hash_password(fake.password()),
             version_terms_agreement="v1.0",
-            permission_id=random.choice(permissions).id,
-            disabled_since=disabled_date
+            role_id=random.choice(roles).id,
+            disabled_since=disabled_date,
         )
+
+    session.add_all(users)
+    print(f"{NUM_USERS} usuários inseridos.")
 
     session.commit()
     keys_session.commit()
-    print(f"{NUM_USERS} usuários inseridos e encriptados.")
-    print(f"{NUM_USERS + 1} chaves de usuário inseridas na base de chaves.")
+    print(f"{NUM_USERS + 1} usuários inseridos e encriptados.")
+    print(f"{NUM_USERS + 1} chaves de usuário inseridas.")
 
     return users
 
 
-def insert_deleted_users(session, users):
-    excluidos = random.sample(users, NUM_HARD_DELETED)
-
-    ids_excluidos = [user.id for user in excluidos]
-    deleted = [DeletedUser(id=id_) for id_ in ids_excluidos]
-
-    # Remove os usuários selecionados
-    for id_ in ids_excluidos:
-        session.query(User).filter(User.id == id_).delete()
-
-    session.add_all(deleted)
-    print(
-        f"{NUM_HARD_DELETED} usuários removidos e adicionados em deleted_users.")
-
-
 def insert_seeds():
     engine = get_engine()
-
     test_connection(engine)
-
     session = sessionmaker(bind=engine)()
 
     print("Iniciando seeds...")
+
     permissions = insert_permissions(session)
-
-    users = insert_users(session, permissions)
-
-    insert_deleted_users(session, users)
-
-    session.commit()
+    roles = insert_roles(session, permissions)
+    insert_users(session, roles)
 
     print("Seed finalizada com sucesso.")
 

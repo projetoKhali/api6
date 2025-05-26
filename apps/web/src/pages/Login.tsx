@@ -4,7 +4,12 @@ import '../styles.css';
 import backgroundImage from '../assets/background-login.jpg';
 import kersysLogo from '../assets/kersys-logo.png';
 import { login } from '../service/AuthService';
-import { setTokenToLocalStorage } from '../store/storage';
+import {
+  setTokenToLocalStorage,
+  setPermissionsToLocalStorage,
+  getUserIdFromLocalStorage,
+} from '../store/storage';
+import { TermsService } from '../service/TermsService';
 
 const Login = ({
   setIsAuthenticated,
@@ -30,11 +35,25 @@ const Login = ({
       setTokenToLocalStorage('token');
       setIsAuthenticated(true);
       navigate('/', { replace: true });
+      setPermissionsToLocalStorage([
+        'dashboard ',
+        'register ',
+        'analitic',
+        'terms',
+      ]);
     } else if (await login({ login: username, password })) {
       setIsAuthenticated(true);
-      navigate('/', { replace: true });
-    } else {
-      setError('Credenciais inválidas');
+      if (
+        await TermsService.hasUserAcceptedTerms(
+          String(getUserIdFromLocalStorage())
+        )
+      ) {
+        setIsAuthenticated(true);
+        navigate('/', { replace: true });
+      } else {
+        navigate('/terms-acceptance', { replace: true });
+        setIsAuthenticated(true);
+      }
     }
   };
 
@@ -54,6 +73,7 @@ const Login = ({
         padding: 0,
       }}
     >
+      {/* Seu JSX continua aqui normalmente */}
       <div
         style={{
           position: 'fixed',
@@ -79,6 +99,7 @@ const Login = ({
           boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         }}
       >
+        {/* Logo */}
         <div
           style={{
             marginBottom: '30px',
@@ -97,6 +118,7 @@ const Login = ({
           />
         </div>
 
+        {/* Error message */}
         {error && (
           <div
             style={{
@@ -112,7 +134,9 @@ const Login = ({
           </div>
         )}
 
+        {/* Form */}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          {/* Username */}
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
             <label
               style={{
@@ -144,6 +168,7 @@ const Login = ({
             />
           </div>
 
+          {/* Password */}
           <div style={{ marginBottom: '30px', textAlign: 'left' }}>
             <label
               style={{
@@ -175,6 +200,7 @@ const Login = ({
             />
           </div>
 
+          {/* Submit button */}
           <button
             type="submit"
             style={{

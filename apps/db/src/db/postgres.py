@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv
+import datetime
 from sqlalchemy import (
     create_engine,
     text,
@@ -10,8 +10,10 @@ from sqlalchemy import (
     Sequence,
     ForeignKey,
     DateTime,
+    Table,
 )
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from dotenv import load_dotenv
 
 
 def get_engine():
@@ -26,6 +28,7 @@ def get_engine():
         "DB_POSTGRES_DEBUG", 'False').lower() in ('true', '1', 't')
 
     database_url = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
+
     return create_engine(
         database_url,
         echo=postgres_debug,
@@ -35,6 +38,36 @@ def get_engine():
 
 
 Base = declarative_base()
+
+role_permissions = Table(
+    "role_permissions",
+    Base.metadata,
+    Column("role_id", BigInteger, ForeignKey("roles.id"), primary_key=True),
+    Column("permission_id", BigInteger, ForeignKey(
+        "permissions.id"), primary_key=True),
+)
+
+
+class Role(Base):
+    __tablename__ = "roles"
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(Text)
+
+    permissions = relationship(
+        "Permission", secondary=role_permissions, back_populates="roles")
+    users = relationship("User", back_populates="role")
+
+
+class Permission(Base):
+    __tablename__ = "permissions"
+    id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(Text, nullable=False)
+
+    roles = relationship("Role", secondary=role_permissions,
+                         back_populates="permissions")
+
 
 class User(Base):
     __tablename__ = "users"
@@ -46,26 +79,34 @@ class User(Base):
     version_terms_agreement = Column(String)
     disabled_since = Column(DateTime, nullable=True)
 
-    permission_id = Column(BigInteger, ForeignKey("permissions.id"), nullable=False)
+    role_id = Column(BigInteger, ForeignKey("roles.id"), nullable=False)
+    role = relationship("Role", back_populates="users")
 
 
-class Permission(Base):
-    __tablename__ = "permissions"
-    id = Column(BigInteger, Sequence("permission_id_seq"), primary_key=True)
-    name = Column(String, unique=True, nullable=False)
-    description = Column(Text, nullable=False)
+class UserKey(Base):
+    __tablename__ = "user_key"
+    id = Column(BigInteger, primary_key=True)
+    key = Column(String, unique=True, nullable=False)
+
+
+class RevokedToken(Base):
+    __tablename__ = "revoked_tokens"
+    jti = Column(String, primary_key=True)
+    revoked_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.utcnow)
 
 
 def create_tables(engine):
     Base.metadata.create_all(engine)
 
+
 Session = sessionmaker(bind=get_engine())
+
 
 def test_connection(engine):
     try:
         with engine.connect() as connection:
-            sql_query = "SELECT 1"
-            connection.execute(text(sql_query))
+            connection.execute(text("SELECT 1"))
     except Exception as e:
         raise Exception("Erro ao conectar ao banco de dados:", e) from e
 
