@@ -405,6 +405,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "argon2",
+ "base64",
  "bcrypt",
  "dotenv",
  "env_logger",
