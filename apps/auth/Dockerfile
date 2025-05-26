@@ -11,7 +11,7 @@ RUN set -o allexport \
     && . /usr/src/auth/.env \
     && set +o allexport \
     && mkdir -p /app \
-    && printenv | grep -E '^AUTH_|^DB_POSTGRES_' > /app/.env
+    && printenv | grep -E '^AUTH_|^DB_POSTGRES_|^DB_KEYS_' > /app/.env
 
 
 RUN cargo build --release
