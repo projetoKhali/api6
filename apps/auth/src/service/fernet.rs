@@ -100,7 +100,7 @@ pub fn decrypt_database_user(
         login: user.login,
         email,
         version_terms,
-        permission_id: user.permission_id,
+        role_id: user.role_id,
         disabled_since: match user.disabled_since {
             Some(dt) => Some(dt.format("%Y-%m-%d").to_string()),
             None => None,

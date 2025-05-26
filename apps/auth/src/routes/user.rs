@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
+use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::prelude::Date;
@@ -11,16 +12,19 @@ use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate}
 use crate::service::fernet::{
     decrypt_database_user, encrypt_field, get_user_key, GetUserKeyResult,
 };
+use crate::service::jwt::validator;
 
 use super::common::{handle_server_error_body, ServerErrorType};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        //
-        web::scope("/users").route("/", web::post().to(get_users)),
+        web::scope("/users")
+            .wrap(HttpAuthentication::bearer(validator))
+            .route("/", web::post().to(get_users)), //
     )
     .service(
         web::scope("/user")
+            .wrap(HttpAuthentication::bearer(validator))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
@@ -219,8 +223,8 @@ async fn update_user(
         Some(ref version_terms) => Set(encrypt_field(&fernet, &version_terms)),
         None => NotSet,
     };
-    user_update_model.permission_id = match user_update.permission_id {
-        Some(permission_id) => Set(permission_id),
+    user_update_model.role_id = match user_update.role_id {
+        Some(role_id) => Set(role_id),
         None => NotSet,
     };
     user_update_model.password = match user_update.password {

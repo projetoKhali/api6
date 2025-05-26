@@ -4,6 +4,7 @@ use actix_web::{
     HttpResponse,
     Responder,
 };
+use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::{
@@ -14,9 +15,15 @@ use sea_orm::{
     QueryFilter,
     Set,
 };
+use sea_query::Query;
 
 use crate::{
-    entities::{keys as keys_entity, user as user_entity},
+    entities::{
+        keys as keys_entity,
+        permission as permission_entity,
+        role_permission as role_permission_entity,
+        user as user_entity, //
+    },
     infra::server::{
         DatabaseClientKeys,
         DatabaseClientPostgres, //
@@ -24,19 +31,26 @@ use crate::{
     models::{
         auth::*,
         jwt::Claims, //
-    }, //
-    service::{fernet::*, jwt::*},
+    },
+    service::{
+        fernet::*,
+        jwt::*, //
+    },
 };
 
 use super::common::{handle_server_error_body, handle_server_error_string, CustomError};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("")
-            .route("/", web::post().to(login))
-            .route("/register", web::post().to(register))
+        web::scope("/auth")
+            .route("/login", web::post().to(login))
             .route("/validate", web::post().to(validate_token))
             .route("/logout", web::post().to(logout)),
+    )
+    .service(
+        web::scope("")
+            .wrap(HttpAuthentication::bearer(validator))
+            .route("/register", web::post().to(register)),
     );
 }
 
@@ -73,7 +87,7 @@ pub async fn register(
         email: Set(encrypt_field(&fernet, &data.email)),
         password: Set(encrypt_field(&fernet, &hashed)),
         version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
-        permission_id: Set(data.permission_id),
+        role_id: Set(data.role_id),
         disabled_since: NotSet,
     };
 
@@ -104,7 +118,7 @@ pub async fn register(
 
 #[utoipa::path(
     post,
-    path = "/",
+    path = "/auth/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = LoginResponse),
@@ -125,51 +139,68 @@ pub async fn login(
         .one(&postgres_client.client)
         .await;
 
-    match user_result {
-        Ok(Some(user)) => {
-            if user.disabled_since.is_some() {
-                return HttpResponse::Unauthorized().body("Inactive user");
-            }
+    let user = match user_result {
+        Ok(Some(user)) => user,
+        Ok(None) => return HttpResponse::Unauthorized().body("User not found"),
+        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
+    };
 
-            let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
-                GetUserKeyResult::Ok(key) => key,
-                GetUserKeyResult::Err(err) => return err,
-            };
+    if user.disabled_since.is_some() {
+        return HttpResponse::Unauthorized().body("Inactive user");
+    }
 
-            let decrypted_password = match decrypt_field(
-                &fernet::Fernet::new(&user_decryption_key).unwrap(),
-                &user.password,
-            ) {
-                Ok(p) => p,
-                Err(err) => {
-                    return handle_server_error_body(
-                        "Decryption error",
-                        CustomError::UnsuccessfulDecryption("password".to_string(), err),
-                        &config,
-                        None,
-                    );
-                }
-            };
+    let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
+        GetUserKeyResult::Ok(key) => key,
+        GetUserKeyResult::Err(err) => return err,
+    };
 
-            if verify(&data.password, &decrypted_password).unwrap_or(false) {
-                let token = create_jwt(&user.id.to_string(), &config.jwt_secret);
-                HttpResponse::Ok().json(LoginResponse {
-                    token,
-                    id: user.id,
-                    permissions: vec![],
-                })
-            } else {
-                HttpResponse::Unauthorized().body("Invalid credentials")
-            }
+    let decrypted_password = match decrypt_field(
+        &fernet::Fernet::new(&user_decryption_key).unwrap(),
+        &user.password,
+    ) {
+        Ok(p) => p,
+        Err(err) => {
+            return handle_server_error_body(
+                "Decryption error",
+                CustomError::UnsuccessfulDecryption("password".to_string(), err),
+                &config,
+                None,
+            );
         }
-        Ok(None) => HttpResponse::Unauthorized().body("User not found"),
-        Err(err) => handle_server_error_body("Database Error", err, &config, None),
+    };
+
+    let permissions = match permission_entity::Entity::find()
+        .filter(
+            permission_entity::Column::Id.in_subquery(
+                Query::select()
+                    .column(role_permission_entity::Column::PermissionId)
+                    .from(role_permission_entity::Entity)
+                    .and_where(role_permission_entity::Column::RoleId.eq(user.role_id))
+                    .to_owned(),
+            ),
+        )
+        .all(&postgres_client.client)
+        .await
+    {
+        Ok(permissions) => permissions.into_iter().map(|p| p.name).collect(),
+        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
+    };
+
+    if verify(&data.password, &decrypted_password).unwrap_or(false) {
+        let token = create_jwt(&user.id.to_string(), &config.jwt_secret);
+        HttpResponse::Ok().json(LoginResponse {
+            token,
+            id: user.id,
+            permissions,
+        })
+    } else {
+        HttpResponse::Unauthorized().body("Invalid credentials")
     }
 }
 
 #[utoipa::path(
     post,
-    path = "/validate",
+    path = "/auth/validate",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token is valid", body = Claims),
@@ -191,7 +222,7 @@ pub async fn validate_token(
 
 #[utoipa::path(
     post,
-    path = "/logout",
+    path = "/auth/logout",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token invalidated")

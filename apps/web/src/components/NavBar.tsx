@@ -2,7 +2,6 @@ import { logout } from '../service/AuthService';
 import { useNavigate } from 'react-router-dom';
 import {
   clearLocalStorageData,
-  clearUserIdFromLocalStorage,
 } from '../store/storage';
 import { useEffect, useState } from 'react';
 
@@ -35,7 +34,6 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
     try {
       await logout();
       setIsAuthenticated(false);
-      clearUserIdFromLocalStorage();
       clearLocalStorageData();
       navigate('/login');
     } catch (err) {

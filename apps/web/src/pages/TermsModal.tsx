@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { TermsService } from '../service/TermsService';
@@ -7,11 +7,7 @@ import {
   TermStatus,
   UserAcceptanceRequest,
 } from '../schemas/TermsSchema';
-import {
-  clearLocalStorageData,
-  clearUserIdFromLocalStorage,
-  getUserIdFromLocalStorage,
-} from '../store/storage';
+import { getLocalStorageData, clearLocalStorageData } from '../store/storage';
 import { deleteUser } from '../service/UserService';
 import { logout } from '../service/AuthService';
 
@@ -26,12 +22,12 @@ interface NavbarProps {
   setIsAuthenticated: (auth: boolean) => void;
 }
 
-const TermsModal: React.FC<TermsModalProps> = ({
+const TermsModal = ({
   onAccept,
   initialNewsletterOptIn = false,
   showBackOption = false,
   setIsAuthenticated,
-}) => {
+}: TermsModalProps) => {
   const [isChecked, setIsChecked] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(
     initialNewsletterOptIn
@@ -46,7 +42,7 @@ const TermsModal: React.FC<TermsModalProps> = ({
 
   useEffect(() => {
     const fetchTermsAndUserAcceptance = async () => {
-      const userId = String(getUserIdFromLocalStorage());
+      const userId = getLocalStorageData()?.id || null;
       const term = await TermsService.getActiveTerm();
       setTermsText(term.text);
 
@@ -85,14 +81,14 @@ const TermsModal: React.FC<TermsModalProps> = ({
   }, []);
 
   const handleAccept = async () => {
-    const userId = getUserIdFromLocalStorage();
+    const userId = getLocalStorageData()?.id;
     if (!userId) {
       console.error('ID do usuário não encontrado no localStorage.');
       return;
     }
 
     const handleDelete = async () => {
-      const currentUser = getUserIdFromLocalStorage();
+      const currentUser = getLocalStorageData()?.id;
       if (
         currentUser &&
         window.confirm('Tem certeza que deseja excluir este usuário?')
@@ -124,7 +120,6 @@ const TermsModal: React.FC<TermsModalProps> = ({
         await logout();
         setIsAuthenticated(false);
 
-        clearUserIdFromLocalStorage();
         clearLocalStorageData();
         navigate('/login');
         return;

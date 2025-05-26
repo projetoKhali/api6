@@ -11,15 +11,14 @@ import '../styles.css';
 import YieldRegister from '../pages/YieldRegister';
 import ProjectionPage from '../pages/ProjectionPage';
 import UserManagementPage from '../pages/UserManagementPage';
-import UserInformation from '../pages/PersonalData';
-import { getUserIdFromLocalStorage } from '../store/storage';
 import Login from '../pages/Login';
 import ProjectionCustomPage from '../pages/ProjectionCustomPage';
 import { useEffect, useState } from 'react';
 import ReportPage from '../pages/ReportPage';
-import { isUserLoggedIn } from '../store/storage';
+import { getLocalStorageData, isUserLoggedIn } from '../store/storage';
 import TermsPage from '../pages/Terms';
 import TermsModal from '../pages/TermsModal';
+import EditUserPage from '../pages/PersonalData';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -28,11 +27,7 @@ function App() {
   useEffect(() => {
     isUserLoggedIn().then((result) => setIsAuthenticated(result));
 
-    const localPermissions = localStorage.getItem('khali_api6:permissions');
-    if (localPermissions) {
-      const parsed = JSON.parse(localPermissions).map((p: string) => p.trim());
-      setPermissions(parsed);
-    }
+    setPermissions(getLocalStorageData()?.permissions || []);
   }, []);
 
   return (
@@ -76,7 +71,7 @@ function App() {
 
                       <Route
                         path="/user-data"
-                        element={<UserInformation userId={getUserIdFromLocalStorage()} />}
+                        element={<EditUserPage />}
                       />
 
                       <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} setIsAuthenticated={setIsAuthenticated}  />} />
