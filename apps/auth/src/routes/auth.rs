@@ -150,8 +150,8 @@ pub async fn login(
     }
 
     let user_decryption_key = match get_user_key(user.id, &keys_client, &config).await {
-        GetUserKeyResult::Ok(key) => key,
-        GetUserKeyResult::Err(err) => return err,
+        GetKeyResult::Ok(key) => key,
+        GetKeyResult::Err(err) => return err,
     };
 
     let decrypted_password = match decrypt_field(

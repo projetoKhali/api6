@@ -10,7 +10,7 @@ use crate::entities::user as user_entity;
 use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
 use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
 use crate::service::fernet::{
-    decrypt_database_user, encrypt_field, get_user_key, GetUserKeyResult,
+    decrypt_database_user, encrypt_field, get_user_key, GetKeyResult,
 };
 use crate::service::jwt::validator;
 
@@ -70,8 +70,8 @@ async fn get_users(
     for encrypted_user in raw_users {
         let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await
         {
-            GetUserKeyResult::Ok(key) => key,
-            GetUserKeyResult::Err(err) => return err,
+            GetKeyResult::Ok(key) => key,
+            GetKeyResult::Err(err) => return err,
         };
 
         users_public.push(
@@ -140,8 +140,8 @@ async fn get_user(
     };
 
     let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await {
-        GetUserKeyResult::Ok(key) => key,
-        GetUserKeyResult::Err(err) => return err,
+        GetKeyResult::Ok(key) => key,
+        GetKeyResult::Err(err) => return err,
     };
 
     match decrypt_database_user(&user_decryption_key, encrypted_user) {
@@ -183,8 +183,8 @@ async fn update_user(
     };
 
     let user_decryption_key = match get_user_key(*user_id, &keys_client, &config).await {
-        GetUserKeyResult::Ok(key) => key,
-        GetUserKeyResult::Err(err) => return err,
+        GetKeyResult::Ok(key) => key,
+        GetKeyResult::Err(err) => return err,
     };
 
     user_update_model.disabled_since = match &user_update.disabled_since {

@@ -19,7 +19,7 @@ use crate::{
     },
 };
 
-pub enum GetUserKeyResult {
+pub enum GetKeyResult {
     Ok(String),
     Err(HttpResponse),
 }
@@ -28,25 +28,25 @@ pub async fn get_user_key(
     user_id: i64,
     keys_client: &web::Data<crate::infra::server::DatabaseClientKeys>,
     config: &web::Data<crate::infra::types::Config>,
-) -> GetUserKeyResult {
+) -> GetKeyResult {
     let user_key_result = keys_entity::Entity::find_by_id(user_id)
         .one(&keys_client.client)
         .await;
 
     match user_key_result {
-        Err(err) => GetUserKeyResult::Err(handle_server_error_body(
+        Err(err) => GetKeyResult::Err(handle_server_error_body(
             "Database Error",
             err,
             &config,
             None,
         )),
-        Ok(None) => GetUserKeyResult::Err(handle_server_error_body(
+        Ok(None) => GetKeyResult::Err(handle_server_error_body(
             "Database Error",
             CustomError::UserKeyNotFound(user_id),
             &config,
             Some(ServerErrorType::NotFound),
         )),
-        Ok(Some(user_key)) => GetUserKeyResult::Ok(user_key.key),
+        Ok(Some(user_key)) => GetKeyResult::Ok(user_key.key),
     }
 }
 
