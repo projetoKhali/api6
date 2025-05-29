@@ -162,7 +162,7 @@ Nesta sprint, serão entregues as seguintes funcionalidades:
 </details>
 
 <details>
-<summary> Sprint 2 </summary>
+<summary> Sprint 3 </summary>
   
 ![image](https://github.com/user-attachments/assets/9498770a-c0d5-4b19-9e11-ce403e710f97)
 
