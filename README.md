@@ -168,6 +168,14 @@ Nesta sprint, serão entregues as seguintes funcionalidades:
 
 </details>
 
+<details>
+<summary> Sprint 3 </summary>
+  
+![image](https://github.com/user-attachments/assets/ac9f7461-eeb9-4cae-95c0-6b5665b7aff2)
+
+</details>
+
+
 <span id="gerenciamento">
 
 ## Gerenciamento do projeto 
