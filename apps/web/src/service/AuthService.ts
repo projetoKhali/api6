@@ -15,11 +15,15 @@ export const login = async (params: LoginRequest): Promise<boolean> => {
     overrideURL: AUTH_BASE_URL,
   });
 
-  if (!result.user) {
+  if (!result?.id || !result?.token || !result?.permissions) {
     return false;
   }
 
-  setLocalStorageData(result.user);
+  setLocalStorageData({
+    id: result.id,
+    token: result.token,
+    permissions: result.permissions,
+  });
   return true;
 };
 

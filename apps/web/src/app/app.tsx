@@ -26,9 +26,11 @@ function App() {
 
   useEffect(() => {
     isUserLoggedIn().then((result) => setIsAuthenticated(result));
-
-    setPermissions(getLocalStorageData()?.permissions || []);
   }, []);
+
+  useEffect(() => {
+    setPermissions(getLocalStorageData()?.permissions || []);
+  }, [isAuthenticated]);
 
   return (
     <Router>
@@ -45,36 +47,66 @@ function App() {
                     </div>
                     <div style={{ height: '100%', width: '100%' }}>
                       <Routes>
-                        <Route path="/" element={<Navigate to="/dashboard" />} />
-                      <Route path="/login" element={<Navigate to="/" />} />
+                        <Route
+                          path="/"
+                          element={<Navigate to="/dashboard" />}
+                        />
+                        <Route path="/login" element={<Navigate to="/" />} />
 
-                      {permissions.includes('dashboard') && (
-                        <Route path="/dashboard" element={<Dashboard />} />
-                      )}
+                        {permissions.includes('dashboard') && (
+                          <Route path="/dashboard" element={<Dashboard />} />
+                        )}
 
-                      {permissions.includes('register') && (
-                        <>
-                          <Route path="/register" element={<Navigate to="/register/yield" replace />} />
-                          <Route path="/register/yield" element={<YieldRegister />} />
-                          <Route path="/register/event" element={<EventsRegister />} />
-                          <Route path="/user" element={<UserManagementPage />} />
-                        </>
-                      )}
+                        {permissions.includes('register') && (
+                          <>
+                            <Route
+                              path="/register"
+                              element={
+                                <Navigate to="/register/yield" replace />
+                              }
+                            />
+                            <Route
+                              path="/register/yield"
+                              element={<YieldRegister />}
+                            />
+                            <Route
+                              path="/register/event"
+                              element={<EventsRegister />}
+                            />
+                            <Route
+                              path="/user"
+                              element={<UserManagementPage />}
+                            />
+                          </>
+                        )}
 
-                      {permissions.includes('analitic') && (
-                        <>
-                          <Route path="/projection" element={<ProjectionPage />} />
-                          <Route path="/prevision" element={<ProjectionCustomPage />} />
-                          <Route path="/report" element={<ReportPage />} />
-                        </>
-                      )}
+                        {permissions.includes('analitic') && (
+                          <>
+                            <Route
+                              path="/projection"
+                              element={<ProjectionPage />}
+                            />
+                            <Route
+                              path="/prevision"
+                              element={<ProjectionCustomPage />}
+                            />
+                            <Route path="/report" element={<ReportPage />} />
+                          </>
+                        )}
 
-                      <Route
-                        path="/user-data"
-                        element={<EditUserPage />}
-                      />
+                        <Route path="/user-data" element={<EditUserPage />} />
 
-                      <Route path="/terms-acceptance" element={<TermsModal onAccept={() => { /* handle accept */ }} setIsAuthenticated={setIsAuthenticated}  />} />
+                        <Route
+                          path="/terms-acceptance"
+                          element={
+                            <TermsModal
+                              onAccept={() => {
+                                /* handle accept */
+                              }}
+                              setIsAuthenticated={setIsAuthenticated}
+                            />
+                          }
+                        />
                         <Route path="/terms" element={<TermsPage />} />
                       </Routes>
                     </div>

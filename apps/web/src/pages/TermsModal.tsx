@@ -53,24 +53,28 @@ const TermsModal = ({
       }));
 
       if (userId) {
-        const userAcceptance = await TermsService.getUserAcceptance(userId);
+        try {
+          const userAcceptance = await TermsService.getUserAcceptance(userId);
 
-        if (userAcceptance && userAcceptance.topics) {
-          setInitialAcceptedTopics(userAcceptance.topics);
-          initialTopics = term.topics.map((termTopic) => {
-            const userTopic = userAcceptance.topics.find(
-              (t) => t.description === termTopic.description
-            );
-            return {
-              description: termTopic.description,
-              status:
-                termTopic.required === true
-                  ? TermStatus.ACTIVE
-                  : TermStatus.INACTIVE,
-              accepted: userTopic ? userTopic.accepted : false,
-            };
-          });
-          setAcceptanceId(userAcceptance.user_id);
+          if (userAcceptance && userAcceptance.topics) {
+            setInitialAcceptedTopics(userAcceptance.topics);
+            initialTopics = term.topics.map((termTopic) => {
+              const userTopic = userAcceptance.topics.find(
+                (t) => t.description === termTopic.description
+              );
+              return {
+                description: termTopic.description,
+                status:
+                  termTopic.required === true
+                    ? TermStatus.ACTIVE
+                    : TermStatus.INACTIVE,
+                accepted: userTopic ? userTopic.accepted : false,
+              };
+            });
+            setAcceptanceId(userAcceptance.user_id);
+          }
+        } catch (e) {
+          console.log(e);
         }
       }
 
