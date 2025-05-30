@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import (
     DateTime,
     ForeignKey,
+    UniqueConstraint,
     create_engine,
     text,
     Column,
@@ -59,6 +60,13 @@ class EntityKey(Base):
         BigInteger,
         ForeignKey("entity_type.id"),
         nullable=False
+    )
+    __table_args__ = (
+        UniqueConstraint(
+            'entity_type',
+            'entity_id',
+            name='uq_entity_type_entity_id'
+        ),
     )
 
 
