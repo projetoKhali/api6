@@ -2,8 +2,8 @@ import datetime
 import os
 from dotenv import load_dotenv
 from sqlalchemy import (
-    Date,
     DateTime,
+    ForeignKey,
     create_engine,
     text,
     Column,
@@ -33,13 +33,28 @@ def get_keys_engine():
 Base = declarative_base()
 
 
-class UserKey(Base):
-    __tablename__ = "user_key"
+class EntityType(Base):
+    __tablename__ = "entity_type"
+    id = Column(
+        BigInteger,
+        primary_key=True,
+        autoincrement=True
+    )
+    name = Column(String, unique=True, nullable=False)
+
+
+class EntityKey(Base):
+    __tablename__ = "entity_key"
     id = Column(
         BigInteger,
         primary_key=True
     )
     key = Column(String, unique=True, nullable=False)
+    entity_type = Column(
+        BigInteger,
+        ForeignKey("entity_type.id"),
+        nullable=False
+    )
 
 
 class RevokedToken(Base):
