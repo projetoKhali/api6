@@ -15,14 +15,11 @@ use sea_orm::{
     QueryFilter,
     Set,
 };
-use sea_query::Query;
 
 use crate::{
     entities::{
         entity_key as keys_entity,
-        permission as permission_entity,
-        role_permission as role_permission_entity,
-        user as user_entity, //
+        external_client as external_client_entity, //
     },
     infra::server::{
         DatabaseClientKeys,
@@ -43,13 +40,13 @@ use super::common::{handle_server_error_body, handle_server_error_string, Custom
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/auth")
+        web::scope("/client/auth")
             .route("/login", web::post().to(login))
             .route("/validate", web::post().to(validate_token))
             .route("/logout", web::post().to(logout)),
     )
     .service(
-        web::scope("")
+        web::scope("/client")
             .wrap(HttpAuthentication::bearer(validator))
             .route("/register", web::post().to(register)),
     );
@@ -58,9 +55,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(
     post,
     path = "/register",
-    request_body = UserRegisterRequest,
+    request_body = ExternalClientRegisterRequest,
     responses(
-        (status = 200, description = "User registered"),
+        (status = 200, description = "ExternalClient registered"),
         (status = 500, description = "Hashing or Database error")
     ),
     tags = ["Auth"]
@@ -70,47 +67,49 @@ pub async fn register(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
-    data: web::Json<UserRegisterRequest>,
+    data: web::Json<ExternalClientRegisterRequest>,
 ) -> impl Responder {
     let hashed = match hash(&data.password, DEFAULT_COST) {
         Ok(h) => h,
         Err(err) => handle_server_error_string("Hashing error", err, &config),
     };
 
-    let new_user_decryption_key = Fernet::generate_key();
+    let new_external_client_decryption_key = Fernet::generate_key();
 
-    let fernet = Fernet::new(&new_user_decryption_key).unwrap();
+    let fernet = Fernet::new(&new_external_client_decryption_key).unwrap();
 
-    let new_user = user_entity::ActiveModel {
-        id: NotSet,
+    let new_external_client = external_client_entity::ActiveModel {
         name: Set(encrypt_field(&fernet, &data.name)),
         login: Set(encrypt_field(&fernet, &data.login)),
-        email: Set(encrypt_field(&fernet, &data.email)),
         password: Set(encrypt_field(&fernet, &hashed)),
-        version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
-        role_id: Set(data.role_id),
         disabled_since: NotSet,
+        ..Default::default()
     };
 
-    let inserted_user = match new_user.insert(&postgres_client.client).await {
-        Ok(inserted_user) => inserted_user,
+    let inserted_external_client = match new_external_client.insert(&postgres_client.client).await {
+        Ok(inserted_external_client) => inserted_external_client,
         Err(err) => {
-            return handle_server_error_body("Failed to register user: {:?}", err, &config, None)
+            return handle_server_error_body(
+                "Failed to register external_client: {:?}",
+                err,
+                &config,
+                None,
+            )
         }
     };
 
-    let new_user_key = keys_entity::ActiveModel {
+    let new_external_client_key = keys_entity::ActiveModel {
         id: NotSet,
-        entity_id: Set(inserted_user.id),
-        entity_type: Set(EntityType::User),
-        key: Set(new_user_decryption_key.clone()),
+        entity_id: Set(inserted_external_client.id),
+        entity_type: Set(EntityType::ExternalClient),
+        key: Set(new_external_client_decryption_key.clone()),
     };
 
-    match new_user_key.insert(&keys_client.client).await {
-        Ok(_) => HttpResponse::Ok().body("User registered"),
+    match new_external_client_key.insert(&keys_client.client).await {
+        Ok(_) => HttpResponse::Ok().body("ExternalClient registered"),
         Err(err) => {
             return handle_server_error_body(
-                "Failed to register user key: {:?}",
+                "Failed to register external_client key: {:?}",
                 err,
                 &config,
                 None,
@@ -124,7 +123,7 @@ pub async fn register(
     path = "/auth/login",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login successful", body = UserLoginResponse),
+        (status = 200, description = "Login successful", body = ExternalClientLoginResponse),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Database error")
     ),
@@ -137,30 +136,36 @@ pub async fn login(
     config: web::Data<crate::infra::types::Config>,
     data: web::Json<LoginRequest>,
 ) -> impl Responder {
-    let user_result = user_entity::Entity::find()
-        .filter(user_entity::Column::Login.eq(data.login.clone()))
+    let external_client_result = external_client_entity::Entity::find()
+        .filter(external_client_entity::Column::Login.eq(data.login.clone()))
         .one(&postgres_client.client)
         .await;
 
-    let user = match user_result {
-        Ok(Some(user)) => user,
-        Ok(None) => return HttpResponse::Unauthorized().body("User not found"),
+    let external_client = match external_client_result {
+        Ok(Some(external_client)) => external_client,
+        Ok(None) => return HttpResponse::Unauthorized().body("ExternalClient not found"),
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    if user.disabled_since.is_some() {
-        return HttpResponse::Unauthorized().body("Inactive user");
+    if external_client.disabled_since.is_some() {
+        return HttpResponse::Unauthorized().body("Inactive external_client");
     }
 
-    let user_decryption_key =
-        match get_entity_key(user.id, EntityType::User, &keys_client, &config).await {
-            GetKeyResult::Ok(key) => key,
-            GetKeyResult::Err(err) => return err,
-        };
+    let external_client_decryption_key = match get_entity_key(
+        external_client.id,
+        EntityType::ExternalClient,
+        &keys_client,
+        &config,
+    )
+    .await
+    {
+        GetKeyResult::Ok(key) => key,
+        GetKeyResult::Err(err) => return err,
+    };
 
     let decrypted_password = match decrypt_field(
-        &fernet::Fernet::new(&user_decryption_key).unwrap(),
-        &user.password,
+        &fernet::Fernet::new(&external_client_decryption_key).unwrap(),
+        &external_client.password,
     ) {
         Ok(p) => p,
         Err(err) => {
@@ -173,34 +178,13 @@ pub async fn login(
         }
     };
 
-    let permissions = match permission_entity::Entity::find()
-        .filter(
-            permission_entity::Column::Id.in_subquery(
-                Query::select()
-                    .column(role_permission_entity::Column::PermissionId)
-                    .from(role_permission_entity::Entity)
-                    .and_where(role_permission_entity::Column::RoleId.eq(user.role_id))
-                    .to_owned(),
-            ),
-        )
-        .all(&postgres_client.client)
-        .await
-    {
-        Ok(permissions) => permissions.into_iter().map(|p| p.name).collect(),
-        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
-    };
-
     if verify(&data.password, &decrypted_password).unwrap_or(false) {
         let token = create_jwt(
-          &user.id.to_string(),
-          EntityType::User,
-          &config.jwt_secret,
+            &external_client.id.to_string(),
+            EntityType::ExternalClient,
+            &config.jwt_secret,
         );
-        HttpResponse::Ok().json(UserLoginResponse {
-            token,
-            id: user.id,
-            permissions,
-        })
+        HttpResponse::Ok().json(ExternalClientLoginResponse { token })
     } else {
         HttpResponse::Unauthorized().body("Invalid credentials")
     }

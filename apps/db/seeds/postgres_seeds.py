@@ -1,10 +1,15 @@
-import bcrypt
-from cryptography.fernet import Fernet
-from faker import Faker
-from datetime import datetime, timedelta
 import random
+from base64 import b64encode
+from datetime import datetime, timedelta
+
+from sqlalchemy.orm import sessionmaker
+from faker import Faker
+from cryptography.fernet import Fernet
+import bcrypt
+
 from db.keys import (
     get_keys_engine,
+    EntityType,
     EntityKey,
 )
 from db.postgres import (
@@ -15,8 +20,6 @@ from db.postgres import (
     Permission,
     Role
 )
-from sqlalchemy.orm import sessionmaker
-from base64 import b64encode
 
 fake = Faker()
 Faker.seed(42)
@@ -33,7 +36,28 @@ NUM_EXTERNAL_CLIENTS = 9
 NUM_EXTERNAL_CLIENTS_DISABLED = 0
 
 
-def insert_permissions(session):
+def insert_entity_types(keys_session):
+    entity_types = {
+        inserted.name: inserted.id
+        for inserted in [
+            (
+                lambda entity_type: None
+                or keys_session.add(entity_type)
+                or keys_session.flush()
+                or entity_type
+            )(EntityType(name=name))
+            for name in [
+                "user",
+                "external_client",
+            ]
+        ]
+    }
+
+    keys_session.flush()
+    return entity_types
+
+
+def insert_permissions(postgres_session):
     permission_names = [
         "dashboard",
         "register",
@@ -46,13 +70,13 @@ def insert_permissions(session):
         for name in permission_names
     ]
 
-    session.add_all(permissions)
-    session.commit()
+    postgres_session.add_all(permissions)
+    postgres_session.flush()
     print(f"{len(permissions)} permissões criadas: {', '.join(permission_names)}.")
     return permissions
 
 
-def insert_roles(session, permissions):
+def insert_roles(postgres_session, permissions):
     permission_dict = {perm.name: perm for perm in permissions}
 
     # ADM - todas as permissões
@@ -74,16 +98,20 @@ def insert_roles(session, permissions):
     )
 
     roles = [adm_role, agent_role]
-    session.add_all(roles)
-    session.commit()
+    postgres_session.add_all(roles)
+    postgres_session.flush()
 
     print("Roles criadas: adm (todas permissões), agent (dashboard, analitic, terms).")
     return roles
 
 
-def insert_users(session, roles):
+def insert_users(
+    postgres_session,
+    keys_session,
+    roles,
+    entity_types,
+):
     users = []
-    keys_session = sessionmaker(bind=get_keys_engine())()
 
     def encrypt_user(
         fernet: Fernet,
@@ -122,13 +150,13 @@ def insert_users(session, roles):
             disabled_since=disabled_since,
         ))
         users.append(user)
-        session.add(user)
-        session.flush()  # get user.id
+        postgres_session.add(user)
+        postgres_session.flush()  # get user.id
 
         keys_session.add(EntityKey(
-            id=user.id,
+            entity_id=user.id,
             key=key.decode(),
-            entity_type="user",
+            entity_type=entity_types["user"]
         ))
 
     add_user(  # default user for easy login
@@ -156,20 +184,23 @@ def insert_users(session, roles):
             disabled_since=disabled_date,
         )
 
-    session.add_all(users)
+    postgres_session.add_all(users)
     print(f"{NUM_USERS} usuários inseridos.")
 
-    session.commit()
-    keys_session.commit()
+    postgres_session.flush()
+    keys_session.flush()
     print(f"{NUM_USERS + 1} usuários inseridos e encriptados.")
     print(f"{NUM_USERS + 1} chaves de usuário inseridas.")
 
     return users
 
 
-def insert_external_clients(session):
+def insert_external_clients(
+    postgres_session,
+    keys_session,
+    entity_types,
+):
     external_clients = []
-    keys_session = sessionmaker(bind=get_keys_engine())()
 
     def encrypt_external_client(
         fernet: Fernet,
@@ -196,13 +227,13 @@ def insert_external_clients(session):
             disabled_since=disabled_since,
         ))
         external_clients.append(external_client)
-        session.add(external_client)
-        session.flush()  # get external_client.id
+        postgres_session.add(external_client)
+        postgres_session.flush()  # get external_client.id
 
         keys_session.add(EntityKey(
-            id=external_client.id,
+            entity_id=external_client.id,
             key=key.decode(),
-            entity_type="external_client",
+            entity_type=entity_types["external_client"],
         ))
 
     add_external_client(  # default external_client for easy login
@@ -218,16 +249,16 @@ def insert_external_clients(session):
 
         add_external_client(
             name=fake.name(),
-            login=fake.unique.external_client_name(),
+            login=fake.unique.company(),
             password=hash_password(fake.password()),
             disabled_since=disabled_date
         )
 
-    session.add_all(external_clients)
+    postgres_session.add_all(external_clients)
     print(f"{NUM_USERS} usuários inseridos.")
 
-    session.commit()
-    keys_session.commit()
+    postgres_session.flush()
+    keys_session.flush()
     print(f"{NUM_USERS + 1} usuários inseridos e encriptados.")
     print(f"{NUM_USERS + 1} chaves de usuário inseridas.")
 
@@ -249,17 +280,27 @@ def hash_password(password: str) -> str:
 
 
 def insert_seeds():
-    engine = get_engine()
-    test_connection(engine)
-    session = sessionmaker(bind=engine)()
+    postgres_engine = get_engine()
+    keys_engine = get_keys_engine()
+
+    test_connection(postgres_engine)
+    test_connection(keys_engine)
+
+    postgres_session = sessionmaker(bind=postgres_engine)()
+    keys_session = sessionmaker(bind=keys_engine)()
 
     print("Iniciando seeds...")
 
-    permissions = insert_permissions(session)
-    roles = insert_roles(session, permissions)
-    insert_users(session, roles)
+    entity_types = insert_entity_types(keys_session)
 
-    insert_external_clients(session)
+    permissions = insert_permissions(postgres_session)
+    roles = insert_roles(postgres_session, permissions)
+    insert_users(postgres_session, keys_session, roles, entity_types)
+
+    insert_external_clients(postgres_session, keys_session, entity_types)
+
+    postgres_session.commit()
+    keys_session.commit()
 
     print("Seed finalizada com sucesso.")
 

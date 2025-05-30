@@ -47,7 +47,12 @@ class EntityKey(Base):
     __tablename__ = "entity_key"
     id = Column(
         BigInteger,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
+    )
+    entity_id = Column(
+        BigInteger,
+        nullable=False
     )
     key = Column(String, unique=True, nullable=False)
     entity_type = Column(
