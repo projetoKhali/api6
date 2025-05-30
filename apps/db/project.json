@@ -45,7 +45,7 @@
     },
     "postgres-seeds": {
       "executor": "nx:run-commands",
-      "dependsOn": ["init-postgres"],
+      "dependsOn": ["init-postgres", "init-keys"],
       "options": {
         "command": "poetry run python {projectRoot}/seeds/postgres_seeds.py"
       }
