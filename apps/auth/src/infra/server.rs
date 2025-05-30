@@ -54,6 +54,8 @@ pub async fn create_server(config: Config) -> std::io::Result<Server> {
             )
             .configure(routes::user)
             .configure(routes::auth)
+            .configure(routes::external_client)
+            .configure(routes::external_client_auth)
     })
     .bind(("0.0.0.0", server_port))?;
 

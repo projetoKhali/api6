@@ -1,12 +1,19 @@
 use actix_web::{web, HttpResponse};
 use thiserror::Error;
 
-use crate::service::fernet::DecryptionError;
+use crate::{
+  models::EntityType,//
+  service::fernet::DecryptionError,
+};
 
 #[derive(Debug, Error)]
 pub enum CustomError {
-    #[error("Decryption key not found in `user_key` table for user ID {0}")]
-    UserKeyNotFound(i64),
+    #[error("User with ID {0} not found")]
+    UserNotFound(i64),
+    #[error("External Client with ID {0} not found")]
+    ExternalClientNotFound(i64),
+    #[error("Decryption key not found in `entity_key` table for `{0}` entity of ID {1}")]
+    EntityKeyNotFound(EntityType, i64),
     #[error("Unsuccessful decryption of field `{0}`: {1}")]
     UnsuccessfulDecryption(String, #[source] DecryptionError),
 }

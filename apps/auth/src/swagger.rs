@@ -1,40 +1,68 @@
-use crate::{
-  routes,
-  models,
-  entities
-};
+use crate::{entities, models, routes};
 use utoipa::OpenApi;
 
 // Swagger Schema
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        // Authentication routes
+
+        // User Authentication routes
         routes::auth::register,
         routes::auth::login,
         routes::auth::validate_token,
         routes::auth::logout,
-        // User routes
+
+        // User _RUD routes
         routes::user::get_users,
         routes::user::get_user,
         routes::user::update_user,
         routes::user::delete_user,
+
+        // External Client Authentication routes
+        routes::external_client_auth::register,
+        routes::external_client_auth::login,
+        routes::external_client_auth::validate_token,
+        routes::external_client_auth::logout,
+
+        // External Client _RUD routes
+        routes::external_client::get_external_clients,
+        routes::external_client::get_external_client,
+        routes::external_client::update_external_client,
+        routes::external_client::delete_external_client,
+
     ),
     components(schemas(
+
         // Authentication models
-        models::auth::RegisterRequest,
+        models::auth::UserRegisterRequest,
+        models::auth::ExternalClientRegisterRequest,
+
         models::auth::LoginRequest,
-        models::auth::LoginResponse,
+
+        models::auth::UserLoginResponse,
+        models::auth::ExternalClientLoginResponse,
+
         models::auth::ValidateRequest,
+
         // User models
         models::UserPublic,
         models::UserUpdate,
+
+        // External Client models
+        models::ExternalClientPublic,
+        models::ExternalClientUpdate,
+
         // Entities
         entities::user::Model,
+        entities::external_client::Model,
+
     )),
     tags(
+
         (name = "Auth", description = "Authentication endpoints"),
-        (name = "User", description = "User management endpoints")
+        (name = "User", description = "User management endpoints"),
+        (name = "External Client", description = "External Client management endpoints")
+
     )
 )]
 
