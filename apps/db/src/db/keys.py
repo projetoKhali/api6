@@ -54,7 +54,7 @@ class EntityKey(Base):
         BigInteger,
         nullable=False
     )
-    key = Column(String, unique=True, nullable=False)
+    key = Column(String, nullable=False)
     entity_type = Column(
         BigInteger,
         ForeignKey("entity_type.id"),
