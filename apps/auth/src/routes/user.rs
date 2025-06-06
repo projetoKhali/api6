@@ -2,34 +2,46 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, DEFAULT_COST};
 use fernet::Fernet;
-use sea_orm::prelude::Date;
-use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{
-    ActiveModelTrait, //
+    prelude::Date,
+    ActiveModelTrait,
+    ActiveValue::{
+        NotSet,
+        Set, //
+    },
     EntityTrait,
     IntoActiveModel,
     PaginatorTrait,
-    QuerySelect,
+    QuerySelect, //
 };
 
-use crate::entities::user as user_entity;
-use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
-use crate::models::{
-    EntityType, //
-    PaginatedRequest,
-    PaginatedResponse,
-    UserPublic,
-    UserUpdate,
+use crate::{
+    entities::user as user_entity,
+    infra::server::{
+        DatabaseClientKeys, //
+        DatabaseClientPostgres,
+    },
+    models::{
+        EntityType, //
+        PaginatedRequest,
+        PaginatedResponse,
+        UserPublic,
+        UserUpdate,
+    },
+    routes::common::{
+        handle_server_error_body,
+        ServerErrorType, //
+    },
+    service::{
+        fernet::{
+            decrypt_database_user, //
+            encrypt_field,
+            get_entity_key,
+            GetKeyResult,
+        },
+        jwt::validator,
+    },
 };
-use crate::service::fernet::{
-    decrypt_database_user, //
-    encrypt_field,
-    get_entity_key,
-    GetKeyResult,
-};
-use crate::service::jwt::validator;
-
-use super::common::{handle_server_error_body, ServerErrorType};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(

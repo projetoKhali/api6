@@ -25,8 +25,13 @@ pub struct Claims {
     pub jti: String,
 }
 
+pub struct ClaimsSubject {
+    pub entity_type: EntityType,
+    pub id: String,
+}
+
 impl Claims {
-    pub fn parse_subject(&self) -> Result<(EntityType, String), VerificationError> {
+    pub fn parse_subject(&self) -> Result<ClaimsSubject, VerificationError> {
         let decoded = STANDARD
             .decode(&self.sub)
             .map_err(|_| VerificationError::InvalidSubjectFormat)?;
@@ -42,7 +47,10 @@ impl Claims {
         let entity_type = EntityType::from_str(parts[0])
             .map_err(|_| VerificationError::InvalidEntityType(parts[0].to_string()))?;
 
-        Ok((entity_type, parts[1].to_string()))
+        Ok(ClaimsSubject {
+            entity_type,
+            id: parts[1].to_string(),
+        })
     }
 }
 

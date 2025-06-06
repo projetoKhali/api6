@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Authorize {{ client_name }} via Khali</title>
+    <script>
+      function sendTokenToOpener(token) {
+        if (window.opener) {
+          window.opener.postMessage({ token }, '*');
+          window.close();
+        } else {
+          alert('No opener window found.');
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <h2>Login to {{ client_name }}</h2>
+    <form id="loginForm">
+      <input type="hidden" name="client_id" value="{{ client_id }}" />
+      <label>Username: <input name="username" required /></label><br />
+      <label>Password: <input type="password" name="password" required /></label
+      ><br />
+      <button type="submit">Login</button>
+    </form>
+
+    <script>
+      document
+        .getElementById('loginForm')
+        .addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const form = e.target;
+          const data = new URLSearchParams(new FormData(form));
+          const response = await fetch('portability/auth/authorize', {
+            method: 'POST',
+            body: data,
+          });
+
+          if (response.ok) {
+            const { token } = await response.json();
+            sendTokenToOpener(token);
+          } else {
+            const msg = await response.text();
+            alert('Login failed: ' + msg);
+          }
+        });
+    </script>
+  </body>
+</html>

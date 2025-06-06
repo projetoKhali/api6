@@ -8,6 +8,8 @@ pub enum EntityType {
     User,
     #[sea_orm(string_value = "external_client")]
     ExternalClient,
+    #[sea_orm(string_value = "authorized_client")]
+    AuthorizedClient,
 }
 
 impl EntityType {
@@ -15,6 +17,7 @@ impl EntityType {
         match self {
             EntityType::User => "user",
             EntityType::ExternalClient => "external_client",
+            EntityType::AuthorizedClient => "authorized_client",
         }
     }
 }
@@ -26,6 +29,7 @@ impl FromStr for EntityType {
         match s {
             "user" => Ok(EntityType::User),
             "external_client" => Ok(EntityType::ExternalClient),
+            "authorized_client" => Ok(EntityType::AuthorizedClient),
             _ => Err(()),
         }
     }

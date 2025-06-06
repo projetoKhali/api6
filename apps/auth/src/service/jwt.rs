@@ -22,40 +22,95 @@ use uuid::Uuid;
 
 use crate::entities::revoked_token;
 
+async fn extract_claims(
+    req: &ServiceRequest,
+    credentials: &BearerAuth,
+) -> Result<Claims, actix_web::Error> {
+    let jwt_secret = req
+        .app_data::<web::Data<Config>>()
+        .ok_or_else(|| actix_web::error::ErrorInternalServerError("JWT secret not configured"))?
+        .get_ref()
+        .jwt_secret
+        .clone();
+
+    let db = req
+        .app_data::<web::Data<DatabaseConnection>>()
+        .ok_or_else(|| {
+            actix_web::error::ErrorInternalServerError("Database connection not configured")
+        })?
+        .get_ref()
+        .clone();
+
+    let token_data = verify_jwt(credentials.token(), &jwt_secret, &db)
+        .await
+        .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid or revoked token"))?;
+
+    Ok(token_data.claims)
+}
+
 pub async fn validator(
     req: ServiceRequest,
     credentials: BearerAuth,
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
-    let jwt_secret = match req.app_data::<web::Data<Config>>() {
-        Some(data) => data.get_ref().jwt_secret.clone(),
-        None => {
+    let claims = match extract_claims(&req, &credentials).await {
+        Ok(claims) => claims,
+        Err(err) => return Err((err, req)),
+    };
+
+    req.extensions_mut().insert(claims);
+    Ok(req)
+}
+
+pub async fn validator_entity_type(
+    req: ServiceRequest,
+    credentials: BearerAuth,
+    entity_type: EntityType,
+) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
+    let claims = match extract_claims(&req, &credentials).await {
+        Ok(claims) => claims,
+        Err(err) => return Err((err, req)),
+    };
+
+    let subject = match claims.parse_subject() {
+        Ok(subject) => subject,
+        Err(_) => {
             return Err((
-                actix_web::error::ErrorInternalServerError("JWT secret not configured"),
+                actix_web::error::ErrorUnauthorized("Invalid token subject"),
                 req,
             ))
         }
     };
 
-    let db = match req.app_data::<web::Data<DatabaseConnection>>() {
-        Some(data) => data.get_ref().clone(),
-        None => {
-            return Err((
-                actix_web::error::ErrorInternalServerError("Database connection not configured"),
-                req,
-            ))
-        }
-    };
-
-    match verify_jwt(credentials.token(), &jwt_secret, &db).await {
-        Ok(token_data) => {
-            req.extensions_mut().insert(token_data.claims);
-            Ok(req)
-        }
-        Err(_) => Err((
-            actix_web::error::ErrorUnauthorized("Invalid or revoked token"),
+    if subject.entity_type != entity_type {
+        return Err((
+            actix_web::error::ErrorUnauthorized("Invalid token entity type"),
             req,
-        )),
+        ));
     }
+
+    req.extensions_mut().insert(subject);
+    Ok(req)
+}
+
+pub async fn validator_user(
+    req: ServiceRequest,
+    credentials: BearerAuth,
+) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
+    validator_entity_type(req, credentials, EntityType::User).await
+}
+
+pub async fn validator_external_client(
+    req: ServiceRequest,
+    credentials: BearerAuth,
+) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
+    validator_entity_type(req, credentials, EntityType::ExternalClient).await
+}
+
+pub async fn validator_authorized_client(
+    req: ServiceRequest,
+    credentials: BearerAuth,
+) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
+    validator_entity_type(req, credentials, EntityType::AuthorizedClient).await
 }
 
 pub async fn verify_jwt(
