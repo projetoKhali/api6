@@ -1,5 +1,6 @@
 mod infra;
 mod service;
+mod templates;
 
 mod entities;
 mod models;
