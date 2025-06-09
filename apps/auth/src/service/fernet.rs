@@ -8,7 +8,8 @@ use thiserror::Error;
 
 use crate::{
     entities::{
-        entity_key as keys_entity, //
+        entity_key as keys_entity,      //
+        entity_type as key_type_entity, //
         external_client::Model as external_client_model,
         user::Model as user_model,
     },
@@ -35,9 +36,38 @@ pub async fn get_entity_key(
     keys_client: &web::Data<crate::infra::server::DatabaseClientKeys>,
     config: &web::Data<crate::infra::types::Config>,
 ) -> GetKeyResult {
+    let entity_type_str = entity_type.to_string();
+
+    dbg!(&entity_type_str);
+
+    let entity_type_result = key_type_entity::Entity::find()
+        .filter(key_type_entity::Column::Name.eq(entity_type_str))
+        .one(&keys_client.client)
+        .await;
+
+    let entity_type_id = match entity_type_result {
+        Err(err) => {
+            return GetKeyResult::Err(handle_server_error_body(
+                "Database Error",
+                err,
+                &config,
+                None,
+            ))
+        }
+        Ok(None) => {
+            return GetKeyResult::Err(handle_server_error_body(
+                "Database Error",
+                CustomError::EntityKeyNotFound(entity_type, entity_id),
+                &config,
+                Some(ServerErrorType::NotFound),
+            ))
+        }
+        Ok(Some(entity_type)) => entity_type.id,
+    };
+
     let entity_key_result = keys_entity::Entity::find()
         .filter(keys_entity::Column::EntityId.eq(entity_id))
-        .filter(keys_entity::Column::EntityType.eq(entity_type))
+        .filter(keys_entity::Column::EntityType.eq(entity_type_id))
         .one(&keys_client.client)
         .await;
 
@@ -125,13 +155,10 @@ pub fn decrypt_database_external_client(
     let name = decrypt_field(&fernet, &external_client.name)
         .map_err(|err| CustomError::UnsuccessfulDecryption("name".to_string(), err))?;
 
-    let login = decrypt_field(&fernet, &external_client.login)
-        .map_err(|err| CustomError::UnsuccessfulDecryption("login".to_string(), err))?;
-
     Ok(ExternalClientPublic {
         id: external_client.id,
         name,
-        login,
+        login: external_client.login,
         created_at: external_client.created_at.format("%Y-%m-%d").to_string(),
         disabled_since: match external_client.disabled_since {
             Some(dt) => Some(dt.format("%Y-%m-%d").to_string()),

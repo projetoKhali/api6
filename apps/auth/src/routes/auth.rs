@@ -49,15 +49,15 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .route("/logout", web::post().to(logout)),
     )
     .service(
-        web::scope("")
+        web::scope("/register")
             .wrap(HttpAuthentication::bearer(validator))
-            .route("/register", web::post().to(register)),
+            .route("/", web::post().to(register)),
     );
 }
 
 #[utoipa::path(
     post,
-    path = "/register",
+    path = "/register/",
     request_body = UserRegisterRequest,
     responses(
         (status = 200, description = "User registered"),
@@ -102,7 +102,7 @@ pub async fn register(
     let new_user_key = keys_entity::ActiveModel {
         id: NotSet,
         entity_id: Set(inserted_user.id),
-        entity_type: Set(EntityType::User),
+        entity_type: Set(1), // TODO: select id instead
         key: Set(new_user_decryption_key.clone()),
     };
 
@@ -191,11 +191,7 @@ pub async fn login(
     };
 
     if verify(&data.password, &decrypted_password).unwrap_or(false) {
-        let token = create_jwt(
-          &user.id.to_string(),
-          EntityType::User,
-          &config.jwt_secret,
-        );
+        let token = create_jwt(&user.id.to_string(), EntityType::User, &config.jwt_secret);
         HttpResponse::Ok().json(UserLoginResponse {
             token,
             id: user.id,
@@ -222,7 +218,7 @@ pub async fn validate_token(
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret, &keys_client.client).await {
+    match verify_jwt(&data.token, &config.jwt_secret, &keys_client).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
         Err(err) => handle_server_error_body("Invalid token", err, &config, None),
     }

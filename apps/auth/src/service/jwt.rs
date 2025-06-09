@@ -1,3 +1,4 @@
+use crate::infra::server::DatabaseClientKeys;
 use crate::infra::types::Config;
 use crate::models::{jwt::*, EntityType};
 use actix_web::dev::ServiceRequest;
@@ -33,15 +34,14 @@ async fn extract_claims(
         .jwt_secret
         .clone();
 
-    let db = req
-        .app_data::<web::Data<DatabaseConnection>>()
+    let keys_client = req
+        .app_data::<web::Data<DatabaseClientKeys>>()
         .ok_or_else(|| {
             actix_web::error::ErrorInternalServerError("Database connection not configured")
         })?
-        .get_ref()
-        .clone();
+        .get_ref();
 
-    let token_data = verify_jwt(credentials.token(), &jwt_secret, &db)
+    let token_data = verify_jwt(credentials.token(), &jwt_secret, &keys_client)
         .await
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid or revoked token"))?;
 
@@ -54,11 +54,33 @@ pub async fn validator(
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
     let claims = match extract_claims(&req, &credentials).await {
         Ok(claims) => claims,
-        Err(err) => return Err((err, req)),
+        Err(_) => {
+            return Err((
+                actix_web::error::ErrorUnauthorized("Error extracting claims"),
+                req,
+            ))
+        } // Err(err) => return Err((err, req)),
     };
 
     req.extensions_mut().insert(claims);
     Ok(req)
+}
+
+pub async fn validate_entity_type(
+    claims: &Claims,
+    entity_type: EntityType,
+) -> Result<ClaimsSubject, actix_web::Error> {
+    let subject = claims
+        .parse_subject()
+        .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid token subject"))?;
+
+    if subject.entity_type != entity_type {
+        return Err(actix_web::error::ErrorUnauthorized(
+            "Invalid token entity type",
+        ));
+    }
+
+    Ok(subject)
 }
 
 pub async fn validator_entity_type(
@@ -68,25 +90,18 @@ pub async fn validator_entity_type(
 ) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)> {
     let claims = match extract_claims(&req, &credentials).await {
         Ok(claims) => claims,
-        Err(err) => return Err((err, req)),
-    };
-
-    let subject = match claims.parse_subject() {
-        Ok(subject) => subject,
         Err(_) => {
             return Err((
-                actix_web::error::ErrorUnauthorized("Invalid token subject"),
+                actix_web::error::ErrorUnauthorized("Error extracting claims"),
                 req,
-            ))
-        }
+            ));
+        } // Err(err) => return Err((err, req)),
     };
 
-    if subject.entity_type != entity_type {
-        return Err((
-            actix_web::error::ErrorUnauthorized("Invalid token entity type"),
-            req,
-        ));
-    }
+    let subject = match validate_entity_type(&claims, entity_type).await {
+        Ok(subject) => subject,
+        Err(err) => return Err((err, req)),
+    };
 
     req.extensions_mut().insert(subject);
     Ok(req)
@@ -116,7 +131,7 @@ pub async fn validator_authorized_client(
 pub async fn verify_jwt(
     token: &str,
     jwt_secret: &str,
-    db: &DatabaseConnection,
+    keys_client: &DatabaseClientKeys,
 ) -> Result<TokenData<Claims>, VerificationError> {
     let token_data = decode::<Claims>(
         token,
@@ -126,7 +141,7 @@ pub async fn verify_jwt(
 
     let jti = &token_data.claims.jti;
     if revoked_token::Entity::find_by_id(jti.clone())
-        .one(db)
+        .one(&keys_client.client)
         .await?
         .is_some()
     {

@@ -9,6 +9,6 @@ pub struct LoginButtonTemplate {
 #[derive(Template)]
 #[template(path = "portability/authorization_form.html")]
 pub struct LoginFormTemplate {
+    pub auth_url: String,
     pub client_name: String,
-    pub client_id: i64,
 }

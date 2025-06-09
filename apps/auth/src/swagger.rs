@@ -19,10 +19,10 @@ use utoipa::OpenApi;
         routes::user::delete_user,
 
         // External Client Authentication routes
-        routes::external_client_auth::register,
-        routes::external_client_auth::login,
-        routes::external_client_auth::validate_token,
-        routes::external_client_auth::logout,
+        routes::external_client_auth::external_client_register,
+        routes::external_client_auth::external_client_login,
+        routes::external_client_auth::external_client_validate_token,
+        routes::external_client_auth::external_client_logout,
 
         // External Client _RUD routes
         routes::external_client::get_external_clients,
@@ -30,6 +30,11 @@ use utoipa::OpenApi;
         routes::external_client::update_external_client,
         routes::external_client::delete_external_client,
 
+        // Portability routes
+        routes::portability::button,
+        routes::portability::screen,
+        routes::portability::authorize,
+        routes::portability::portability,
     ),
     components(schemas(
 
@@ -43,14 +48,15 @@ use utoipa::OpenApi;
         models::auth::ExternalClientLoginResponse,
 
         models::auth::ValidateRequest,
+        models::auth::PortabilityScreenQuery,
 
-        // User models
+        // models
         models::UserPublic,
         models::UserUpdate,
-
-        // External Client models
+        models::UserPortability,
         models::ExternalClientPublic,
         models::ExternalClientUpdate,
+
 
         // Entities
         entities::user::Model,
@@ -61,7 +67,9 @@ use utoipa::OpenApi;
 
         (name = "Auth", description = "Authentication endpoints"),
         (name = "User", description = "User management endpoints"),
-        (name = "External Client", description = "External Client management endpoints")
+        (name = "External Client", description = "External Client management endpoints"),
+        (name = "External Client Auth", description = "External client authentication endpoints"),
+        (name = "Portability", description = "Portability related endpoints"),
 
     )
 )]

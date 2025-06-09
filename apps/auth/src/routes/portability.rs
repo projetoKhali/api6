@@ -1,5 +1,5 @@
 use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Responder};
-use actix_web_httpauth::middleware::HttpAuthentication;
+use actix_web_httpauth::{extractors::bearer::BearerAuth, middleware::HttpAuthentication};
 use askama::Template;
 use bcrypt::verify;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
@@ -14,9 +14,14 @@ use crate::{
         DatabaseClientPostgres, //
     },
     models::{
-        auth::{ExternalClientLoginResponse, LoginRequest},
-        jwt::ClaimsSubject,
+        auth::{
+            ExternalClientLoginResponse,
+            LoginRequest, //
+            PortabilityScreenQuery,
+        },
+        jwt::ClaimsSubject, //
         EntityType,
+        UserPortability,
     },
     routes::common::{
         handle_server_error_body,
@@ -31,35 +36,44 @@ use crate::{
             GetKeyResult, //
         },
         jwt::{
-            create_jwt, //
+            create_jwt,
+            validate_entity_type,
             validator_authorized_client,
             validator_external_client,
+            verify_jwt, //
         },
     },
-    templates::engine::{LoginButtonTemplate, LoginFormTemplate},
+    templates::{
+        LoginButtonTemplate,
+        LoginFormTemplate, //
+    },
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/portability/button") //
-            .route("/", web::get().to(button)),
+        web::scope("/portability_button") //
+            .wrap(HttpAuthentication::bearer(validator_external_client))
+            .route("/button", web::get().to(button)),
+    )
+    .service(
+        web::scope("/portability/screen") //
+            .route("/", web::get().to(screen)),
     )
     .service(
         web::scope("/portability/auth")
             .wrap(HttpAuthentication::bearer(validator_external_client))
-            .route("/screen", web::get().to(screen))
             .route("/authorize", web::post().to(authorize)),
     )
     .service(
         web::scope("/portability/data")
             .wrap(HttpAuthentication::bearer(validator_authorized_client))
-            .route("/", web::post().to(portability)),
+            .route("/", web::get().to(portability)),
     );
 }
 
 #[utoipa::path(
     get,
-    path = "/portability/button",
+    path = "/portability_button",
     responses(
         (status = 200, description = "Returns the portability button HTML"),
         (status = 500, description = "Database error")
@@ -67,14 +81,15 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     tags = ["Portability"]
 )]
 
-pub async fn button(req: HttpRequest) -> impl Responder {
-    let client_id = match req.extensions().get::<ClaimsSubject>() {
-        Some(subject) => subject.id.to_string(),
-        None => return HttpResponse::Unauthorized().body("Unauthorized"),
-    };
-
+pub async fn button(req: HttpRequest, credentials: BearerAuth) -> impl Responder {
     let tmpl = LoginButtonTemplate {
-        popup_url: format!("/login-form/{}", client_id),
+        popup_url: format!(
+            "{}/portability/screen/?token={}",
+            req.app_data::<web::Data<crate::infra::types::Config>>()
+                .unwrap()
+                .get_app_url(),
+            credentials.token(),
+        ),
     };
     HttpResponse::Ok().content_type("text/html").body(
         tmpl.render()
@@ -84,7 +99,7 @@ pub async fn button(req: HttpRequest) -> impl Responder {
 
 #[utoipa::path(
     get,
-    path = "/portability/auth/screen",
+    path = "/portability/screen",
     responses(
         (status = 200, description = "Returns the authorization screen HTML"),
         (status = 500, description = "Database error")
@@ -96,12 +111,23 @@ pub async fn screen(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
-    req: HttpRequest,
+    query: web::Query<PortabilityScreenQuery>,
 ) -> impl Responder {
-    let client_id = match req.extensions().get::<ClaimsSubject>() {
-        Some(subject) => subject.id.to_string(),
-        None => return HttpResponse::Unauthorized().body("Unauthorized"),
+    let token = &query.token;
+
+    let claims = match verify_jwt(&token, &config.jwt_secret, &keys_client).await {
+        Ok(token_data) => token_data.claims,
+        Err(err) => {
+            return handle_server_error_body("Invalid or expired token", err, &config, None)
+        }
     };
+
+    let client_id = match validate_entity_type(&claims, EntityType::ExternalClient).await {
+        Ok(subject) => subject.id,
+        Err(err) => return handle_server_error_body("Invalid token", err, &config, None),
+    };
+
+    dbg!(&client_id);
 
     let external_client_result =
         external_client_entity::Entity::find_by_id(client_id.parse::<i64>().unwrap())
@@ -139,8 +165,11 @@ pub async fn screen(
     };
 
     let tmpl = LoginFormTemplate {
+        auth_url: format!(
+            "{}/portability/auth/authorize",
+            config.get_app_url()
+        ),
         client_name: external_client.name,
-        client_id: external_client.id,
     };
     HttpResponse::Ok().content_type("text/html").body(
         tmpl.render()
@@ -303,7 +332,11 @@ pub async fn portability(
         };
 
     match decrypt_database_user(&user_decryption_key, encrypted_user) {
-        Ok(decrypted_user) => HttpResponse::Ok().json(decrypted_user),
+        Ok(decrypted_user) => HttpResponse::Ok().json(UserPortability {
+            name: decrypted_user.name,
+            login: decrypted_user.login,
+            email: decrypted_user.email,
+        }),
         Err(err) => handle_server_error_body("Parse error", err, &config, None),
     }
 }

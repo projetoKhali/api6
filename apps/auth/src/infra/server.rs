@@ -23,7 +23,7 @@ pub struct DatabaseClientKeys {
 }
 
 pub async fn create_server(config: Config) -> std::io::Result<Server> {
-    let server_port = config.server_port;
+    let server_port = config.app_port;
 
     let db_postgres_client_data = web::Data::new(DatabaseClientPostgres {
         client: db::create_seaorm_connection(

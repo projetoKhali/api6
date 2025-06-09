@@ -4,7 +4,6 @@ use actix_web::{
     HttpResponse,
     Responder,
 };
-use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::{
@@ -40,30 +39,29 @@ use super::common::{handle_server_error_body, handle_server_error_string, Custom
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/client/auth")
-            .route("/login", web::post().to(login))
-            .route("/validate", web::post().to(validate_token))
-            .route("/logout", web::post().to(logout)),
+        web::scope("/client_auth")
+            .route("/login", web::post().to(external_client_login))
+            .route("/validate", web::post().to(external_client_validate_token))
+            .route("/logout", web::post().to(external_client_logout)),
     )
     .service(
-        web::scope("/client")
-            .wrap(HttpAuthentication::bearer(validator))
-            .route("/register", web::post().to(register)),
+        web::scope("/client") //
+            .route("/register", web::post().to(external_client_register)),
     );
 }
 
 #[utoipa::path(
     post,
-    path = "/register",
+    path = "/client/register",
     request_body = ExternalClientRegisterRequest,
     responses(
         (status = 200, description = "ExternalClient registered"),
         (status = 500, description = "Hashing or Database error")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn register(
+pub async fn external_client_register(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
@@ -101,7 +99,7 @@ pub async fn register(
     let new_external_client_key = keys_entity::ActiveModel {
         id: NotSet,
         entity_id: Set(inserted_external_client.id),
-        entity_type: Set(EntityType::ExternalClient),
+        entity_type: Set(2), // TODO: select id instead
         key: Set(new_external_client_decryption_key.clone()),
     };
 
@@ -120,17 +118,17 @@ pub async fn register(
 
 #[utoipa::path(
     post,
-    path = "/auth/login",
+    path = "/client_auth/login",
     request_body = LoginRequest,
     responses(
         (status = 200, description = "Login successful", body = ExternalClientLoginResponse),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Database error")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn login(
+pub async fn external_client_login(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
@@ -192,21 +190,21 @@ pub async fn login(
 
 #[utoipa::path(
     post,
-    path = "/auth/validate",
+    path = "/client_auth/validate",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token is valid", body = Claims),
         (status = 401, description = "Invalid token")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn validate_token(
+pub async fn external_client_validate_token(
     data: web::Json<ValidateRequest>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
 ) -> impl Responder {
-    match verify_jwt(&data.token, &config.jwt_secret, &keys_client.client).await {
+    match verify_jwt(&data.token, &config.jwt_secret, &keys_client).await {
         Ok(claims) => HttpResponse::Ok().json(claims.claims),
         Err(err) => handle_server_error_body("Invalid token", err, &config, None),
     }
@@ -214,15 +212,15 @@ pub async fn validate_token(
 
 #[utoipa::path(
     post,
-    path = "/auth/logout",
+    path = "/client_auth/logout",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token invalidated")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn logout(
+pub async fn external_client_logout(
     req: HttpRequest,
     keys_client: web::Data<DatabaseClientPostgres>,
     config: web::Data<crate::infra::types::Config>,

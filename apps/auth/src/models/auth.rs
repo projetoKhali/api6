@@ -42,3 +42,8 @@ pub struct ExternalClientLoginResponse {
 pub struct ValidateRequest {
     pub token: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct PortabilityScreenQuery {
+    pub token: String,
+}

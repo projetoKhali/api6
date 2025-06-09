@@ -25,3 +25,11 @@ pub struct UserUpdate {
     pub role_id: Option<i64>,
     pub disabled_since: Option<Option<String>>,
 }
+
+#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserPortability {
+    pub name: String,
+    pub login: String,
+    pub email: String,
+}

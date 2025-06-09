@@ -39,19 +39,19 @@ use crate::{
             get_entity_key,
             GetKeyResult,
         },
-        jwt::validator,
+        jwt::validator_user,
     },
 };
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/users")
-            .wrap(HttpAuthentication::bearer(validator))
+            .wrap(HttpAuthentication::bearer(validator_user))
             .route("/", web::post().to(get_users)), //
     )
     .service(
         web::scope("/user")
-            .wrap(HttpAuthentication::bearer(validator))
+            .wrap(HttpAuthentication::bearer(validator_user))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
