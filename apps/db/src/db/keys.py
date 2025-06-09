@@ -2,8 +2,9 @@ import datetime
 import os
 from dotenv import load_dotenv
 from sqlalchemy import (
-    Date,
     DateTime,
+    ForeignKey,
+    UniqueConstraint,
     create_engine,
     text,
     Column,
@@ -33,13 +34,40 @@ def get_keys_engine():
 Base = declarative_base()
 
 
-class UserKey(Base):
-    __tablename__ = "user_key"
+class EntityType(Base):
+    __tablename__ = "entity_type"
     id = Column(
         BigInteger,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
     )
-    key = Column(String, unique=True, nullable=False)
+    name = Column(String, unique=True, nullable=False)
+
+
+class EntityKey(Base):
+    __tablename__ = "entity_key"
+    id = Column(
+        BigInteger,
+        primary_key=True,
+        autoincrement=True
+    )
+    entity_id = Column(
+        BigInteger,
+        nullable=False
+    )
+    key = Column(String, nullable=False)
+    entity_type = Column(
+        BigInteger,
+        ForeignKey("entity_type.id"),
+        nullable=False
+    )
+    __table_args__ = (
+        UniqueConstraint(
+            'entity_type',
+            'entity_id',
+            name='uq_entity_type_entity_id'
+        ),
+    )
 
 
 class RevokedToken(Base):

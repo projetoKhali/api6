@@ -4,7 +4,6 @@ use actix_web::{
     HttpResponse,
     Responder,
 };
-use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use fernet::Fernet;
 use sea_orm::{
@@ -15,14 +14,11 @@ use sea_orm::{
     QueryFilter,
     Set,
 };
-use sea_query::Query;
 
 use crate::{
     entities::{
         entity_key as keys_entity,
-        permission as permission_entity,
-        role_permission as role_permission_entity,
-        user as user_entity, //
+        external_client as external_client_entity, //
     },
     infra::server::{
         DatabaseClientKeys,
@@ -43,74 +39,75 @@ use super::common::{handle_server_error_body, handle_server_error_string, Custom
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/auth")
-            .route("/login", web::post().to(login))
-            .route("/validate", web::post().to(validate_token))
-            .route("/logout", web::post().to(logout)),
+        web::scope("/client_auth")
+            .route("/login", web::post().to(external_client_login))
+            .route("/validate", web::post().to(external_client_validate_token))
+            .route("/logout", web::post().to(external_client_logout)),
     )
     .service(
-        web::scope("/register")
-            .wrap(HttpAuthentication::bearer(validator))
-            .route("/", web::post().to(register)),
+        web::scope("/client") //
+            .route("/register", web::post().to(external_client_register)),
     );
 }
 
 #[utoipa::path(
     post,
-    path = "/register/",
-    request_body = UserRegisterRequest,
+    path = "/client/register",
+    request_body = ExternalClientRegisterRequest,
     responses(
-        (status = 200, description = "User registered"),
+        (status = 200, description = "ExternalClient registered"),
         (status = 500, description = "Hashing or Database error")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn register(
+pub async fn external_client_register(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
-    data: web::Json<UserRegisterRequest>,
+    data: web::Json<ExternalClientRegisterRequest>,
 ) -> impl Responder {
     let hashed = match hash(&data.password, DEFAULT_COST) {
         Ok(h) => h,
         Err(err) => handle_server_error_string("Hashing error", err, &config),
     };
 
-    let new_user_decryption_key = Fernet::generate_key();
+    let new_external_client_decryption_key = Fernet::generate_key();
 
-    let fernet = Fernet::new(&new_user_decryption_key).unwrap();
+    let fernet = Fernet::new(&new_external_client_decryption_key).unwrap();
 
-    let new_user = user_entity::ActiveModel {
-        id: NotSet,
+    let new_external_client = external_client_entity::ActiveModel {
         name: Set(encrypt_field(&fernet, &data.name)),
         login: Set(encrypt_field(&fernet, &data.login)),
-        email: Set(encrypt_field(&fernet, &data.email)),
         password: Set(encrypt_field(&fernet, &hashed)),
-        version_terms_agreement: Set(encrypt_field(&fernet, &data.version_terms)),
-        role_id: Set(data.role_id),
         disabled_since: NotSet,
+        ..Default::default()
     };
 
-    let inserted_user = match new_user.insert(&postgres_client.client).await {
-        Ok(inserted_user) => inserted_user,
+    let inserted_external_client = match new_external_client.insert(&postgres_client.client).await {
+        Ok(inserted_external_client) => inserted_external_client,
         Err(err) => {
-            return handle_server_error_body("Failed to register user: {:?}", err, &config, None)
+            return handle_server_error_body(
+                "Failed to register external_client: {:?}",
+                err,
+                &config,
+                None,
+            )
         }
     };
 
-    let new_user_key = keys_entity::ActiveModel {
+    let new_external_client_key = keys_entity::ActiveModel {
         id: NotSet,
-        entity_id: Set(inserted_user.id),
-        entity_type: Set(1), // TODO: select id instead
-        key: Set(new_user_decryption_key.clone()),
+        entity_id: Set(inserted_external_client.id),
+        entity_type: Set(2), // TODO: select id instead
+        key: Set(new_external_client_decryption_key.clone()),
     };
 
-    match new_user_key.insert(&keys_client.client).await {
-        Ok(_) => HttpResponse::Ok().body("User registered"),
+    match new_external_client_key.insert(&keys_client.client).await {
+        Ok(_) => HttpResponse::Ok().body("ExternalClient registered"),
         Err(err) => {
             return handle_server_error_body(
-                "Failed to register user key: {:?}",
+                "Failed to register external_client key: {:?}",
                 err,
                 &config,
                 None,
@@ -121,46 +118,52 @@ pub async fn register(
 
 #[utoipa::path(
     post,
-    path = "/auth/login",
+    path = "/client_auth/login",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "Login successful", body = UserLoginResponse),
+        (status = 200, description = "Login successful", body = ExternalClientLoginResponse),
         (status = 401, description = "Unauthorized"),
         (status = 500, description = "Database error")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn login(
+pub async fn external_client_login(
     postgres_client: web::Data<DatabaseClientPostgres>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
     data: web::Json<LoginRequest>,
 ) -> impl Responder {
-    let user_result = user_entity::Entity::find()
-        .filter(user_entity::Column::Login.eq(data.login.clone()))
+    let external_client_result = external_client_entity::Entity::find()
+        .filter(external_client_entity::Column::Login.eq(data.login.clone()))
         .one(&postgres_client.client)
         .await;
 
-    let user = match user_result {
-        Ok(Some(user)) => user,
-        Ok(None) => return HttpResponse::Unauthorized().body("User not found"),
+    let external_client = match external_client_result {
+        Ok(Some(external_client)) => external_client,
+        Ok(None) => return HttpResponse::Unauthorized().body("ExternalClient not found"),
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    if user.disabled_since.is_some() {
-        return HttpResponse::Unauthorized().body("Inactive user");
+    if external_client.disabled_since.is_some() {
+        return HttpResponse::Unauthorized().body("Inactive external_client");
     }
 
-    let user_decryption_key =
-        match get_entity_key(user.id, EntityType::User, &keys_client, &config).await {
-            GetKeyResult::Ok(key) => key,
-            GetKeyResult::Err(err) => return err,
-        };
+    let external_client_decryption_key = match get_entity_key(
+        external_client.id,
+        EntityType::ExternalClient,
+        &keys_client,
+        &config,
+    )
+    .await
+    {
+        GetKeyResult::Ok(key) => key,
+        GetKeyResult::Err(err) => return err,
+    };
 
     let decrypted_password = match decrypt_field(
-        &fernet::Fernet::new(&user_decryption_key).unwrap(),
-        &user.password,
+        &fernet::Fernet::new(&external_client_decryption_key).unwrap(),
+        &external_client.password,
     ) {
         Ok(p) => p,
         Err(err) => {
@@ -173,30 +176,13 @@ pub async fn login(
         }
     };
 
-    let permissions = match permission_entity::Entity::find()
-        .filter(
-            permission_entity::Column::Id.in_subquery(
-                Query::select()
-                    .column(role_permission_entity::Column::PermissionId)
-                    .from(role_permission_entity::Entity)
-                    .and_where(role_permission_entity::Column::RoleId.eq(user.role_id))
-                    .to_owned(),
-            ),
-        )
-        .all(&postgres_client.client)
-        .await
-    {
-        Ok(permissions) => permissions.into_iter().map(|p| p.name).collect(),
-        Err(err) => return handle_server_error_body("Database Error", err, &config, None),
-    };
-
     if verify(&data.password, &decrypted_password).unwrap_or(false) {
-        let token = create_jwt(&user.id.to_string(), EntityType::User, &config.jwt_secret);
-        HttpResponse::Ok().json(UserLoginResponse {
-            token,
-            id: user.id,
-            permissions,
-        })
+        let token = create_jwt(
+            &external_client.id.to_string(),
+            EntityType::ExternalClient,
+            &config.jwt_secret,
+        );
+        HttpResponse::Ok().json(ExternalClientLoginResponse { token })
     } else {
         HttpResponse::Unauthorized().body("Invalid credentials")
     }
@@ -204,16 +190,16 @@ pub async fn login(
 
 #[utoipa::path(
     post,
-    path = "/auth/validate",
+    path = "/client_auth/validate",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token is valid", body = Claims),
         (status = 401, description = "Invalid token")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn validate_token(
+pub async fn external_client_validate_token(
     data: web::Json<ValidateRequest>,
     keys_client: web::Data<DatabaseClientKeys>,
     config: web::Data<crate::infra::types::Config>,
@@ -226,15 +212,15 @@ pub async fn validate_token(
 
 #[utoipa::path(
     post,
-    path = "/auth/logout",
+    path = "/client_auth/logout",
     request_body = ValidateRequest,
     responses(
         (status = 200, description = "Token invalidated")
     ),
-    tags = ["Auth"]
+    tags = ["External Client Auth"]
 )]
 
-pub async fn logout(
+pub async fn external_client_logout(
     req: HttpRequest,
     keys_client: web::Data<DatabaseClientPostgres>,
     config: web::Data<crate::infra::types::Config>,

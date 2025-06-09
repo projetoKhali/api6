@@ -29,7 +29,7 @@ export const getUser = async (id: number): Promise<User> => {
 
 export const createUser = async (newUser: NewUser): Promise<User> => {
   return await processPOST<NewUser, User>({
-    path: `/register`,
+    path: `/register/`,
     body: newUser,
     overrideURL: AUTH_BASE_URL,
   });

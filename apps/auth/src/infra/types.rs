@@ -10,7 +10,8 @@ pub struct DatabaseConfig {
 
 pub struct Config {
     pub database_clients: HashMap<String, DatabaseConfig>,
-    pub server_port: u16,
+    pub app_host: String,
+    pub app_port: u16,
     pub jwt_secret: String,
     pub dev_mode: bool,
 }
@@ -20,6 +21,13 @@ impl Config {
         match self.database_clients.get(name) {
             Some(config) => config,
             None => panic!("Database config not found for `{}`", name),
+        }
+    }
+
+    pub fn get_app_url(&self) -> String {
+        match self.app_host.as_str() {
+            "localhost" => format!("http://{}:{}", self.app_host, self.app_port),
+            _ => format!("https://{}", self.app_host),
         }
     }
 }

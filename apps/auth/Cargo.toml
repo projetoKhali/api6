@@ -37,5 +37,6 @@ thiserror = "2.0.12"
 fernet = "0.2.2"
 base64 = "0.22.1"
 actix-web-httpauth = "0.8.2"
+askama = "0.14.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

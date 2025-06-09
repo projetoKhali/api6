@@ -4,7 +4,7 @@ export interface User {
   login: string;
   email: string;
   versionTerms: string;
-  permissionId: number;
+  roleId: number;
   disabledSince?: string;
 }
 
