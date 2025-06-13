@@ -6,7 +6,7 @@ import yaml
 from jinja2 import Template
 from cryptography.fernet import Fernet
 
-from db.pg_keys import Session as KeysSession, UserKey
+from db.keys import Session as KeysSession, UserKey
 from db.postgres import Session, User
 
 def decrypt(cipher_text: str, key:bytes):
@@ -32,7 +32,7 @@ def load_config():
 def filter_users(session, filters):
     query = session.query(User)
     users = query.all()
-    
+
     if not users:
         return []
 
@@ -53,7 +53,7 @@ def filter_users(session, filters):
                 'name': decrypt(user.name, key),
                 'email': decrypt(user.email, key),
                 'login': user.login,
-                'permission_id': user.permission_id,
+                'role_id': user.role_id,
                 'disabled_since': user.disabled_since
             })
         except Exception as e:
@@ -63,9 +63,9 @@ def filter_users(session, filters):
     filtered_users = []
     for user in decrypted_users:
         skip = False
-        
-        if 'permission_id' in filters and filters['permission_id'] is not None:
-            if user['permission_id'] != filters['permission_id']:
+
+        if 'role_id' in filters and filters['role_id'] is not None:
+            if user['role_id'] != filters['role_id']:
                 skip = True
 
         if 'disabled' in filters:
@@ -128,7 +128,7 @@ def main():
     session = Session()
     try:
         users = filter_users(session, filters)
-        
+
         if not users:
             print("Nenhum usuário encontrado com os filtros aplicados.")
             return

@@ -4,9 +4,9 @@ export type LoginRequest = {
 };
 
 export type LoginResponse = {
+  id?: number;
   token?: string;
-  userId: number;
-  permissions: string[];
+  permissions?: string[];
 };
 
 export type ValidateRequest = {

@@ -37,7 +37,9 @@ pub fn setup() -> Config {
             .parse()
             .unwrap(),
 
-        server_port: env::var("AUTH_APP_PORT")
+        app_host: env::var("AUTH_APP_HOST").unwrap_or_else(|_| "localhost".into()),
+
+        app_port: env::var("AUTH_APP_PORT")
             .unwrap_or_else(|_| "3000".into())
             .parse()
             .unwrap(),

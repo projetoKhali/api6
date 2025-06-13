@@ -13,8 +13,8 @@ import {
   processGET,
   processPOST,
   processRequest,
-  API_BASE_URL } from './service';
-  
+} from './service';
+
 const TERMS_BASE_PATH = '/terms';
 
 export class TermsService {
@@ -31,7 +31,9 @@ export class TermsService {
     });
   }
 
-  static async acceptTerms(data: UserAcceptanceRequest): Promise<{ success: boolean }> {
+  static async acceptTerms(
+    data: UserAcceptanceRequest
+  ): Promise<{ success: boolean }> {
     return await processPOST({
       path: `${TERMS_BASE_PATH}/user/accept`,
       body: data,
@@ -44,19 +46,14 @@ export class TermsService {
     });
   }
 
-  static async createNewVersion(data: NewTermVersionRequest): Promise<TermResponse> {
+  static async createNewVersion(
+    data: NewTermVersionRequest
+  ): Promise<TermResponse> {
     return await processPOST({
       path: `${TERMS_BASE_PATH}/new-version`,
       body: data,
     });
   }
-
-  // static async updateUserAcceptance(userId: string, data: UpdateAcceptanceRequest): Promise<{ success: boolean }> {
-  //   return await processRequest<'PUT', { success: boolean }>('PUT', {
-  //     path: `${TERMS_BASE_PATH}/user/update/${userId}`,
-  //     body: data,
-  //   });
-  // }
 
   static async checkCompliance(userId: string): Promise<ComplianceResponse> {
     return await processGET({
@@ -66,10 +63,10 @@ export class TermsService {
 
   static async hasUserAcceptedTerms(userId: string): Promise<boolean> {
     try {
-      const response = await processGET<{ 
-        _id: string; 
-        topics: { accepted: boolean; description: string; status: string }[]; 
-        user_id: string; 
+      const response = await processGET<{
+        _id: string;
+        topics: { accepted: boolean; description: string; status: string }[];
+        user_id: string;
       }>({
         path: `${TERMS_BASE_PATH}/user/${userId}`,
       });
@@ -90,25 +87,31 @@ export class TermsService {
 
       // Caso contrário, todos os termos ativos estão aceitos, retorna true
       return true;
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
       // Caso de erro na requisição, considera que usuário não aceitou
       return false;
     }
   }
 
-    static async getUserAcceptance(userId: string): Promise<{ _id: string; topics: AcceptedTopic[]; user_id: string }> {
-      return await processGET({
-          path: `${TERMS_BASE_PATH}/user/${userId}`
-      });
-  }
-
-  static async updateUserAcceptance(acceptanceId: string, data: UpdateAcceptanceRequest): Promise<{ success: boolean }> {
-        return await processRequest<UpdateAcceptanceRequest, { success: boolean }>('PUT', {
-      path: `${TERMS_BASE_PATH}/user/update/${acceptanceId}`,
-      body: data,
+  static async getUserAcceptance(
+    userId: number
+  ): Promise<{ _id: string; topics: AcceptedTopic[]; user_id: string }> {
+    return await processGET({
+      path: `${TERMS_BASE_PATH}/user/${userId}`,
     });
   }
 
-
+  static async updateUserAcceptance(
+    acceptanceId: string,
+    data: UpdateAcceptanceRequest
+  ): Promise<{ success: boolean }> {
+    return await processRequest<UpdateAcceptanceRequest, { success: boolean }>(
+      'PUT',
+      {
+        path: `${TERMS_BASE_PATH}/user/update/${acceptanceId}`,
+        body: data,
+      }
+    );
+  }
 }
-

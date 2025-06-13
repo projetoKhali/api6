@@ -1,0 +1,24 @@
+[tool.coverage.run]
+branch = true
+source = ["notif"]
+
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
+show_missing = true
+
+[tool.poetry]
+name = "notif"
+version = "1.0.0"
+license = "Proprietary"
+readme = "README.md"
+packages = [{ include = "notif", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "*"
+jinja2 = "*"
+
+db = { path = "../db/" }
+
+[tool.poetry.group.dev.dependencies]
+
+[tool.poetry-monorepo.deps]

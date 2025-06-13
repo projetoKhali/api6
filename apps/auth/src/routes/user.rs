@@ -1,26 +1,57 @@
 use actix_web::{web, HttpResponse, Responder};
+use actix_web_httpauth::middleware::HttpAuthentication;
 use bcrypt::{hash, DEFAULT_COST};
 use fernet::Fernet;
-use sea_orm::prelude::Date;
-use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect};
-
-use crate::entities::user as user_entity;
-use crate::infra::server::{DatabaseClientKeys, DatabaseClientPostgres};
-use crate::models::{PaginatedRequest, PaginatedResponse, UserPublic, UserUpdate};
-use crate::service::fernet::{
-    decrypt_database_user, encrypt_field, get_user_key, GetUserKeyResult,
+use sea_orm::{
+    prelude::Date,
+    ActiveModelTrait,
+    ActiveValue::{
+        NotSet,
+        Set, //
+    },
+    EntityTrait,
+    IntoActiveModel,
+    PaginatorTrait,
+    QuerySelect, //
 };
 
-use super::common::{handle_server_error_body, ServerErrorType};
+use crate::{
+    entities::user as user_entity,
+    infra::server::{
+        DatabaseClientKeys, //
+        DatabaseClientPostgres,
+    },
+    models::{
+        EntityType, //
+        PaginatedRequest,
+        PaginatedResponse,
+        UserPublic,
+        UserUpdate,
+    },
+    routes::common::{
+        handle_server_error_body,
+        ServerErrorType, //
+    },
+    service::{
+        fernet::{
+            decrypt_database_user, //
+            encrypt_field,
+            get_entity_key,
+            GetKeyResult,
+        },
+        jwt::validator_user,
+    },
+};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        //
-        web::scope("/users").route("/", web::post().to(get_users)),
+        web::scope("/users")
+            .wrap(HttpAuthentication::bearer(validator_user))
+            .route("/", web::post().to(get_users)), //
     )
     .service(
         web::scope("/user")
+            .wrap(HttpAuthentication::bearer(validator_user))
             .route("/{id}", web::get().to(get_user))
             .route("/{id}", web::put().to(update_user))
             .route("/{id}", web::delete().to(delete_user)),
@@ -64,10 +95,16 @@ async fn get_users(
     let mut users_public = Vec::with_capacity(raw_users.len());
 
     for encrypted_user in raw_users {
-        let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await
+        let user_decryption_key = match get_entity_key(
+            encrypted_user.id,
+            EntityType::User,
+            &keys_client,
+            &config,
+        )
+        .await
         {
-            GetUserKeyResult::Ok(key) => key,
-            GetUserKeyResult::Err(err) => return err,
+            GetKeyResult::Ok(key) => key,
+            GetKeyResult::Err(err) => return err,
         };
 
         users_public.push(
@@ -115,7 +152,9 @@ async fn get_user(
     config: web::Data<crate::infra::types::Config>,
     user_id: web::Path<i64>,
 ) -> impl Responder {
-    let result = user_entity::Entity::find_by_id(user_id.into_inner())
+    let user_id = user_id.into_inner();
+
+    let result = user_entity::Entity::find_by_id(user_id)
         .one(&postgres_client.client)
         .await;
 
@@ -124,10 +163,7 @@ async fn get_user(
         Ok(None) => {
             return handle_server_error_body(
                 "Database Error",
-                std::io::Error::new(
-                    std::io::ErrorKind::NotFound,
-                    "User not found in `users` table",
-                ),
+                super::common::CustomError::UserNotFound(user_id),
                 &config,
                 Some(ServerErrorType::NotFound),
             )
@@ -135,10 +171,11 @@ async fn get_user(
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    let user_decryption_key = match get_user_key(encrypted_user.id, &keys_client, &config).await {
-        GetUserKeyResult::Ok(key) => key,
-        GetUserKeyResult::Err(err) => return err,
-    };
+    let user_decryption_key =
+        match get_entity_key(encrypted_user.id, EntityType::User, &keys_client, &config).await {
+            GetKeyResult::Ok(key) => key,
+            GetKeyResult::Err(err) => return err,
+        };
 
     match decrypt_database_user(&user_decryption_key, encrypted_user) {
         Ok(decrypted_user) => HttpResponse::Ok().json(decrypted_user),
@@ -178,10 +215,11 @@ async fn update_user(
         Err(err) => return handle_server_error_body("Database Error", err, &config, None),
     };
 
-    let user_decryption_key = match get_user_key(*user_id, &keys_client, &config).await {
-        GetUserKeyResult::Ok(key) => key,
-        GetUserKeyResult::Err(err) => return err,
-    };
+    let user_decryption_key =
+        match get_entity_key(*user_id, EntityType::User, &keys_client, &config).await {
+            GetKeyResult::Ok(key) => key,
+            GetKeyResult::Err(err) => return err,
+        };
 
     user_update_model.disabled_since = match &user_update.disabled_since {
         Some(dt) => match dt {
@@ -219,8 +257,8 @@ async fn update_user(
         Some(ref version_terms) => Set(encrypt_field(&fernet, &version_terms)),
         None => NotSet,
     };
-    user_update_model.permission_id = match user_update.permission_id {
-        Some(permission_id) => Set(permission_id),
+    user_update_model.role_id = match user_update.role_id {
+        Some(role_id) => Set(role_id),
         None => NotSet,
     };
     user_update_model.password = match user_update.password {
@@ -256,7 +294,6 @@ async fn delete_user(
     user_id: web::Path<i64>,
 ) -> impl Responder {
     // TODO: use `disabled_since` field of `users` table
-    // OR insert user into `deleted_users` table
 
     let result = user_entity::Entity::delete_by_id(user_id.into_inner())
         .exec(&postgres_client.client)

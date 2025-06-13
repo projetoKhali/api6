@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Page, PageRequest, emptyPage } from '../schemas/pagination';
-import { getTokenFromLocalStorage } from '../store/storage';
+import { getLocalStorageData } from '../store/storage';
 
 export const API_BASE_URL = 'http://127.0.0.1:5000';
 export const AUTH_BASE_URL = 'http://127.0.0.1:3000';
@@ -37,7 +37,7 @@ export const processRequest = async <R, T>(
   params?: RequestParams<R>
 ): Promise<T> => {
   const { path, body, overrideURL } = params || {};
-  const token = getTokenFromLocalStorage();
+  const token = getLocalStorageData()?.token;
 
   const response = await axios.request<T>({
     url: `${overrideURL || API_BASE_URL}${path}`,

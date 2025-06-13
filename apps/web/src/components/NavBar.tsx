@@ -1,9 +1,6 @@
 import { logout } from '../service/AuthService';
 import { useNavigate } from 'react-router-dom';
-import {
-  clearLocalStorageData,
-  clearUserIdFromLocalStorage,
-} from '../store/storage';
+import { clearLocalStorageData, getLocalStorageData } from '../store/storage';
 import { useEffect, useState } from 'react';
 
 interface NavbarProps {
@@ -19,15 +16,12 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const permissions = localStorage.getItem('khali_api6:permissions');
+    const permissions = getLocalStorageData()?.permissions;
     if (permissions) {
-      const parsedPermissions = JSON.parse(permissions).map((p: string) =>
-        p.trim()
-      ); // <- aqui
-      setDashboard(parsedPermissions.includes('dashboard'));
-      setRegister(parsedPermissions.includes('register'));
-      setAnalitic(parsedPermissions.includes('analitic'));
-      setTerms(parsedPermissions.includes('terms'));
+      setDashboard(permissions.includes('dashboard'));
+      setRegister(permissions.includes('register'));
+      setAnalitic(permissions.includes('analitic'));
+      setTerms(permissions.includes('terms'));
     }
   }, []);
 
@@ -35,7 +29,6 @@ const Navbar = ({ setIsAuthenticated }: NavbarProps) => {
     try {
       await logout();
       setIsAuthenticated(false);
-      clearUserIdFromLocalStorage();
       clearLocalStorageData();
       navigate('/login');
     } catch (err) {
