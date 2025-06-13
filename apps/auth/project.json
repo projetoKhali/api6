@@ -16,6 +16,13 @@
         }
       }
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo watch -x run",
+        "cwd": "apps/auth"
+      }
+    },
     "serve": {
       "executor": "@monodon/rust:run",
       "outputs": ["{options.target-dir}"],
