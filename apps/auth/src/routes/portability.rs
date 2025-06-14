@@ -1,6 +1,7 @@
 use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_httpauth::{extractors::bearer::BearerAuth, middleware::HttpAuthentication};
 use askama::Template;
+use base64::Engine;
 use bcrypt::verify;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
@@ -82,6 +83,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 )]
 
 pub async fn button(req: HttpRequest, credentials: BearerAuth) -> impl Responder {
+    let bytes = include_bytes!("../../assets/khali-logo.png");
+    let logo_base64 = base64::engine::general_purpose::STANDARD.encode(bytes);
+
     let tmpl = LoginButtonTemplate {
         popup_url: format!(
             "{}/portability/screen/?token={}",
@@ -90,6 +94,7 @@ pub async fn button(req: HttpRequest, credentials: BearerAuth) -> impl Responder
                 .get_app_url(),
             credentials.token(),
         ),
+        logo_base64,
     };
     HttpResponse::Ok().content_type("text/html").body(
         tmpl.render()
@@ -165,10 +170,7 @@ pub async fn screen(
     };
 
     let tmpl = LoginFormTemplate {
-        auth_url: format!(
-            "{}/portability/auth/authorize",
-            config.get_app_url()
-        ),
+        auth_url: format!("{}/portability/auth/authorize", config.get_app_url()),
         client_name: external_client.name,
     };
     HttpResponse::Ok().content_type("text/html").body(

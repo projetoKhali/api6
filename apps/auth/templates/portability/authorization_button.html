@@ -1,9 +1,156 @@
-<button
-  onclick="window.open(
-    '{{ popup_url }}',
-    'Authorize external app',
-    'width=800,height=600'
-  )"
+<div
+  class="khali-button-wrapper"
+  style="position: relative; display: inline-block"
 >
-  Login via Khali
-</button>
+  <div class="rainbow-glow"></div>
+
+  <button
+    onclick="window.open('{{ popup_url }}', 'Authorize external app', 'width=800,height=600')"
+    class="khali-login-button"
+    id="khaliLoginBtn"
+    style="position: relative; z-index: 2"
+  >
+    <div class="logo-container" style="position: relative">
+      <img
+        src="data:image/svg+xml;base64,{{ logo_base64 }}"
+        alt="Khali Logo"
+        class="khali-logo"
+        style="
+          height: 1.75rem;
+          margin: 0.25rem 0.125rem 0.125rem 0.125rem;
+          position: relative;
+          z-index: 2;
+        "
+      />
+    </div>
+    <span>Login via Khali</span>
+  </button>
+</div>
+
+<style>
+  .rainbow-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140%;
+    height: 140%;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(
+      from 0deg,
+      #ff00aa,
+      #00ffff,
+      #ffff00,
+      #ff00aa,
+      #00ffff,
+      #ffff00,
+      #ff00aa
+    );
+    border-radius: 1rem;
+    filter: blur(30px);
+    opacity: 0;
+    z-index: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .khali-button-wrapper:hover .rainbow-glow {
+    opacity: 0.7;
+  }
+
+  .khali-login-button {
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 0.375rem;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    overflow: visible;
+    position: relative; /* needed for ::before */
+  }
+
+  .khali-login-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 0, 150, 0.3),
+      rgba(0, 229, 255, 0.3),
+      rgba(255, 255, 0, 0.3),
+      rgba(255, 0, 150, 0.3)
+    );
+    background-size: 300% 300%;
+    filter: blur(30px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+    animation: holo-foil 2s linear infinite;
+  }
+
+  .khali-login-button:hover::before {
+    opacity: 1;
+  }
+
+  .logo-container::after {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: -30%;
+    width: 160%;
+    height: 160%;
+    background: linear-gradient(
+      60deg,
+      rgba(255, 0, 150, 0.4),
+      rgba(0, 229, 255, 0.4),
+      rgba(255, 255, 0, 0.4),
+      rgba(255, 0, 150, 0.4)
+    );
+    background-size: 300% 300%;
+    filter: blur(10px);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    animation: holo-foil-logo 2s linear infinite;
+    pointer-events: none;
+  }
+
+  .khali-login-button:hover .logo-container::after {
+    opacity: 1;
+  }
+
+  @keyframes holo-foil {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes holo-foil-logo {
+    0% {
+      background-position: 100% 0%;
+    }
+    50% {
+      background-position: 0% 100%;
+    }
+    100% {
+      background-position: 100% 0%;
+    }
+  }
+</style>

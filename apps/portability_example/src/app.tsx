@@ -72,8 +72,25 @@ const App = () => {
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold">Auth Integration Demo</h1>
+    <div
+      style={{
+        padding: '16px',
+        maxWidth: '640px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '16px',
+      }}
+    >
+      <h1
+        style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+        }}
+      >
+        Auth Integration Demo
+      </h1>
 
       {/* Step 2: Render fetched button HTML */}
       {buttonHtml && (
@@ -87,7 +104,21 @@ const App = () => {
       {portabilityToken && !user && (
         <button
           onClick={fetchPortabilityData}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#2563eb',
+            color: '#ffffff',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+          }}
+          onMouseOver={(e) =>
+            (e.currentTarget.style.backgroundColor = '#1e40af')
+          }
+          onMouseOut={(e) =>
+            (e.currentTarget.style.backgroundColor = '#2563eb')
+          }
         >
           Fetch Portability Data
         </button>
@@ -95,8 +126,23 @@ const App = () => {
 
       {/* Step 5: Display user data */}
       {user && (
-        <div className="bg-gray-100 p-4 rounded shadow">
-          <h2 className="text-xl font-semibold">User Data</h2>
+        <div
+          style={{
+            backgroundColor: '#f3f4f6',
+            padding: '16px',
+            borderRadius: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              marginBottom: '8px',
+            }}
+          >
+            User Data
+          </h2>
           <p>
             <strong>Name:</strong> {user.name}
           </p>

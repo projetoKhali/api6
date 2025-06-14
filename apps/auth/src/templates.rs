@@ -4,6 +4,7 @@ use askama::Template;
 #[template(path = "portability/authorization_button.html")]
 pub struct LoginButtonTemplate {
     pub popup_url: String,
+    pub logo_base64: String,
 }
 
 #[derive(Template)]
